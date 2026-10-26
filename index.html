@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tower Sketch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Nunito:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  /* ===== ЦВЕТА САЙТА: три цвета из палитры Material 3 + нейтральные ===== */
+  :root {
+    --primary:  #6750A4;   /* 1. мягкий фиолетовый: кнопки, точки, акценты */
+    --lavender: #EADDFF;   /* 2. светло-сиреневый: плашки, выбранное */
+    --rose:     #FFD8E4;   /* 3. нежно-розовый: подсказки, метка на карте */
+    /* нейтральные (в счёт цветов не входят) */
+    --surface: #FEF7FF; --card: #F3EDF7; --paper: #FFFFFF;
+    --ink: #1D1B20; --ink2: #49454F; --line: #CAC4D0;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font-family: 'Nunito', 'Noto Sans KR', system-ui, sans-serif;
+    background: var(--surface); color: var(--ink);
+    min-height: 100vh; line-height: 1.55; overflow-x: hidden;
+  }
+  :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+  /* ---------- кнопки ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    height: 40px; padding: 0 24px; border: none; border-radius: 999px;
+    font: 500 .95rem/1 inherit; font-family: inherit; cursor: pointer;
+    background: var(--primary); color: #fff;
+    transition: box-shadow .2s, filter .2s, background .2s, transform .1s;
+  }
+  .btn:hover { box-shadow: 0 1px 4px rgba(29,27,32,.28); filter: brightness(1.06); }
+  .btn:active { transform: scale(.98); }
+  .btn:disabled { opacity: .5; cursor: wait; box-shadow: none; }
+  .btn svg { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
+  .btn.tonal { background: var(--lavender); color: var(--ink); }
+  .btn.tonal:hover { filter: brightness(.97); }
+  .btn.outline { background: transparent; color: var(--primary); box-shadow: inset 0 0 0 1px var(--line); }
+  .btn.outline:hover { background: rgba(103,80,164,.08); filter: none; }
+  .btn.text { background: transparent; color: var(--primary); padding: 0 16px; }
+  .btn.text:hover { background: rgba(103,80,164,.08); box-shadow: none; filter: none; }
+  .btn.text.active, .btn.text.on { background: var(--lavender); color: var(--ink); }
+  .btn.lg { height: 56px; padding: 0 32px; font-size: 1rem; }
+  .btn.sm { height: 34px; padding: 0 16px; font-size: .875rem; }
+
+  /* ---------- верхняя панель ---------- */
+  header {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    padding: 10px 24px; background: rgba(254,247,255,.9); backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(202,196,208,.5);
+  }
+  .langs { display: inline-flex; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; margin-left: 4px; }
+  .langs button { border: none; background: transparent; font: 500 .85rem/1 inherit; font-family: inherit; color: var(--primary); height: 34px; padding: 0 14px; cursor: pointer; }
+  .langs button:hover { background: rgba(103,80,164,.08); }
+  .langs button.on { background: var(--lavender); color: var(--ink); }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 1.1rem; letter-spacing: .01em; }
+  .logo svg { width: 28px; height: 28px; }
+  nav { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+
+  main { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 24px 24px 80px; }
+  .view { display: none; }
+  .view.active { display: block; }
+  .narrow { max-width: 900px; margin: 0 auto; }
+
+  /* ---------- Земля из точек на фоне главного экрана ---------- */
+  #globeBg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; display: none; }
+  body.is-home #globeBg { display: block; }
+  @media (max-width: 899px) { #globeBg { opacity: .55; } }
+
+  /* ---------- главная ---------- */
+  .hero { max-width: 560px; padding: clamp(36px, 9vh, 100px) 0 0; }
+  .hero h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); line-height: 1.12; font-weight: 500; letter-spacing: -.02em; }
+  .hero h1 span { color: var(--primary); }
+  .hero p { margin-top: 20px; font-size: 1.15rem; color: var(--ink2); max-width: 470px; }
+  .modes { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 36px; }
+  .home-contacts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: clamp(40px, 9vh, 90px); }
+  .home-contacts a {
+    display: inline-flex; align-items: center; height: 34px; padding: 0 16px; border-radius: 999px;
+    font-size: .875rem; color: var(--ink2); text-decoration: none; background: rgba(254,247,255,.85);
+    box-shadow: inset 0 0 0 1px var(--line); transition: background .2s, color .2s;
+  }
+  .home-contacts a:hover { background: var(--lavender); color: var(--ink); }
+
+  /* ---------- общие заголовки ---------- */
+  h2 { font-size: 2rem; font-weight: 500; letter-spacing: -.01em; }
+  .lead { color: var(--ink2); margin: 6px 0 24px; }
+
+  /* ---------- как это работает ---------- */
+  .steps { list-style: none; padding: 0; counter-reset: s; display: grid; gap: 12px; }
+  .steps li {
+    counter-increment: s; display: flex; gap: 16px; align-items: flex-start;
+    padding: 16px 20px; border-radius: 24px; background: var(--card);
+  }
+  .steps li::before {
+    content: counter(s); flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%;
+    background: var(--lavender); display: grid; place-items: center; font-weight: 500;
+  }
+
+  /* ---------- контакты ---------- */
+  .card { border-radius: 28px; padding: 8px 28px; background: var(--card); }
+  .contact-row { display: flex; gap: 12px; flex-wrap: wrap; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .contact-row:last-child { border: none; }
+  .contact-row b { min-width: 130px; font-weight: 500; color: var(--primary); }
+  .contact-row a { color: var(--ink); }
+  .contact-row a:hover { color: var(--primary); }
+
+  /* ---------- рисование ---------- */
+  .stage {
+    position: relative; width: 100%; max-width: 680px; margin: 0 auto; aspect-ratio: 4 / 3;
+    border-radius: 28px; overflow: hidden; background: var(--paper); border: 1px solid var(--line);
+  }
+  .stage video, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .stage video { object-fit: cover; transform: scaleX(-1); opacity: .5; }
+  .stage canvas { touch-action: none; }
+  #mouseCanvas { cursor: crosshair; }
+  .cursor {
+    position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%;
+    border: 3px solid var(--primary); pointer-events: none; display: none;
+  }
+  .cursor.draw { background: var(--primary); }
+  .toolbar { display: flex; gap: 8px; justify-content: center; align-items: center; margin: 16px 0; flex-wrap: wrap; }
+  .toolbar .label { font-size: .875rem; color: var(--ink2); margin-right: 4px; }
+  .hint { text-align: center; font-size: .95rem; color: var(--ink2); min-height: 1.6em; }
+  .hint.error { color: var(--primary); font-weight: 500; }
+
+  /* ---------- результаты ---------- */
+  .results-hint { margin: 28px 0 12px; font-weight: 500; }
+  .results { display: grid; gap: 12px; }
+  .result {
+    display: flex; gap: 16px; border-radius: 24px; overflow: hidden; background: var(--card); cursor: pointer;
+    transition: box-shadow .2s, transform .2s;
+  }
+  .result:hover { box-shadow: 0 3px 14px rgba(103,80,164,.2); transform: translateY(-2px); }
+  .result img, .result .noimg { width: 168px; min-height: 140px; object-fit: cover; flex-shrink: 0; background: var(--lavender); }
+  .result .body { padding: 14px 18px 14px 0; display: flex; flex-direction: column; gap: 2px; }
+  .result h3 { font-size: 1.15rem; font-weight: 500; }
+  .result .meta { font-size: .875rem; color: var(--ink2); }
+  .result p { font-size: .95rem; margin-top: 4px; }
+  .result .go { margin-top: auto; padding-top: 8px; color: var(--primary); font-weight: 500; font-size: .9rem; }
+  .bar { height: 6px; background: var(--lavender); border-radius: 3px; margin: 8px 0 4px; overflow: hidden; max-width: 260px; }
+  .bar i { display: block; height: 100%; background: var(--primary); border-radius: 3px; }
+  @media (max-width: 560px) {
+    .result { flex-direction: column; }
+    .result img, .result .noimg { width: 100%; height: 170px; }
+    .result .body { padding: 0 18px 16px; }
+  }
+
+  /* ---------- экран здания ---------- */
+  .detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; margin-top: 16px; align-items: start; }
+  .viewer-card {
+    position: sticky; top: 84px; aspect-ratio: 1 / 1; border-radius: 28px; overflow: hidden;
+    background: var(--card);
+  }
+  #modelCanvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+  #modelCanvas:active { cursor: grabbing; }
+  .v-hint { position: absolute; left: 0; right: 0; bottom: 12px; text-align: center; font-size: .8rem; color: var(--ink2); pointer-events: none; }
+  .v-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 24px; background: var(--card); }
+  .v-overlay[hidden] { display: none; }
+  .dots { display: flex; gap: 8px; }
+  .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--primary); animation: bounce 1.2s ease-in-out infinite; }
+  .dots i:nth-child(2) { animation-delay: .15s; } .dots i:nth-child(3) { animation-delay: .3s; }
+  @keyframes bounce { 0%, 80%, 100% { transform: scale(.55); opacity: .4; } 40% { transform: scale(1); opacity: 1; } }
+  .info-card { display: flex; flex-direction: column; gap: 16px; }
+  .chip { align-self: flex-start; padding: 4px 14px; border-radius: 999px; background: var(--lavender); font-size: .85rem; font-weight: 500; min-height: 28px; }
+  .chip:empty { display: none; }
+  .info-card h2 { font-size: 2.1rem; line-height: 1.15; }
+  .info-card .sub { color: var(--ink2); margin-top: -8px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+  .stat { padding: 14px 16px; border-radius: 20px; background: var(--lavender); }
+  .stat small { display: block; font-size: .8rem; color: var(--ink2); }
+  .stat b { font-size: 1.2rem; font-weight: 500; }
+  .summary { font-size: 1.02rem; }
+  .fact { padding: 16px 18px; border-radius: 20px; background: var(--rose); }
+  .fact[hidden] { display: none; }
+  .fact b { display: block; margin-bottom: 2px; }
+  .media { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .photo, .mini { position: relative; aspect-ratio: 4 / 3; border-radius: 20px; overflow: hidden; background: var(--card); margin: 0; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo figcaption, .mini .cap { position: absolute; left: 8px; bottom: 8px; padding: 2px 10px; border-radius: 999px; background: rgba(254,247,255,.88); font-size: .72rem; color: var(--ink2); }
+  #miniGlobe { width: 100%; height: 100%; display: block; }
+  .links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .links a { text-decoration: none; }
+  @media (max-width: 860px) {
+    .detail { grid-template-columns: 1fr; }
+    .viewer-card { position: relative; top: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+
+<body class="is-home">
+
+<canvas id="globeBg" aria-hidden="true"></canvas>
+
+<header>
+  <span class="logo">
+    <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12" fill="#EADDFF"/><g fill="#6750A4"><circle cx="9" cy="10" r="1.6"/><circle cx="14" cy="8" r="1.6"/><circle cx="19" cy="11" r="1.6"/><circle cx="11" cy="15" r="1.6"/><circle cx="16" cy="16" r="1.6"/><circle cx="20" cy="17" r="1.2"/><circle cx="13" cy="20" r="1.4"/></g></svg>
+    Tower Sketch
+  </span>
+  <nav>
+    <button class="btn text sm" id="btnHome" data-i18n="home"></button>
+    <button class="btn text sm" id="btnInfo" data-i18n="info"></button>
+    <button class="btn text sm" id="btnMusic"><svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg><span data-i18n="music"></span></button>
+    <div class="langs" id="langs"><button data-lang="en">EN</button><button data-lang="ko">한국어</button><button data-lang="ru">RU</button></div>
+  </nav>
+</header>
+
+<main>
+  <!-- ГЛАВНАЯ -->
+  <section class="view active" id="view-home">
+    <div class="hero">
+      <h1 data-i18n-html="heroTitle"></h1>
+      <p data-i18n="heroText"></p>
+      <div class="modes">
+        <button class="btn lg" id="goMouse"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg><span data-i18n="modeMouse"></span></button>
+        <button class="btn lg tonal" id="goCam"><svg viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4z"/></svg><span data-i18n="modeCam"></span></button>
+      </div>
+    </div>
+    <div class="home-contacts" id="homeContacts"></div>
+  </section>
+
+  <!-- КАК ЭТО РАБОТАЕТ -->
+  <section class="view narrow" id="view-info">
+    <h2 data-i18n="infoTitle"></h2>
+    <p class="lead" data-i18n="infoLead"></p>
+    <ol class="steps" id="infoSteps"></ol>
+  </section>
+
+  <!-- РИСОВАНИЕ МЫШЬЮ -->
+  <section class="view narrow" id="view-mouse">
+    <div class="toolbar">
+      <span class="label" data-i18n="tryIt"></span>
+      <button class="btn tonal sm" data-ex="triangle" data-i18n="exTriangle"></button>
+      <button class="btn tonal sm" data-ex="twin" data-i18n="exTwin"></button>
+      <button class="btn tonal sm" data-ex="spire" data-i18n="exSpire"></button>
+    </div>
+    <div class="stage"><canvas id="mouseCanvas" width="640" height="480"></canvas></div>
+    <div class="toolbar">
+      <button class="btn" id="mouseGuess" data-i18n="guess"></button>
+      <button class="btn outline" id="mouseUndo" data-i18n="undo"></button>
+      <button class="btn outline" id="mouseClear" data-i18n="clear"></button>
+      <button class="btn outline" id="mouseSave" data-i18n="save"></button>
+    </div>
+    <p class="hint" id="mouseHint"></p>
+    <div id="mouseResults"></div>
+  </section>
+
+  <!-- РИСОВАНИЕ КАМЕРОЙ -->
+  <section class="view narrow" id="view-cam">
+    <div class="stage">
+      <video id="video" playsinline muted></video>
+      <canvas id="camCanvas" width="640" height="480"></canvas>
+      <div class="cursor" id="cursor"></div>
+    </div>
+    <div class="toolbar">
+      <button class="btn tonal" id="camStart" data-i18n="camStart"></button>
+      <button class="btn" id="camGuess" data-i18n="guess"></button>
+      <button class="btn outline" id="camClear" data-i18n="clear"></button>
+    </div>
+    <p class="hint" id="camHint"></p>
+    <div id="camResults"></div>
+  </section>
+
+  <!-- ЭКРАН ЗДАНИЯ: 3D из точек и описание -->
+  <section class="view" id="view-detail">
+    <button class="btn tonal sm" id="dBack"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg><span data-i18n="back"></span></button>
+    <div class="detail">
+      <div class="viewer-card">
+        <canvas id="modelCanvas"></canvas>
+        <div class="v-overlay" id="vOverlay">
+          <div class="dots" id="vDots"><i></i><i></i><i></i></div>
+          <p id="vMsg"></p>
+          <button class="btn tonal sm" id="dRetry" hidden data-i18n="retry"></button>
+        </div>
+        <p class="v-hint" data-i18n="viewerHint"></p>
+      </div>
+      <div class="info-card">
+        <span class="chip" id="dType"></span>
+        <h2 id="dTitle"></h2>
+        <p class="sub" id="dSub"></p>
+        <div class="stats" id="dStats"></div>
+        <p class="summary" id="dSummary"></p>
+        <div class="fact" id="dFact" hidden></div>
+        <div class="media">
+          <figure class="photo" id="dPhotoBox" hidden><img id="dPhoto" alt=""><figcaption data-i18n="photoCredit"></figcaption></figure>
+          <div class="mini"><canvas id="miniGlobe"></canvas><span class="cap" id="dWhere"></span></div>
+        </div>
+        <div class="links" id="dLinks"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+/* ============ ТВОИ КОНТАКТЫ ============ */
+const CONTACT = {
+  name: 'Azizjon (카사노브 아지즈존)',
+  email: 'xasanov.aziz99@gmail.com',
+  phone: '+82 10-7941-5553',
+  instagram: 'nothumourist'             // без @
+};
+
+/* ============ МУЗЫКА: пусто = мелодию создаёт сам код; свой трек: положи файл в public и впиши имя, например 'music.mp3' ============ */
+const MUSIC_FILE = '';
+
+/* ============ ТЕКСТЫ (английский и корейский) ============ */
+const T = {
+  en: {
+    home: 'Home', info: 'How it works', contacts: 'Contact', music: 'Music',
+    heroTitle: 'Find <span>buildings</span><br>around the world from a simple sketch',
+    heroText: 'Draw a shape with your mouse or webcam, and discover famous landmarks that look like it.',
+    modeMouse: 'Draw with mouse', modeCam: 'Draw with webcam',
+    infoTitle: 'How it works',
+    infoLead: 'Six quick steps from a doodle to a 3D landmark.',
+    infoSteps: [
+      '<b>Pick how to draw.</b> Use your mouse or touchscreen, or draw in the air with your finger in front of the webcam (pinch thumb and index finger to draw, open them to lift the pen).',
+      '<b>Sketch a simple shape.</b> A triangle, two tall bars, a spire: simple outlines work best.',
+      '<b>Press “Find my building”.</b> AI compares your sketch with landmarks around the world and shows the closest matches.',
+      '<b>Choose a building.</b> Click any result card to open it.',
+      '<b>Explore it in 3D.</b> A model made of dots appears. Drag to rotate it and scroll to zoom. It is an AI-made approximation, not an exact scan.',
+      '<b>Learn about it.</b> See what the building is, where it stands on the globe and when it was built.'
+    ],
+    contactsTitle: 'Contact', contactsText: 'Questions, feedback, or a building that surprised you? Get in touch.',
+    lName: 'Name', lEmail: 'Email', lPhone: 'Phone', lInsta: 'Instagram',
+    tryIt: 'Try an example:', exTriangle: 'Triangle', exTwin: 'Twin towers', exSpire: 'Spire',
+    guess: 'Find my building', clear: 'Clear', undo: 'Undo', save: 'Save drawing', camStart: 'Turn on camera',
+    thinking: 'Searching the world…', none: 'No similar landmarks found. Try a different sketch.',
+    empty: 'Draw something first.', fail: 'Something went wrong. Please try again.',
+    busy: 'Too many requests right now. Please try again in a few minutes.',
+    camAsk: 'Please allow camera access in your browser…', camReady: 'Pinch thumb and index finger to draw.',
+    camDenied: 'Camera access was denied. Allow it via the lock icon in the address bar.',
+    camNone: 'No camera found.', camLoad: 'Loading hand-tracking model…',
+    match: 'Match', resultsHint: 'Tap a building to explore it in 3D.', view3d: 'Explore in 3D',
+    back: 'Back to results', viewerHint: 'Drag to rotate · Scroll to zoom · Double-click to reset · AI-made approximation',
+    loading3d: 'Assembling the dots…', model_fail: 'The 3D model is not available right now.', retry: 'Try again',
+    built: 'Built', height: 'Height', architect: 'Architect', didYou: 'Did you know?',
+    wikiLink: 'Read on Wikipedia', mapLink: 'Open in Maps', photoCredit: 'Photo: Wikipedia',
+    infoLoading: 'Loading details…', infoFail: 'Details are not available right now.'
+  },
+  ko: {
+    home: '홈', info: '이용 방법', contacts: '연락처', music: '음악',
+    heroTitle: '간단한 스케치로<br>세계의 <span>건축물</span>을 찾아보세요',
+    heroText: '마우스나 웹캠으로 도형을 그리면, 모양이 비슷한 세계의 유명한 건축물을 찾아 드려요.',
+    modeMouse: '마우스로 그리기', modeCam: '웹캠으로 그리기',
+    infoTitle: '이용 방법',
+    infoLead: '낙서에서 3D 건축물까지, 여섯 단계로 만나 보세요.',
+    infoSteps: [
+      '<b>그리는 방법을 고르세요.</b> 마우스나 터치스크린을 쓰거나, 웹캠 앞에서 손가락으로 허공에 그릴 수 있어요. (엄지와 검지를 붙이면 그려지고, 떼면 멈춰요.)',
+      '<b>간단한 도형을 그리세요.</b> 삼각형, 긴 기둥 두 개, 뾰족한 탑처럼 단순한 윤곽이 가장 좋아요.',
+      '<b>“내 건물 찾기”를 누르세요.</b> AI가 스케치를 세계의 건축물과 비교해 가장 비슷한 결과를 보여 줘요.',
+      '<b>건물을 선택하세요.</b> 결과 카드를 누르면 상세 화면이 열려요.',
+      '<b>3D로 살펴보세요.</b> 점으로 만든 모델이 나타나요. 드래그하면 회전하고, 스크롤하면 확대돼요. 정확한 스캔이 아닌 AI가 만든 근사 모델이에요.',
+      '<b>건물에 대해 알아보세요.</b> 어떤 건물인지, 지구본의 어디에 있는지, 언제 지어졌는지 볼 수 있어요.'
+    ],
+    contactsTitle: '연락처', contactsText: '문의, 의견, 또는 놀라운 건물을 발견했다면 연락 주세요.',
+    lName: '이름', lEmail: '이메일', lPhone: '전화번호', lInsta: '인스타그램',
+    tryIt: '예시로 해보기:', exTriangle: '삼각형', exTwin: '쌍둥이 빌딩', exSpire: '첨탑',
+    guess: '내 건물 찾기', clear: '지우기', undo: '되돌리기', save: '그림 저장', camStart: '카메라 켜기',
+    thinking: '세계를 검색하는 중…', none: '비슷한 건축물을 찾지 못했어요. 다른 스케치를 그려 보세요.',
+    empty: '먼저 그림을 그려 주세요.', fail: '오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
+    busy: '지금 요청이 너무 많아요. 몇 분 뒤에 다시 시도해 주세요.',
+    camAsk: '브라우저에서 카메라 권한을 허용해 주세요…', camReady: '엄지와 검지를 붙이면 그려져요.',
+    camDenied: '카메라 권한이 거부되었습니다. 주소창의 자물쇠 아이콘에서 허용해 주세요.',
+    camNone: '카메라를 찾을 수 없습니다.', camLoad: '손 인식 모델 불러오는 중…',
+    match: '유사도', resultsHint: '건물을 눌러 3D로 살펴보세요.', view3d: '3D로 보기',
+    back: '결과로 돌아가기', viewerHint: '드래그: 회전 · 스크롤: 확대 · 더블클릭: 초기화 · AI가 만든 근사 모델',
+    loading3d: '점을 쌓는 중…', model_fail: '지금은 3D 모델을 불러올 수 없어요.', retry: '다시 시도',
+    built: '준공', height: '높이', architect: '건축가', didYou: '알고 계셨나요?',
+    wikiLink: '위키백과에서 보기', mapLink: '지도에서 보기', photoCredit: '사진: 위키백과',
+    infoLoading: '상세 정보를 불러오는 중…', infoFail: '지금은 상세 정보를 불러올 수 없어요.'
+  },
+  ru: {
+    home: 'Главная', info: 'Как это работает', contacts: 'Контакты', music: 'Музыка',
+    heroTitle: 'Находи <span>здания</span><br>по всему миру по простому скетчу',
+    heroText: 'Нарисуй фигуру мышкой или через веб-камеру, и мы покажем знаменитые здания, которые на неё похожи.',
+    modeMouse: 'Рисовать мышкой', modeCam: 'Рисовать через камеру',
+    infoTitle: 'Как это работает',
+    infoLead: 'Шесть шагов от каракулей до 3D-здания.',
+    infoSteps: [
+      '<b>Выбери способ рисования.</b> Мышь или сенсорный экран, либо рисуй пальцем в воздухе перед веб-камерой (сведи большой и указательный пальцы, чтобы рисовать, разведи, чтобы остановиться).',
+      '<b>Нарисуй простую фигуру.</b> Треугольник, две высокие башни, шпиль: лучше всего работают простые контуры.',
+      '<b>Нажми «Найти моё здание».</b> ИИ сравнит рисунок со зданиями мира и покажет самые похожие.',
+      '<b>Выбери здание.</b> Нажми на любую карточку результата.',
+      '<b>Рассмотри его в 3D.</b> Появится модель из точек. Тяни мышкой, чтобы вращать, и крути колесо, чтобы приближать. Это приблизительная модель, созданная ИИ, а не точный скан.',
+      '<b>Узнай о нём больше.</b> Что это за здание, где оно стоит на глобусе и в каком году построено.'
+    ],
+    contactsTitle: 'Контакты', contactsText: '',
+    lName: 'Имя', lEmail: 'Почта', lPhone: 'Телефон', lInsta: 'Instagram',
+    tryIt: 'Попробуй пример:', exTriangle: 'Треугольник', exTwin: 'Башни-близнецы', exSpire: 'Шпиль',
+    guess: 'Найти моё здание', clear: 'Очистить', undo: 'Отменить', save: 'Сохранить рисунок', camStart: 'Включить камеру',
+    thinking: 'Ищем по всему миру…', none: 'Похожих зданий не найдено. Попробуй другой рисунок.',
+    empty: 'Сначала что-нибудь нарисуй.', fail: 'Что-то пошло не так. Попробуй ещё раз.',
+    busy: 'Сейчас слишком много запросов. Попробуй через несколько минут.',
+    camAsk: 'Разреши доступ к камере в браузере…', camReady: 'Сведи большой и указательный пальцы, чтобы рисовать.',
+    camDenied: 'Доступ к камере запрещён. Разреши его через значок замка в адресной строке.',
+    camNone: 'Камера не найдена.', camLoad: 'Загружаем модель распознавания руки…',
+    match: 'Сходство', resultsHint: 'Нажми на здание, чтобы рассмотреть его в 3D.', view3d: 'Смотреть в 3D',
+    back: 'Назад к результатам', viewerHint: 'Тяни: вращение · Колесо: масштаб · Двойной клик: сброс · Приблизительная модель ИИ',
+    loading3d: 'Собираем точки…', model_fail: 'Сейчас 3D-модель недоступна.', retry: 'Повторить',
+    built: 'Построено', height: 'Высота', architect: 'Архитектор', didYou: 'Знаете ли вы?',
+    wikiLink: 'Читать в Википедии', mapLink: 'Открыть на карте', photoCredit: 'Фото: Википедия',
+    infoLoading: 'Загружаем подробности…', infoFail: 'Сейчас подробности недоступны.'
+  }
+};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const TAU = Math.PI * 2;
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const saved = localStorage.getItem('towerLang');
+let lang = (saved === 'ko' || saved === 'en' || saved === 'ru') ? saved : 'en';
+
+/* ============ ЯЗЫК ============ */
+function renderContacts() {
+  const t = T[lang], tel = CONTACT.phone.replace(/[^+\d]/g, '');
+  $('homeContacts').innerHTML = `
+    <a href="mailto:${CONTACT.email}">${CONTACT.email}</a>
+    <a href="tel:${tel}">${CONTACT.phone}</a>
+    <a href="https://instagram.com/${CONTACT.instagram}" target="_blank" rel="noopener">@${CONTACT.instagram}</a>`;
+}
+function applyLang() {
+  const t = T[lang];
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t[el.dataset.i18n]);
+  document.querySelectorAll('[data-i18n-html]').forEach(el => el.innerHTML = t[el.dataset.i18nHtml]);
+  $('infoSteps').innerHTML = t.infoSteps.map(s => `<li><span>${s}</span></li>`).join('');
+  document.querySelectorAll('#langs button').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
+  renderContacts();
+}
+document.querySelectorAll('#langs button').forEach(b => b.onclick = () => {
+  lang = b.dataset.lang;
+  localStorage.setItem('towerLang', lang);
+  applyLang();
+  if (current === 'detail' && state.item) loadInfo(state.token);   // описание перезагружается на новом языке
+});
+
+/* ============ ДАННЫЕ О СУШЕ (карта мира для точечной Земли) ============ */
+const LAND_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json';
+
+function topoToMask(topo) {                       // карта мира → маска суши 360×180 (1 клетка = 1°)
+  const [sx, sy] = topo.transform.scale, [tx, ty] = topo.transform.translate;
+  const arcs = topo.arcs.map(a => { let x = 0, y = 0; return a.map(p => { x += p[0]; y += p[1]; return [x * sx + tx, y * sy + ty]; }); });
+  const arc = i => i >= 0 ? arcs[i] : arcs[~i].slice().reverse();
+  const ring = idx => { const pts = []; idx.forEach((i, k) => { const a = arc(i); for (let j = k ? 1 : 0; j < a.length; j++) pts.push(a[j]); }); return pts; };
+  const W = 360, H = 180, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d', { willReadFrequently: true });
+  g.fillStyle = '#000'; g.fillRect(0, 0, W, H); g.fillStyle = '#fff';
+  const obj = topo.objects.land, geoms = obj.geometries || [obj];
+  geoms.forEach(geo => {
+    const polys = geo.type === 'MultiPolygon' ? geo.arcs : [geo.arcs];
+    polys.forEach(poly => {
+      g.beginPath();
+      poly.forEach(r => { ring(r).forEach((p, i) => { const x = p[0] + 180, y = 90 - p[1]; i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.closePath(); });
+      g.fill('evenodd');
+    });
+  });
+  const d = g.getImageData(0, 0, W, H).data, m = new Uint8Array(W * H);
+  for (let i = 0; i < m.length; i++) m[i] = d[i * 4] > 127 ? 1 : 0;
+  return m;
+}
+function makeDots(mask, step = 2.2) {             // ровная сетка точек по шару; остаются только точки на суше
+  const out = [], rows = Math.round(180 / step);
+  for (let r = 0; r < rows; r++) {
+    const lat = -90 + (r + .5) * 180 / rows, cl = Math.cos(lat * Math.PI / 180);
+    const n = Math.max(1, Math.round(360 * cl / step));
+    for (let i = 0; i < n; i++) {
+      const lon = -180 + (i + .5 * (r % 2)) * 360 / n;
+      const px = Math.min(359, Math.floor(lon + 180)), py = Math.min(179, Math.max(0, Math.floor(90 - lat)));
+      if (mask && !mask[py * 360 + px]) continue;
+      const f = lat * Math.PI / 180, l = lon * Math.PI / 180;
+      out.push(Math.cos(f) * Math.sin(l), Math.sin(f), Math.cos(f) * Math.cos(l));
+    }
+  }
+  return new Float32Array(out);
+}
+const landReady = fetch(LAND_URL).then(r => r.json()).then(topoToMask).catch(() => null).then(m => makeDots(m));
+
+const fit = c => {                                // подгоняет размер холста под экран (чётко на Retina)
+  const dpr = Math.min(2, devicePixelRatio || 1), W = c.clientWidth, H = c.clientHeight;
+  const w = Math.round(W * dpr), h = Math.round(H * dpr);
+  if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+  return [W, H, dpr];
+};
+const wrapAngle = a => ((a % TAU) + TAU) % TAU;
+
+/* ============ ЗЕМЛЯ ИЗ ТОЧЕК ============ */
+class Globe {
+  constructor(canvas, layout, opts = {}) {
+    this.c = canvas; this.g = canvas.getContext('2d'); this.layout = layout;
+    this.rot = opts.rot ?? -1.7; this.tilt = opts.tilt ?? .38; this.auto = opts.auto !== false;
+    this.pin = null; this.target = null; this.raf = 0; this.last = 0; this.pts = null;
+    landReady.then(p => { this.pts = p; });
+  }
+  setPin(lat, lon) {                              // поворачивает Землю к нужному месту и ставит метку
+    lat = Number(lat); lon = Number(lon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+    this.pin = { lat, lon }; this.auto = false;
+    this.target = { rot: lon * Math.PI / 180, tilt: lat * Math.PI / 180 * .75 };
+  }
+  clearPin() { this.pin = null; this.target = null; }
+  start() {
+    if (this.raf) return;
+    this.last = performance.now();
+    const loop = t => { this.draw(t); this.raf = requestAnimationFrame(loop); };
+    this.raf = requestAnimationFrame(loop);
+  }
+  stop() { cancelAnimationFrame(this.raf); this.raf = 0; }
+  draw(t) {
+    const dt = Math.min(64, t - this.last); this.last = t;
+    const [W, H, dpr] = fit(this.c);
+    if (!W || !H) return;
+    const g = this.g; g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    const [cx, cy, R] = this.layout(W, H);
+    if (this.target) {
+      const d = wrapAngle(this.target.rot - this.rot + Math.PI) - Math.PI, k = 1 - Math.exp(-dt / 260);
+      this.rot += d * k; this.tilt += (this.target.tilt - this.tilt) * k;
+    } else if (this.auto && !REDUCED) this.rot += dt * .00011;
+
+    const disc = g.createRadialGradient(cx - R * .3, cy - R * .35, R * .1, cx, cy, R);   // сиреневый шар под точками
+    disc.addColorStop(0, 'rgba(234,221,255,.95)'); disc.addColorStop(1, 'rgba(234,221,255,.35)');
+    g.fillStyle = disc; g.beginPath(); g.arc(cx, cy, R, 0, TAU); g.fill();
+
+    const cr = Math.cos(this.rot), sr = Math.sin(this.rot), ct = Math.cos(this.tilt), st = Math.sin(this.tilt);
+    const project = (X, Y, Z) => {
+      const x = X * cr - Z * sr, z1 = X * sr + Z * cr;
+      return [x, Y * ct - z1 * st, Y * st + z1 * ct];
+    };
+    const P = this.pts;
+    if (P) {
+      const r0 = Math.max(1.1, R * .0085), B = [[], [], [], []], back = [];
+      for (let i = 0; i < P.length; i += 3) {
+        const [x, y, z] = project(P[i], P[i + 1], P[i + 2]);
+        if (z > .02) B[Math.min(3, (z * 4) | 0)].push(cx + x * R, cy - y * R);
+        else if (z < -.02) back.push(cx + x * R, cy - y * R);
+      }
+      const dots = (arr, rad, a) => {
+        g.fillStyle = `rgba(103,80,164,${a})`; g.beginPath();
+        for (let i = 0; i < arr.length; i += 2) { g.moveTo(arr[i] + rad, arr[i + 1]); g.arc(arr[i], arr[i + 1], rad, 0, TAU); }
+        g.fill();
+      };
+      dots(back, r0 * .7, .1);
+      [.32, .5, .72, .95].forEach((a, i) => dots(B[i], r0 * (.8 + i * .08), a));
+    }
+    g.strokeStyle = 'rgba(202,196,208,.9)'; g.lineWidth = 1; g.beginPath(); g.arc(cx, cy, R, 0, TAU); g.stroke();
+
+    if (this.pin) {                               // метка места здания
+      const f = this.pin.lat * Math.PI / 180, l = this.pin.lon * Math.PI / 180;
+      const [x, y, z] = project(Math.cos(f) * Math.sin(l), Math.sin(f), Math.cos(f) * Math.cos(l));
+      if (z > .05) {
+        const px = cx + x * R, py = cy - y * R, pulse = (t / 1100) % 1;
+        g.strokeStyle = `rgba(103,80,164,${.55 * (1 - pulse)})`; g.lineWidth = 2;
+        g.beginPath(); g.arc(px, py, 6 + pulse * 18, 0, TAU); g.stroke();
+        g.fillStyle = '#FFD8E4'; g.strokeStyle = '#6750A4'; g.lineWidth = 2.5;
+        g.beginPath(); g.arc(px, py, 6, 0, TAU); g.fill(); g.stroke();
+      }
+    }
+  }
+}
+const homeLayout = (W, H) => W >= 900 ? [W * .76, H * .54, Math.min(H * .46, W * .29)] : [W * .5, H * .66, Math.min(W * .62, H * .4)];
+const globe = new Globe($('globeBg'), homeLayout);
+const miniGlobe = new Globe($('miniGlobe'), (W, H) => [W / 2, H / 2, Math.min(W, H) * .44], { rot: 0, tilt: .3, auto: true });
+
+/* ============ 3D ИЗ ТОЧЕК: превращаем список деталей здания в облако точек ============ */
+const mulberry = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const num = v => Number.isFinite(+v) ? +v : 0;
+
+function spline(pts) {                            // плавная кривая через точки (Catmull-Rom)
+  const P = [pts[0], ...pts, pts[pts.length - 1]], out = [];
+  for (let i = 1; i < P.length - 2; i++) {
+    for (let k = 0; k < 12; k++) {
+      const t = k / 12, t2 = t * t, t3 = t2 * t;
+      out.push([0, 1, 2].map(a => .5 * ((2 * P[i][a]) + (-P[i - 1][a] + P[i + 1][a]) * t + (2 * P[i - 1][a] - 5 * P[i][a] + 4 * P[i + 1][a] - P[i + 2][a]) * t2 + (-P[i - 1][a] + 3 * P[i][a] - 3 * P[i + 1][a] + P[i + 2][a]) * t3)));
+    }
+  }
+  out.push(pts[pts.length - 1]);
+  return out;
+}
+
+function buildCloud(parts, total = 5200) {
+  const rnd = mulberry(7), items = [];
+  const taper = (a, b, c, d) => {                 // чтобы у сужающихся башен точки не скапливались наверху
+    let u = rnd();
+    for (let k = 0; k < 8; k++) {
+      u = rnd();
+      const q = ((a + (b - a) * u) / (Math.max(a, b) || 1) + (c + (d - c) * u) / (Math.max(c, d) || 1)) / 2;
+      if (rnd() < q) break;
+    }
+    return u;
+  };
+  for (const p of parts || []) {
+    if (!p || typeof p !== 'object') continue;
+    const x = num(p.x), y = num(p.y), z = num(p.z);
+    if (p.t === 'box') {
+      const w = Math.abs(num(p.w)) || 1, d = Math.abs(num(p.d)) || 1, h = Math.abs(num(p.h)) || 1;
+      const w2 = p.w2 == null ? w : Math.abs(num(p.w2)), d2 = p.d2 == null ? d : Math.abs(num(p.d2));
+      const az = h * (w + w2) / 2, ax = h * (d + d2) / 2, top = w2 * d2, sum = 2 * az + 2 * ax + top;
+      items.push({ area: sum, fn: () => {
+        const a = rnd() * sum;
+        if (a >= 2 * az + 2 * ax) return [x + (rnd() - .5) * w2, y + h, z + (rnd() - .5) * d2];
+        const u = taper(w, w2, d, d2), wu = w + (w2 - w) * u, du = d + (d2 - d) * u, v = rnd() - .5;
+        if (a < 2 * az) return [x + v * wu, y + u * h, z + (a < az ? 1 : -1) * du / 2];
+        return [x + (a < 2 * az + ax ? 1 : -1) * wu / 2, y + u * h, z + v * du];
+      } });
+    } else if (p.t === 'cyl') {
+      const r = Math.abs(num(p.r)) || 1, r2 = p.r2 == null ? r : Math.abs(num(p.r2)), h = Math.abs(num(p.h)) || 1;
+      const sx = num(p.sx) || 1, sz = num(p.sz) || 1, hollow = !!p.hollow;
+      const lat = Math.PI * (r + r2) * h * (hollow ? 1.9 : 1), cap = Math.PI * r2 * r2 * (hollow ? .2 : 1);
+      items.push({ area: lat + cap, fn: () => {
+        const a = rnd() * TAU;
+        if (rnd() * (lat + cap) >= lat) {
+          const rad = r2 * (hollow ? .9 + .1 * rnd() : Math.sqrt(rnd()));
+          return [x + sx * rad * Math.cos(a), y + h, z + sz * rad * Math.sin(a)];
+        }
+        let u = rnd();
+        for (let k = 0; k < 8; k++) { u = rnd(); if (rnd() < (r + (r2 - r) * u) / (Math.max(r, r2) || 1)) break; }
+        const rad = (r + (r2 - r) * u) * (hollow && rnd() < .47 ? .9 : 1);
+        return [x + sx * rad * Math.cos(a), y + u * h, z + sz * rad * Math.sin(a)];
+      } });
+    } else if (p.t === 'sphere') {
+      const r = Math.abs(num(p.r)) || 1, half = !!p.half;
+      items.push({ area: (half ? 2 : 4) * Math.PI * r * r, fn: () => {
+        const yy = 2 * rnd() - 1, s = Math.sqrt(1 - yy * yy), a = rnd() * TAU;
+        return [x + r * s * Math.cos(a), y + r * (half ? Math.abs(yy) : yy), z + r * s * Math.sin(a)];
+      } });
+    } else if (p.t === 'path' && Array.isArray(p.pts)) {
+      const pts = p.pts.filter(q => Array.isArray(q)).map(q => [num(q[0]), num(q[1]), num(q[2])]);
+      if (pts.length < 2) continue;
+      const line = spline(pts), cum = [0];
+      for (let i = 1; i < line.length; i++) cum.push(cum[i - 1] + Math.hypot(line[i][0] - line[i - 1][0], line[i][1] - line[i - 1][1], line[i][2] - line[i - 1][2]));
+      const L = cum[cum.length - 1] || 1, r = Math.abs(num(p.r)) || 1, r2 = p.r2 == null ? r : Math.abs(num(p.r2));
+      items.push({ area: L * TAU * (r + r2) / 2, fn: () => {
+        const s = rnd() * L; let i = 1;
+        while (i < cum.length - 1 && cum[i] < s) i++;
+        const t = (s - cum[i - 1]) / ((cum[i] - cum[i - 1]) || 1), A = line[i - 1], B = line[i];
+        let T = [B[0] - A[0], B[1] - A[1], B[2] - A[2]]; const tl = Math.hypot(...T) || 1; T = T.map(v => v / tl);
+        const ref = Math.abs(T[1]) > .9 ? [1, 0, 0] : [0, 1, 0];
+        const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+        let n1 = cross(T, ref); const nl = Math.hypot(...n1) || 1; n1 = n1.map(v => v / nl);
+        const n2 = cross(T, n1), rad = r + (r2 - r) * (s / L), a = rnd() * TAU;
+        return [0, 1, 2].map(k => A[k] + (B[k] - A[k]) * t + rad * (Math.cos(a) * n1[k] + Math.sin(a) * n2[k]));
+      } });
+    }
+  }
+  const sumArea = items.reduce((s, i) => s + i.area, 0);
+  if (!items.length || !(sumArea > 0)) return null;
+  const raw = [];
+  for (const it of items) {
+    const n = Math.max(30, Math.round(total * it.area / sumArea));
+    for (let k = 0; k < n; k++) { const q = it.fn(); if (q.every(Number.isFinite)) raw.push(q); }
+  }
+  if (raw.length < 50) return null;
+  let mn = [Infinity, Infinity, Infinity], mx = [-Infinity, -Infinity, -Infinity];
+  raw.forEach(q => q.forEach((v, k) => { if (v < mn[k]) mn[k] = v; if (v > mx[k]) mx[k] = v; }));
+  const mx0 = (mn[0] + mx[0]) / 2, mz0 = (mn[2] + mx[2]) / 2, hh = (mx[1] - mn[1]) / 2 || 1;
+  let rMax = 0; raw.forEach(q => { rMax = Math.max(rMax, Math.hypot(q[0] - mx0, q[2] - mz0)); });
+  const sc = 1 / Math.max(rMax, hh, 1e-6);
+  const p = new Float32Array(raw.length * 3), h01 = new Float32Array(raw.length);
+  raw.forEach((q, i) => {
+    p[i * 3] = (q[0] - mx0) * sc; p[i * 3 + 1] = (q[1] - mn[1] - hh) * sc; p[i * 3 + 2] = (q[2] - mz0) * sc;
+    h01[i] = (q[1] - mn[1]) / (2 * hh);
+  });
+  return { p, h01, n: raw.length, gy: -hh * sc, rr: Math.max(.35, rMax * sc * 1.12) };
+}
+
+/* ============ ПРОСМОТР 3D: вращение мышкой, масштаб колёсиком ============ */
+class Viewer {
+  constructor(canvas) {
+    this.c = canvas; this.g = canvas.getContext('2d'); this.cloud = null; this.raf = 0; this.last = 0;
+    this.yaw = .7; this.pitch = .25; this.zoom = 1; this.auto = true; this.drag = false; this.idle = 0; this.t0 = 0;
+    let prev = null;
+    canvas.addEventListener('pointerdown', e => { prev = [e.clientX, e.clientY]; this.drag = true; this.auto = false; canvas.setPointerCapture(e.pointerId); });
+    canvas.addEventListener('pointermove', e => {
+      if (!prev) return;
+      this.yaw += (e.clientX - prev[0]) * .01;
+      this.pitch = Math.max(-.25, Math.min(1.25, this.pitch + (e.clientY - prev[1]) * .008));
+      prev = [e.clientX, e.clientY];
+    });
+    ['pointerup', 'pointercancel'].forEach(ev => canvas.addEventListener(ev, () => { prev = null; this.drag = false; this.idle = 0; }));
+    canvas.addEventListener('wheel', e => { e.preventDefault(); this.zoom = Math.max(.6, Math.min(2.6, this.zoom * (1 - e.deltaY * .0012))); }, { passive: false });
+    canvas.addEventListener('dblclick', () => { this.zoom = 1; this.pitch = .25; this.auto = true; });
+  }
+  setCloud(cloud) { this.cloud = cloud; this.t0 = performance.now(); this.auto = true; this.zoom = 1; }
+  start() {
+    if (this.raf) return;
+    this.last = performance.now();
+    const loop = t => { this.draw(t); this.raf = requestAnimationFrame(loop); };
+    this.raf = requestAnimationFrame(loop);
+  }
+  stop() { cancelAnimationFrame(this.raf); this.raf = 0; }
+  draw(t) {
+    const dt = Math.min(64, t - this.last); this.last = t;
+    const [W, H, dpr] = fit(this.c);
+    if (!W || !H) return;
+    const g = this.g; g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    const C = this.cloud; if (!C) return;
+    if (!this.auto && !this.drag) { this.idle += dt; if (this.idle > 3500) this.auto = true; }
+    if (this.auto && !REDUCED) this.yaw += dt * .00045;
+
+    const S = Math.min(W, H) * .4 * this.zoom, cx = W / 2, cy = H * .48, D = 4.2;
+    const cyw = Math.cos(this.yaw), syw = Math.sin(this.yaw), cp = Math.cos(this.pitch), sp = Math.sin(this.pitch);
+    const prog = REDUCED ? 1 : Math.min(1, (t - this.t0) / 1700), reveal = (1 - Math.pow(1 - prog, 3)) * 1.03;
+    const base = Math.max(.9, S * .0072);
+    const tr = (x, y, z) => {
+      const x1 = x * cyw + z * syw, z1 = -x * syw + z * cyw;
+      const y2 = y * cp - z1 * sp, z2 = y * sp + z1 * cp, f = D / (D - z2);
+      return [cx + x1 * S * f, cy - y2 * S * f, z2, f];
+    };
+    g.fillStyle = 'rgba(121,116,126,.38)'; g.beginPath();            // кольцо земли под зданием
+    for (let i = 0; i < 120; i++) {
+      const a = i / 120 * TAU, [x, y, , f] = tr(Math.cos(a) * C.rr, C.gy, Math.sin(a) * C.rr);
+      g.moveTo(x + base * .8 * f, y); g.arc(x, y, base * .8 * f, 0, TAU);
+    }
+    g.fill();
+    const B = [[], [], [], [], []];
+    for (let i = 0; i < C.n; i++) {
+      if (C.h01[i] > reveal) continue;                               // здание «вырастает» снизу вверх
+      const [x, y, z, f] = tr(C.p[i * 3], C.p[i * 3 + 1], C.p[i * 3 + 2]);
+      B[Math.max(0, Math.min(4, Math.floor((z + 1) / 2 * 5)))].push(x, y, f);
+    }
+    B.forEach((arr, k) => {
+      g.fillStyle = `rgba(103,80,164,${.22 + k * .19})`; g.beginPath();
+      for (let i = 0; i < arr.length; i += 3) { const r = base * arr[i + 2] * (.85 + k * .08); g.moveTo(arr[i] + r, arr[i + 1]); g.arc(arr[i], arr[i + 1], r, 0, TAU); }
+      g.fill();
+    });
+  }
+}
+const viewer = new Viewer($('modelCanvas'));
+
+/* ============ НАВИГАЦИЯ ============ */
+let current = 'home';
+const NAVS = { home: 'btnHome', info: 'btnInfo' };
+function show(name) {
+  current = name;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  $('view-' + name).classList.add('active');
+  document.body.classList.toggle('is-home', name === 'home');         // Земля только на главной
+  Object.entries(NAVS).forEach(([k, id]) => $(id).classList.toggle('active', k === name));
+  if (name !== 'cam') stopCamera();
+  name === 'home' ? globe.start() : globe.stop();
+  if (name === 'detail') { viewer.start(); miniGlobe.start(); } else { viewer.stop(); miniGlobe.stop(); }
+  window.scrollTo(0, 0);
+}
+$('btnHome').onclick = () => show('home');
+$('btnInfo').onclick = () => show('info');
+$('goMouse').onclick = () => show('mouse');
+$('goCam').onclick = () => show('cam');
+$('dBack').onclick = () => show(state.from);
+
+/* ============ ОБРАЩЕНИЕ К СЕРВЕРУ ============ */
+async function api(path, body) {
+  const r = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) { const e = new Error('HTTP ' + r.status); e.status = r.status; throw e; }
+  return r.json();
+}
+const errText = e => e && e.status === 429 ? T[lang].busy : T[lang].fail;
+
+const wikiCache = new Map();
+function wikiInfo(title) {                        // фото и координаты из Википедии (берётся один раз)
+  if (!wikiCache.has(title)) {
+    wikiCache.set(title, fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(String(title).replace(/ /g, '_')))
+      .then(r => r.ok ? r.json() : null).catch(() => null));
+  }
+  return wikiCache.get(title);
+}
+
+/* ============ ПОИСК ЗДАНИЙ ПО РИСУНКУ ============ */
+const INK = '#1D1B20';
+function exportImage(canvas) {                    // белый фон + линии → JPEG
+  const t = document.createElement('canvas');
+  t.width = canvas.width; t.height = canvas.height;
+  const g = t.getContext('2d');
+  g.fillStyle = '#fff'; g.fillRect(0, 0, t.width, t.height); g.drawImage(canvas, 0, 0);
+  return t.toDataURL('image/jpeg', .85);
+}
+function isBlank(canvas) {
+  const d = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+  for (let i = 3; i < d.length; i += 4) if (d[i] > 0) return false;
+  return true;
+}
+
+async function runGuess(canvas, hintEl, outEl, btn, view) {
+  const t = T[lang];
+  hintEl.className = 'hint';
+  if (isBlank(canvas)) { hintEl.textContent = t.empty; return; }
+  hintEl.textContent = t.thinking; outEl.innerHTML = ''; btn.disabled = true;
+  try {
+    const list = await api('/api/guess', { image: exportImage(canvas), lang });
+    if (!Array.isArray(list) || !list.length) { hintEl.textContent = t.none; return; }
+    hintEl.textContent = '';
+    const thumbs = await Promise.all(list.map(p => wikiInfo(p.wiki).then(j => j && j.thumbnail ? j.thumbnail.source : null)));
+    outEl.innerHTML = `<p class="results-hint">${t.resultsHint}</p><div class="results">` + list.map((p, i) => {
+      const m = Math.max(0, Math.min(100, Math.round(Number(p.match) || 0)));
+      return `<article class="result" tabindex="0" role="button" data-i="${i}">
+        ${thumbs[i] ? `<img src="${esc(thumbs[i])}" alt="">` : '<div class="noimg"></div>'}
+        <div class="body">
+          <h3>${esc(p.name)}</h3>
+          <div class="meta">${esc([p.city, p.country].filter(Boolean).join(', '))}</div>
+          <div class="bar"><i style="width:${m}%"></i></div>
+          <div class="meta">${t.match}: ${m}%</div>
+          <p>${esc(p.why)}</p>
+          <span class="go">${t.view3d} →</span>
+        </div></article>`;
+    }).join('') + '</div>';
+    const open = el => { const c = el.closest('.result'); if (c) openDetail(list[+c.dataset.i], view); };
+    outEl.onclick = e => open(e.target);
+    outEl.onkeydown = e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.result')) { e.preventDefault(); open(e.target); } };
+    outEl.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
+  } catch (e) {
+    hintEl.className = 'hint error'; hintEl.textContent = errText(e);
+  } finally { btn.disabled = false; }
+}
+
+/* ============ ЭКРАН ЗДАНИЯ ============ */
+const state = { item: null, from: 'mouse', token: 0, info: null };
+
+function setPinFrom(lat, lon, force) {
+  if (!force && miniGlobe.pin) return;
+  miniGlobe.setPin(lat, lon);
+}
+function openDetail(item, from) {
+  const my = ++state.token;
+  state.item = item; state.from = from; state.info = null;
+  show('detail');
+  $('dType').textContent = ''; $('dTitle').textContent = item.name || '';
+  $('dSub').textContent = [item.city, item.country].filter(Boolean).join(', ');
+  $('dStats').innerHTML = ''; $('dSummary').textContent = T[lang].infoLoading; $('dFact').hidden = true; $('dLinks').innerHTML = '';
+  $('dWhere').textContent = $('dSub').textContent; $('dPhotoBox').hidden = true;
+  miniGlobe.clearPin(); miniGlobe.auto = true;
+  viewer.cloud = null;
+  wikiInfo(item.wiki).then(j => {
+    if (my !== state.token || !j) return;
+    if (j.thumbnail) {
+      const img = $('dPhoto'), small = j.thumbnail.source;
+      img.onerror = () => { img.onerror = null; img.src = small; };
+      img.src = small.replace(/\/\d+px-/, '/960px-'); $('dPhotoBox').hidden = false;
+    }
+    if (j.coordinates) setPinFrom(j.coordinates.lat, j.coordinates.lon, true);
+  });
+  loadInfo(my); loadModel(my);
+}
+
+async function loadInfo(my) {
+  const item = state.item, t = T[lang];
+  if (!item) return;
+  $('dSummary').textContent = t.infoLoading;
+  try {
+    const info = await api('/api/info', { wiki: item.wiki, name: item.name, lang });
+    if (my !== state.token) return;
+    state.info = info;
+    const stats = [];
+    if (info.year != null) stats.push([t.built, String(info.year)]);
+    if (info.height_m != null) stats.push([t.height, Math.round(info.height_m) + ' m']);
+    if (info.architect) stats.push([t.architect, info.architect]);
+    $('dType').textContent = info.type || '';
+    const place = [info.city, info.country].filter(Boolean).join(', ');
+    if (place) { $('dSub').textContent = place; $('dWhere').textContent = place; }
+    $('dStats').innerHTML = stats.map(s => `<div class="stat"><small>${esc(s[0])}</small><b>${esc(s[1])}</b></div>`).join('');
+    $('dSummary').textContent = info.summary || '';
+    $('dFact').hidden = !info.fact;
+    $('dFact').innerHTML = info.fact ? `<b>${t.didYou}</b>${esc(info.fact)}` : '';
+    setPinFrom(info.lat, info.lon, false);
+    const q = encodeURIComponent((info.lat != null && info.lon != null) ? info.lat + ',' + info.lon : item.name);
+    $('dLinks').innerHTML =
+      `<a class="btn tonal sm" target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/${encodeURIComponent(String(item.wiki).replace(/ /g, '_'))}">${t.wikiLink}</a>` +
+      `<a class="btn outline sm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${q}">${t.mapLink}</a>`;
+  } catch (e) {
+    if (my !== state.token) return;
+    $('dSummary').textContent = e.status === 429 ? t.busy : t.infoFail;
+  }
+}
+
+async function loadModel(my) {
+  const item = state.item, t = T[lang];
+  $('vOverlay').hidden = false; $('vDots').hidden = false; $('dRetry').hidden = true; $('vMsg').textContent = t.loading3d;
+  try {
+    const res = await api('/api/model', { wiki: item.wiki, name: item.name });
+    if (my !== state.token) return;
+    const cloud = buildCloud(res.parts);
+    if (!cloud) throw new Error('empty');
+    viewer.setCloud(cloud);
+    $('vOverlay').hidden = true;
+  } catch (e) {
+    if (my !== state.token) return;
+    $('vDots').hidden = true; $('dRetry').hidden = false;
+    $('vMsg').textContent = e.status === 429 ? T[lang].busy : T[lang].model_fail;
+  }
+}
+$('dRetry').onclick = () => loadModel(state.token);
+
+/* ============ РИСОВАНИЕ МЫШЬЮ ============ */
+function setupStroke(ctx) { ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = INK; }
+const pos = (e, c) => { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) * c.width / r.width, (e.clientY - r.top) * c.height / r.height]; };
+
+const mc = $('mouseCanvas'), mctx = mc.getContext('2d');
+setupStroke(mctx);
+const undoStack = [];
+const saveUndo = () => { undoStack.push(mctx.getImageData(0, 0, mc.width, mc.height)); if (undoStack.length > 20) undoStack.shift(); };
+let drawing = false;
+mc.addEventListener('pointerdown', e => {
+  saveUndo(); drawing = true; mc.setPointerCapture(e.pointerId);
+  const [x, y] = pos(e, mc); mctx.beginPath(); mctx.moveTo(x, y); mctx.lineTo(x + .01, y); mctx.stroke();
+});
+mc.addEventListener('pointermove', e => { if (!drawing) return; const [x, y] = pos(e, mc); mctx.lineTo(x, y); mctx.stroke(); });
+['pointerup', 'pointercancel'].forEach(ev => mc.addEventListener(ev, () => drawing = false));
+$('mouseUndo').onclick = () => { const s = undoStack.pop(); if (s) mctx.putImageData(s, 0, 0); };
+$('mouseClear').onclick = () => { saveUndo(); mctx.clearRect(0, 0, mc.width, mc.height); $('mouseResults').innerHTML = ''; $('mouseHint').textContent = ''; };
+$('mouseSave').onclick = () => { const a = document.createElement('a'); a.download = 'my-sketch.jpg'; a.href = exportImage(mc); a.click(); };
+$('mouseGuess').onclick = () => runGuess(mc, $('mouseHint'), $('mouseResults'), $('mouseGuess'), 'mouse');
+
+const examples = {
+  triangle: c => { c.moveTo(320, 90); c.lineTo(520, 380); c.lineTo(120, 380); c.closePath(); },
+  twin: c => { c.rect(190, 70, 80, 320); c.rect(370, 70, 80, 320); },
+  spire: c => { c.moveTo(320, 50); c.lineTo(390, 390); c.moveTo(320, 50); c.lineTo(250, 390); c.moveTo(290, 280); c.lineTo(350, 280); }
+};
+document.querySelectorAll('[data-ex]').forEach(b => b.onclick = () => {
+  saveUndo(); mctx.beginPath(); examples[b.dataset.ex](mctx); mctx.stroke();
+});
+
+/* ============ РИСОВАНИЕ КАМЕРОЙ (пальцем в воздухе) ============ */
+const cc = $('camCanvas'), cctx = cc.getContext('2d');
+setupStroke(cctx);
+const video = $('video'), cursor = $('cursor'), camHint = $('camHint');
+let stream = null, landmarker = null, rafId = null, lastVideoTime = -1, last = null, smooth = null;
+
+async function loadModelHands() {
+  if (landmarker) return;
+  camHint.textContent = T[lang].camLoad;
+  const base = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+  const { HandLandmarker, FilesetResolver } = await import(base + '/vision_bundle.mjs');
+  const fileset = await FilesetResolver.forVisionTasks(base + '/wasm');
+  landmarker = await HandLandmarker.createFromOptions(fileset, {
+    baseOptions: { modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task' },
+    runningMode: 'VIDEO', numHands: 1
+  });
+}
+async function startCamera() {
+  const t = T[lang];
+  camHint.className = 'hint'; camHint.textContent = t.camAsk;
+  try {                                           // здесь браузер сам спрашивает разрешение на камеру
+    stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: 'user' }, audio: false });
+  } catch (err) {
+    camHint.className = 'hint error';
+    camHint.textContent = err.name === 'NotFoundError' ? t.camNone : t.camDenied;
+    return;
+  }
+  video.srcObject = stream; await video.play();
+  try { await loadModelHands(); } catch { camHint.className = 'hint error'; camHint.textContent = t.fail; return; }
+  camHint.textContent = t.camReady;
+  loop();
+}
+function stopCamera() {
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = null; last = null; smooth = null;
+  if (stream) stream.getTracks().forEach(tr => tr.stop());
+  stream = null; video.srcObject = null; cursor.style.display = 'none';
+}
+function loop() {
+  if (!stream) return;
+  if (video.currentTime !== lastVideoTime) {
+    lastVideoTime = video.currentTime;
+    const res = landmarker.detectForVideo(video, performance.now());
+    if (res.landmarks.length) {
+      const h = res.landmarks[0], tip = h[8], thumb = h[4];
+      const rawX = (1 - tip.x) * cc.width, rawY = tip.y * cc.height;   // зеркало по X
+      smooth = smooth ? [smooth[0] + (rawX - smooth[0]) * .5, smooth[1] + (rawY - smooth[1]) * .5] : [rawX, rawY];
+      const handSize = Math.hypot(h[0].x - h[9].x, h[0].y - h[9].y);
+      const pinch = Math.hypot(tip.x - thumb.x, tip.y - thumb.y) / handSize < .3;
+      const rect = cc.getBoundingClientRect(), stage = cc.parentElement.getBoundingClientRect();
+      cursor.style.display = 'block';
+      cursor.style.left = (smooth[0] / cc.width * rect.width + rect.left - stage.left) + 'px';
+      cursor.style.top = (smooth[1] / cc.height * rect.height + rect.top - stage.top) + 'px';
+      cursor.classList.toggle('draw', pinch);
+      if (pinch) {
+        if (last) { cctx.beginPath(); cctx.moveTo(last[0], last[1]); cctx.lineTo(smooth[0], smooth[1]); cctx.stroke(); }
+        last = [smooth[0], smooth[1]];
+      } else last = null;
+    } else { cursor.style.display = 'none'; last = null; }
+  }
+  rafId = requestAnimationFrame(loop);
+}
+$('camStart').onclick = startCamera;
+$('camClear').onclick = () => { cctx.clearRect(0, 0, cc.width, cc.height); $('camResults').innerHTML = ''; };
+$('camGuess').onclick = () => runGuess(cc, camHint, $('camResults'), $('camGuess'), 'cam');
+
+/* ============ ФОНОВАЯ МУЗЫКА (мягкая мелодия, которую создаёт сам код) ============ */
+const Music = (() => {
+  let ctx, master, bus, timer, audioEl, on = false, step = 0;
+  const chords = [[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]];
+  const bass = [110, 87.31, 130.81, 98], scale = [523.25, 587.33, 659.25, 783.99, 880, 1046.5];
+  function init() {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
+    bus = ctx.createGain(); bus.connect(master);
+    const delay = ctx.createDelay(1.5); delay.delayTime.value = .55;
+    const fb = ctx.createGain(); fb.gain.value = .38; const wet = ctx.createGain(); wet.gain.value = .45;
+    bus.connect(delay); delay.connect(fb); fb.connect(delay); delay.connect(wet); wet.connect(master);
+  }
+  function tone(f, t, dur, vol, type, attack) {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.value = f;
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(vol, t + attack); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g); g.connect(bus); o.start(t); o.stop(t + dur + .1);
+  }
+  function bar() {
+    if (!on) return;
+    const t = ctx.currentTime + .1, i = step % 4;
+    chords[i].forEach(f => tone(f, t, 9, .05, 'sine', 2.5));
+    tone(bass[i], t, 9, .07, 'sine', 1.5);
+    const n = 4 + Math.floor(Math.random() * 3);
+    for (let k = 0; k < n; k++) tone(scale[Math.floor(Math.random() * scale.length)], t + .5 + k * (6.5 / n) + Math.random() * .4, 3.2, .045, 'triangle', .05);
+    step++; timer = setTimeout(bar, 8000);
+  }
+  async function start() {
+    on = true;
+    if (MUSIC_FILE) { if (!audioEl) { audioEl = new Audio(MUSIC_FILE); audioEl.loop = true; audioEl.volume = .35; } audioEl.play().catch(() => {}); return; }
+    if (!ctx) init();
+    await ctx.resume();
+    master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
+    master.gain.linearRampToValueAtTime(.8, ctx.currentTime + 1.5);
+    clearTimeout(timer); bar();
+  }
+  function stop() {
+    on = false; clearTimeout(timer);
+    if (audioEl) audioEl.pause();
+    if (ctx) { master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(master.gain.value, ctx.currentTime); master.gain.linearRampToValueAtTime(0, ctx.currentTime + 1); }
+  }
+  return { start, stop, isOn: () => on };
+})();
+function setMusic(wantOn) {
+  wantOn ? Music.start() : Music.stop();
+  $('btnMusic').classList.toggle('on', wantOn);
+  localStorage.setItem('towerMusic', wantOn ? 'on' : 'off');
+}
+$('btnMusic').onclick = () => setMusic(!Music.isOn());
+let autoTried = false;                            // браузер включает звук только после клика: включаем при первом клике на сайте
+window.addEventListener('pointerdown', e => {
+  if (autoTried) return;
+  autoTried = true;
+  if (e.target.closest('#btnMusic')) return;
+  if (localStorage.getItem('towerMusic') !== 'off') setMusic(true);
+}, true);
+
+/* ============ СТАРТ ============ */
+applyLang();
+show('home');
+window.__tower = { buildCloud, viewer, miniGlobe, globe, openDetail, show, state };   // для тестов
+</script>
+</body>
+</html>
