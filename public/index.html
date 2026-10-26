@@ -754,8 +754,10 @@ $('goCam').onclick = () => show('cam');
 $('dBack').onclick = () => show(state.from);
 
 /* ============ ОБРАЩЕНИЕ К СЕРВЕРУ ============ */
+/* на GitHub Pages сервера нет, поэтому поиск обращается к серверу на Render */
+const API_BASE = location.hostname.endsWith('github.io') ? 'https://nine99weweek.onrender.com' : '';
 async function api(path, body) {
-  const r = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const r = await fetch(API_BASE + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   if (!r.ok) { const e = new Error('HTTP ' + r.status); e.status = r.status; throw e; }
   return r.json();
 }
