@@ -161,11 +161,7 @@ app.post('/api/model', limit(30, 3600e3), async (req, res) => {
 
     if (overDaily()) return res.status(429).json({ error: 'daily' });
 
-    const msg = await ai.messages.create({
-      model: MODEL,
-      max_tokens: 3500,
-      temperature: 0.3,
-      messages: [{ role: 'user', content:
+    const prompt =
         'Design a simplified 3D model of the landmark "' + name + '" (English Wikipedia: "' + wiki + '") as a short list of geometric parts. ' +
         'Use METERS and real proportions. x and z are horizontal, y is up. The landmark is centered on x=0, z=0 and its base sits at y=0.\n' +
         'Allowed parts (numbers only; leave out optional keys you do not need):\n' +
@@ -173,14 +169,22 @@ app.post('/api/model', limit(30, 3600e3), async (req, res) => {
         '{"t":"cyl","x":0,"y":0,"z":0,"r":R,"h":H,"r2":R_TOP,"sx":1,"sz":1,"hollow":false}  cylinder, cone or frustum. (x,y,z) is the center of the base. r2 = top radius (default r). sx and sz stretch it into an ellipse. hollow=true gives a ring wall (arenas, stadiums).\n' +
         '{"t":"sphere","x":0,"y":0,"z":0,"r":R,"half":false}  sphere or dome. (x,y,z) is the CENTER; half=true keeps only the upper half.\n' +
         '{"t":"path","pts":[[x,y,z],[x,y,z]],"r":R_START,"r2":R_END}  smooth curved tube through 3 to 9 points: arches, curved legs, cables, bridges. r2 defaults to r.\n' +
-        'Rules: use 4 to 30 parts; make the silhouette instantly recognizable; write symmetric parts out explicitly; no comments or text outside the JSON.\n' +
+        'Rules: use 4 to 25 parts (keep the JSON short); make the silhouette instantly recognizable; write symmetric parts out explicitly; no comments or text outside the JSON.\n' +
         'Example (Eiffel Tower): ' + EXAMPLE + '\n' +
-        'Return ONLY a JSON object {"parts":[...]} for "' + name + '".'
-      }]
-    });
-    const text = msg.content.map(b => b.text || '').join('');
-    const data = pickJSON(text, '{', '}');
-    const parts = data && Array.isArray(data.parts) ? data.parts.slice(0, 40).map(cleanPart).filter(Boolean) : [];
+        'Return ONLY a JSON object {"parts":[...]} for "' + name + '".';
+
+    let parts = [];
+    for (let attempt = 0; attempt < 2 && !parts.length; attempt++) {   // одна повторная попытка, если ответ пришёл битый
+      const msg = await ai.messages.create({
+        model: MODEL,
+        max_tokens: 6000,
+        messages: [{ role: 'user', content: prompt }]
+      });
+      const text = msg.content.map(b => b.text || '').join('');
+      const data = pickJSON(text, '{', '}');
+      parts = data && Array.isArray(data.parts) ? data.parts.slice(0, 40).map(cleanPart).filter(Boolean) : [];
+      if (!parts.length) console.error('model attempt ' + (attempt + 1) + ' bad answer for ' + wiki + ', stop=' + msg.stop_reason);
+    }
     if (!parts.length) return res.status(502).json({ error: 'bad model' });
     const result = { parts };
     remember(key, result);
