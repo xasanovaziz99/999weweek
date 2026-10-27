@@ -75,6 +75,44 @@ function pickJSON(text, open, close) {
 const clean = s => String(s || '').replace(/[\r\n"\\]/g, ' ').slice(0, 120);   // имя здания попадает в запрос к ИИ
 
 /* ---------- 1. Поиск зданий по рисунку ---------- */
+
+/* ---- фото зданий: сервер сам спрашивает Википедию и отдаёт готовую ссылку на картинку ---- */
+const photoCache = new Map();
+const WUA = { headers: { 'User-Agent': 'TowerSketch/1.0 (student project; xasanov.aziz99@gmail.com)', 'Api-User-Agent': 'TowerSketch/1.0' } };
+async function wj(url) { try { const r = await fetch(url, { ...WUA, signal: AbortSignal.timeout(7000) }); return r.ok ? await r.json() : null; } catch { return null; } }
+const big = u => u ? u.replace(/\/(\d+)px-/, '/960px-') : null;
+async function findPhoto(title) {
+  let page = null, thumb = null;
+  const sum = await wj('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(title.replace(/ /g, '_')) + '?redirect=true');
+  if (sum && sum.type !== 'disambiguation' && sum.title) {
+    page = sum.content_urls?.desktop?.page || ('https://en.wikipedia.org/wiki/' + encodeURIComponent(sum.title.replace(/ /g, '_')));
+    thumb = big(sum.thumbnail?.source) || sum.originalimage?.source || null;
+  }
+  if (!thumb) {
+    const q = new URLSearchParams({ action: 'query', format: 'json', generator: 'search', gsrsearch: title, gsrlimit: '6', prop: 'pageimages|info', piprop: 'thumbnail', pithumbsize: '960', inprop: 'url' });
+    const j = await wj('https://en.wikipedia.org/w/api.php?' + q);
+    const words = title.toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length >= 4);
+    const pages = Object.values(j?.query?.pages || {}).sort((a, b) => a.index - b.index).filter(p => words.some(w => p.title.toLowerCase().includes(w)));
+    const hit = pages.find(p => p.thumbnail) || pages[0];
+    if (hit) { page = page || hit.fullurl; thumb = hit.thumbnail?.source || null; }
+  }
+  if (!thumb) {
+    const q = new URLSearchParams({ action: 'query', format: 'json', generator: 'search', gsrsearch: title + ' filetype:bitmap', gsrnamespace: '6', gsrlimit: '6', prop: 'imageinfo', iiprop: 'url|mime', iiurlwidth: '960' });
+    const j = await wj('https://commons.wikimedia.org/w/api.php?' + q);
+    const pg = Object.values(j?.query?.pages || {}).sort((a, b) => a.index - b.index).find(p => /jpe?g|png/.test(p.imageinfo?.[0]?.mime || '') && p.imageinfo[0].thumburl);
+    if (pg) thumb = pg.imageinfo[0].thumburl;
+  }
+  return { page, thumb };
+}
+app.get('/api/photo', limit(300, 3600e3), async (req, res) => {
+  const title = String(req.query.title || '').slice(0, 120).trim();
+  if (!title) return res.status(400).json({});
+  if (!photoCache.has(title)) photoCache.set(title, findPhoto(title).catch(() => ({ page: null, thumb: null })));
+  const out = await photoCache.get(title);
+  if (!out.thumb) photoCache.delete(title);
+  res.set('Cache-Control', 'public, max-age=86400').json(out);
+});
+
 app.post('/api/guess', limit(20, 3600e3), dailyCap, async (req, res) => {
   try {
     const { image, lang } = req.body;
@@ -84,12 +122,12 @@ app.post('/api/guess', limit(20, 3600e3), dailyCap, async (req, res) => {
 
     const msg = await ai.messages.create({
       model: MODEL,
-      max_tokens: 1000,
+      max_tokens: 1600,
       messages: [{ role: 'user', content: [
         { type: 'image', source: { type: 'base64', media_type: m[1], data: m[2] } },
         { type: 'text', text:
           'This is a rough sketch drawn by a user. Which famous towers, skyscrapers, monuments or landmarks of the world does its shape resemble? ' +
-          'Return ONLY a JSON array of 3 or 4 objects, no markdown, with keys: ' +
+          'Return ONLY a JSON array of 6 objects (best match first), no markdown. Prefer widely known landmarks that have their own English Wikipedia article, and give each article title exactly as it appears on Wikipedia. Keys: ' +
           '"name" (name in ' + language + '), "wiki" (exact English Wikipedia article title), ' +
           '"city" and "country" (in ' + language + '), "match" (integer 0-100, how similar the shape is), ' +
           '"why" (one short sentence in ' + language + ' explaining the resemblance). ' +
@@ -98,7 +136,7 @@ app.post('/api/guess', limit(20, 3600e3), dailyCap, async (req, res) => {
     });
     const text = msg.content.map(b => b.text || '').join('');
     const list = pickJSON(text, '[', ']');
-    res.json(Array.isArray(list) ? list.slice(0, 4) : []);
+    res.json(Array.isArray(list) ? list.slice(0, 6) : []);
   } catch (e) {
     console.error('guess error:', e.message);
     res.status(500).json({ error: 'server error' });
@@ -181,7 +219,7 @@ app.post('/api/model', limit(30, 3600e3), async (req, res) => {
         '{"t":"cyl","x":0,"y":0,"z":0,"r":R,"h":H,"r2":R_TOP,"sx":1,"sz":1,"hollow":false}  cylinder, cone or frustum. (x,y,z) is the center of the base. r2 = top radius (default r). sx and sz stretch it into an ellipse. hollow=true gives a ring wall (arenas, stadiums).\n' +
         '{"t":"sphere","x":0,"y":0,"z":0,"r":R,"half":false}  sphere or dome. (x,y,z) is the CENTER; half=true keeps only the upper half.\n' +
         '{"t":"path","pts":[[x,y,z],[x,y,z]],"r":R_START,"r2":R_END}  smooth curved tube through 3 to 9 points: arches, curved legs, cables, bridges. r2 defaults to r.\n' +
-        'Rules: use 4 to 25 parts (keep the JSON short); make the silhouette instantly recognizable; write symmetric parts out explicitly; no comments or text outside the JSON.\n' +
+        'Rules: use 6 to 30 parts (keep the JSON compact, numbers rounded); make the silhouette instantly recognizable; write symmetric parts out explicitly; no comments or text outside the JSON.\n' +
         'Example (Eiffel Tower): ' + EXAMPLE + '\n' +
         'Return ONLY a JSON object {"parts":[...]} for "' + name + '".';
 
