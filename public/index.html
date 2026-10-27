@@ -11,10 +11,12 @@
 <style>
   /* ===== ЦВЕТА САЙТА: три цвета из палитры Material 3 + нейтральные ===== */
   :root {
-    --primary:  #6750A4;   /* 1. мягкий фиолетовый: кнопки, точки, акценты */
-    --lavender: #EADDFF;   /* 2. светло-сиреневый: плашки, выбранное */
-    --rose:     #FFD8E4;   /* 3. нежно-розовый: подсказки, метка на карте */
-    /* нейтральные (в счёт цветов не входят) */
+    /* ===== ПАЛИТРА: меняй только эти строки, и весь сайт перекрасится ===== */
+    --primary:  #6750A4;   /* главный цвет: кнопки, точки, акценты */
+    --lavender: #EADDFF;   /* светлая версия того же цвета: плашки, выбранное */
+    --light:    #9A82DB;   /* оттенок для нижней части 3D-моделей */
+    --deep:     #3F2D7A;   /* оттенок для верхней части 3D-моделей */
+    /* нейтральные: фон и текст (в счёт цветов не входят) */
     --surface: #FEF7FF; --card: #F3EDF7; --paper: #FFFFFF;
     --ink: #1D1B20; --ink2: #49454F; --line: #CAC4D0;
   }
@@ -31,7 +33,7 @@
   .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     height: 40px; padding: 0 24px; border: none; border-radius: 999px;
-    font: 500 .95rem/1 inherit; font-family: inherit; cursor: pointer;
+    font-weight: 500; font-size: .95rem; line-height: 1; font-family: inherit; cursor: pointer;
     background: var(--primary); color: #fff;
     transition: box-shadow .2s, filter .2s, background .2s, transform .1s;
   }
@@ -42,9 +44,9 @@
   .btn.tonal { background: var(--lavender); color: var(--ink); }
   .btn.tonal:hover { filter: brightness(.97); }
   .btn.outline { background: transparent; color: var(--primary); box-shadow: inset 0 0 0 1px var(--line); }
-  .btn.outline:hover { background: rgba(103,80,164,.08); filter: none; }
+  .btn.outline:hover { background: color-mix(in srgb, var(--primary) 8%, transparent); filter: none; }
   .btn.text { background: transparent; color: var(--primary); padding: 0 16px; }
-  .btn.text:hover { background: rgba(103,80,164,.08); box-shadow: none; filter: none; }
+  .btn.text:hover { background: color-mix(in srgb, var(--primary) 8%, transparent); box-shadow: none; filter: none; }
   .btn.text.active, .btn.text.on { background: var(--lavender); color: var(--ink); }
   .btn.lg { height: 56px; padding: 0 32px; font-size: 1rem; }
   .btn.sm { height: 34px; padding: 0 16px; font-size: .875rem; }
@@ -53,12 +55,12 @@
   header {
     position: sticky; top: 0; z-index: 10;
     display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-    padding: 10px 24px; background: rgba(254,247,255,.9); backdrop-filter: blur(10px);
+    padding: 10px 24px; background: color-mix(in srgb, var(--surface) 90%, transparent); backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(202,196,208,.5);
   }
   .langs { display: inline-flex; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; margin-left: 4px; }
-  .langs button { border: none; background: transparent; font: 500 .85rem/1 inherit; font-family: inherit; color: var(--primary); height: 34px; padding: 0 14px; cursor: pointer; }
-  .langs button:hover { background: rgba(103,80,164,.08); }
+  .langs button { border: none; background: transparent; font-weight: 500; font-size: .85rem; line-height: 1; font-family: inherit; color: var(--primary); height: 34px; padding: 0 14px; cursor: pointer; }
+  .langs button:hover { background: color-mix(in srgb, var(--primary) 8%, transparent); }
   .langs button.on { background: var(--lavender); color: var(--ink); }
   .logo { display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 1.1rem; letter-spacing: .01em; }
   .logo svg { width: 28px; height: 28px; }
@@ -75,18 +77,14 @@
   @media (max-width: 899px) { #globeBg { opacity: .55; } }
 
   /* ---------- главная ---------- */
-  .hero { max-width: 560px; padding: clamp(36px, 9vh, 100px) 0 0; }
-  .hero h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); line-height: 1.12; font-weight: 500; letter-spacing: -.02em; }
+  .hero { max-width: 560px; padding: clamp(20px, 5vh, 56px) 0 0; }
+  .hero h1 { font-size: clamp(2rem, 4.4vw, 3.3rem); line-height: 1.12; font-weight: 500; letter-spacing: -.02em; }
   .hero h1 span { color: var(--primary); }
-  .hero p { margin-top: 20px; font-size: 1.15rem; color: var(--ink2); max-width: 470px; }
-  .modes { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 36px; }
-  .home-contacts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: clamp(40px, 9vh, 90px); }
-  .home-contacts a {
-    display: inline-flex; align-items: center; height: 34px; padding: 0 16px; border-radius: 999px;
-    font-size: .875rem; color: var(--ink2); text-decoration: none; background: rgba(254,247,255,.85);
-    box-shadow: inset 0 0 0 1px var(--line); transition: background .2s, color .2s;
-  }
-  .home-contacts a:hover { background: var(--lavender); color: var(--ink); }
+  .hero p { margin-top: 16px; font-size: 1.05rem; color: var(--ink2); max-width: 440px; }
+  .modes { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+  .home-contacts { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 0; padding-bottom: 8px; }
+  .home-contacts a { font-size: .8rem; color: var(--ink2); text-decoration: none; padding: 4px 2px; }
+  .home-contacts a:hover { color: var(--primary); }
 
   /* ---------- общие заголовки ---------- */
   h2 { font-size: 2rem; font-weight: 500; letter-spacing: -.01em; }
@@ -137,7 +135,7 @@
     display: flex; gap: 16px; border-radius: 24px; overflow: hidden; background: var(--card); cursor: pointer;
     transition: box-shadow .2s, transform .2s;
   }
-  .result:hover { box-shadow: 0 3px 14px rgba(103,80,164,.2); transform: translateY(-2px); }
+  .result:hover { box-shadow: 0 3px 14px color-mix(in srgb, var(--primary) 20%, transparent); transform: translateY(-2px); }
   .result img, .result .noimg { width: 168px; min-height: 140px; object-fit: cover; flex-shrink: 0; background: var(--lavender); }
   .result .body { padding: 14px 18px 14px 0; display: flex; flex-direction: column; gap: 2px; }
   .result h3 { font-size: 1.15rem; font-weight: 500; }
@@ -177,13 +175,13 @@
   .stat small { display: block; font-size: .8rem; color: var(--ink2); }
   .stat b { font-size: 1.2rem; font-weight: 500; }
   .summary { font-size: 1.02rem; }
-  .fact { padding: 16px 18px; border-radius: 20px; background: var(--rose); }
+  .fact { padding: 16px 20px; border-radius: 20px; background: var(--card); box-shadow: inset 4px 0 0 var(--primary); }
   .fact[hidden] { display: none; }
   .fact b { display: block; margin-bottom: 2px; }
   .media { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .photo, .mini { position: relative; aspect-ratio: 4 / 3; border-radius: 20px; overflow: hidden; background: var(--card); margin: 0; }
   .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .photo figcaption, .mini .cap { position: absolute; left: 8px; bottom: 8px; padding: 2px 10px; border-radius: 999px; background: rgba(254,247,255,.88); font-size: .72rem; color: var(--ink2); }
+  .photo figcaption, .mini .cap { position: absolute; left: 8px; bottom: 8px; padding: 2px 10px; border-radius: 999px; background: color-mix(in srgb, var(--surface) 88%, transparent); font-size: .72rem; color: var(--ink2); }
   #miniGlobe { width: 100%; height: 100%; display: block; }
   .links { display: flex; gap: 8px; flex-wrap: wrap; }
   .links a { text-decoration: none; }
@@ -191,6 +189,118 @@
     .detail { grid-template-columns: 1fr; }
     .viewer-card { position: relative; top: 0; }
   }
+
+  .result { animation: rise .5s both; }
+  .result:nth-child(2) { animation-delay: .07s; } .result:nth-child(3) { animation-delay: .14s; }
+  .result:nth-child(4) { animation-delay: .21s; } .result:nth-child(5) { animation-delay: .28s; } .result:nth-child(6) { animation-delay: .35s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(18px); } }
+  .stage canvas.fx { pointer-events: none; display: none; }
+
+  /* экскурсия по глобусу */
+  .tour {
+    display: inline-flex; align-items: center; gap: 12px; margin-top: 24px; padding: 8px 8px 8px 18px;
+    border: none; border-radius: 999px; background: color-mix(in srgb, var(--surface) 92%, transparent); color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--line); font-family: inherit; font-size: .95rem; cursor: pointer; transition: background .2s;
+  }
+  .tour:hover { background: var(--lavender); }
+  .tour i { width: 10px; height: 10px; border-radius: 50%; background: var(--primary); animation: pulse 1.6s infinite; flex-shrink: 0; }
+  .tour b { font-weight: 700; }
+  .tour .go { background: var(--primary); color: #fff; border-radius: 999px; padding: 7px 14px; font-size: .85rem; font-weight: 500; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 50%, transparent); } 100% { box-shadow: 0 0 0 12px color-mix(in srgb, var(--primary) 0%, transparent); } }
+
+  /* витрина зданий */
+  .featured { margin-top: clamp(20px, 4vh, 40px); }
+  .featured h2 { font-size: 1rem; font-weight: 500; color: var(--ink2); margin-bottom: 4px; }
+  .featured .lead { margin: 2px 0 12px; }
+  .f-row { display: flex; gap: 16px; overflow-x: auto; padding: 8px 4px 20px; scroll-snap-type: x proximity; scrollbar-width: thin; }
+  .f-card {
+    flex: 0 0 232px; scroll-snap-align: start; border: none; padding: 0; text-align: left; overflow: hidden;
+    border-radius: 28px; background: color-mix(in srgb, var(--card) 94%, transparent); cursor: pointer; font-family: inherit; color: inherit;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .f-card:hover, .f-card.active { transform: translateY(-4px); box-shadow: 0 6px 18px color-mix(in srgb, var(--primary) 22%, transparent), inset 0 0 0 2px var(--primary); }
+  .f-card canvas { display: block; width: 100%; height: 150px; }
+  .f-card .t { padding: 0 18px 16px; display: flex; flex-direction: column; gap: 2px; }
+  .f-card h3 { font-size: 1.02rem; font-weight: 700; }
+  .f-card span { font-size: .85rem; color: var(--ink2); }
+
+  /* атлас */
+  .atlas-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; max-height: 480px; border-radius: 28px; background: var(--card); overflow: hidden; }
+  #atlasCanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .chips button { border: none; border-radius: 999px; background: var(--lavender); color: var(--ink); font-family: inherit; font-size: .9rem; font-weight: 500; padding: 10px 16px; cursor: pointer; }
+  .chips button:hover { filter: brightness(.96); }
+  .links { align-items: center; }
+
+
+  /* ===== современный слой: мягкие градиенты, стекло, крупные скругления ===== */
+  body { background: radial-gradient(1000px 560px at 8% -8%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 70%),
+                     radial-gradient(800px 520px at 100% 6%, color-mix(in srgb, var(--light) 22%, transparent), transparent 70%), var(--surface);
+         background-attachment: fixed; }
+  header {
+    top: 12px; margin: 12px 16px 0; padding: 8px 12px 8px 20px; border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+    background: color-mix(in srgb, var(--paper) 64%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4);
+    box-shadow: 0 10px 34px color-mix(in srgb, var(--primary) 12%, transparent);
+  }
+  .logo { font-weight: 800; letter-spacing: -.01em; }
+  .btn.text.active, .btn.text.on { font-weight: 700; color: var(--primary); }
+  .btn:not(.tonal):not(.outline):not(.text) {
+    background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 55%, var(--light)));
+    box-shadow: 0 8px 22px color-mix(in srgb, var(--primary) 38%, transparent);
+  }
+  .btn:not(.tonal):not(.outline):not(.text):hover { transform: translateY(-1px); filter: none; box-shadow: 0 12px 28px color-mix(in srgb, var(--primary) 46%, transparent); }
+  .btn.tonal { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 16%, transparent); }
+  h2 { font-weight: 800; letter-spacing: -.02em; }
+  .hero h1 { font-weight: 800; letter-spacing: -.035em; line-height: 1.04; }
+  .hero h1 span { background: linear-gradient(100deg, var(--primary), var(--light)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p { color: var(--ink2); }
+  .featured h2 { font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--primary); }
+  .f-card, .result, .steps li, .stat, .card, .viewer-card, .atlas-wrap, .stage, .photo, .mini, .fact { border-radius: 32px; }
+  .f-card {
+    background: color-mix(in srgb, var(--paper) 72%, transparent);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    border: 1px solid color-mix(in srgb, var(--line) 45%, transparent);
+    box-shadow: 0 8px 28px color-mix(in srgb, var(--primary) 9%, transparent);
+  }
+  .f-card:hover, .f-card.active { box-shadow: 0 16px 38px color-mix(in srgb, var(--primary) 24%, transparent), inset 0 0 0 2px var(--primary); }
+  .f-card h3 { font-weight: 800; letter-spacing: -.01em; }
+  .result, .steps li, .card { background: color-mix(in srgb, var(--paper) 70%, transparent); border: 1px solid color-mix(in srgb, var(--line) 45%, transparent); box-shadow: 0 8px 26px color-mix(in srgb, var(--primary) 7%, transparent); }
+  .result h3 { font-weight: 800; letter-spacing: -.01em; }
+  .result .noimg { background: linear-gradient(135deg, var(--lavender), color-mix(in srgb, var(--light) 40%, var(--lavender))); }
+  .steps li::before { background: linear-gradient(135deg, var(--primary), var(--light)); color: #fff; font-weight: 700; }
+  .stage { box-shadow: 0 14px 44px color-mix(in srgb, var(--primary) 14%, transparent); border: 1px solid color-mix(in srgb, var(--line) 55%, transparent); }
+  .viewer-card, .atlas-wrap { background: radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--primary) 10%, var(--paper)), var(--card)); border: 1px solid color-mix(in srgb, var(--line) 45%, transparent); box-shadow: 0 14px 44px color-mix(in srgb, var(--primary) 12%, transparent); }
+  .info-card h2 { font-weight: 800; letter-spacing: -.03em; }
+  .stat { background: color-mix(in srgb, var(--primary) 9%, var(--paper)); border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent); }
+  .chip { background: color-mix(in srgb, var(--primary) 12%, var(--paper)); color: var(--primary); font-weight: 700; }
+  .chips button { background: color-mix(in srgb, var(--primary) 10%, var(--paper)); border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent); }
+  .photo, .mini { background: color-mix(in srgb, var(--primary) 6%, var(--paper)); }
+
+  /* парящие здания на главной */
+  #globeBg { pointer-events: none; }
+  .float-tip {
+    position: fixed; z-index: 5; left: 0; top: 0; transform: translate(-50%, -100%); pointer-events: none;
+    padding: 8px 14px; border-radius: 999px; font-size: .85rem; font-weight: 700; white-space: nowrap;
+    background: color-mix(in srgb, var(--paper) 86%, transparent); color: var(--ink);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--primary) 20%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--primary) 25%, transparent);
+    opacity: 0; transition: opacity .15s;
+  }
+  .float-tip.on { opacity: 1; }
+  .float-tip span { color: var(--primary); font-weight: 500; margin-left: 6px; }
+  .float-hint { margin-top: 10px; font-size: .8rem; color: var(--ink2); }
+  .result .noimg, .noimg {
+    background: radial-gradient(circle, color-mix(in srgb, var(--primary) 30%, transparent) 1.8px, transparent 2.4px) 0 0 / 14px 14px,
+                linear-gradient(135deg, var(--lavender), color-mix(in srgb, var(--light) 35%, var(--lavender)));
+  }
+  /* главная: текст крупнее, кнопки и контакты ниже */
+  .hero { padding-top: clamp(28px, 7vh, 80px); }
+  .hero p { font-size: 1.3rem; line-height: 1.55; max-width: 520px; margin-top: 20px; }
+  .modes { margin-top: clamp(40px, 8vh, 76px); }
+  .home-contacts { margin-top: clamp(40px, 9vh, 90px); gap: 22px; }
+  .home-contacts a { font-size: .92rem; }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 </head>
@@ -201,12 +311,13 @@
 
 <header>
   <span class="logo">
-    <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12" fill="#EADDFF"/><g fill="#6750A4"><circle cx="9" cy="10" r="1.6"/><circle cx="14" cy="8" r="1.6"/><circle cx="19" cy="11" r="1.6"/><circle cx="11" cy="15" r="1.6"/><circle cx="16" cy="16" r="1.6"/><circle cx="20" cy="17" r="1.2"/><circle cx="13" cy="20" r="1.4"/></g></svg>
+    <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12" style="fill:var(--lavender)"/><g style="fill:var(--primary)"><circle cx="9" cy="10" r="1.6"/><circle cx="14" cy="8" r="1.6"/><circle cx="19" cy="11" r="1.6"/><circle cx="11" cy="15" r="1.6"/><circle cx="16" cy="16" r="1.6"/><circle cx="20" cy="17" r="1.2"/><circle cx="13" cy="20" r="1.4"/></g></svg>
     Tower Sketch
   </span>
   <nav>
     <button class="btn text sm" id="btnHome" data-i18n="home"></button>
     <button class="btn text sm" id="btnInfo" data-i18n="info"></button>
+    <button class="btn text sm" id="btnAtlas"><span data-i18n="atlas"></span> <span id="atlasCount"></span></button>
     <button class="btn text sm" id="btnMusic"><svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg><span data-i18n="music"></span></button>
     <div class="langs" id="langs"><button data-lang="en">EN</button><button data-lang="ko">한국어</button><button data-lang="ru">RU</button></div>
   </nav>
@@ -233,6 +344,15 @@
     <ol class="steps" id="infoSteps"></ol>
   </section>
 
+  <!-- АТЛАС -->
+  <section class="view narrow" id="view-atlas">
+    <h2 data-i18n="atlasTitle"></h2>
+    <p class="lead" data-i18n="atlasLead"></p>
+    <div class="atlas-wrap"><canvas id="atlasCanvas"></canvas></div>
+    <div class="chips" id="atlasChips"></div>
+    <p class="hint" id="atlasEmpty"></p>
+  </section>
+
   <!-- РИСОВАНИЕ МЫШЬЮ -->
   <section class="view narrow" id="view-mouse">
     <div class="toolbar">
@@ -241,7 +361,7 @@
       <button class="btn tonal sm" data-ex="twin" data-i18n="exTwin"></button>
       <button class="btn tonal sm" data-ex="spire" data-i18n="exSpire"></button>
     </div>
-    <div class="stage"><canvas id="mouseCanvas" width="640" height="480"></canvas></div>
+    <div class="stage"><canvas id="mouseCanvas" width="640" height="480"></canvas><canvas class="fx" id="mouseFx"></canvas></div>
     <div class="toolbar">
       <button class="btn" id="mouseGuess" data-i18n="guess"></button>
       <button class="btn outline" id="mouseUndo" data-i18n="undo"></button>
@@ -257,6 +377,7 @@
     <div class="stage">
       <video id="video" playsinline muted></video>
       <canvas id="camCanvas" width="640" height="480"></canvas>
+      <canvas class="fx" id="camFx"></canvas>
       <div class="cursor" id="cursor"></div>
     </div>
     <div class="toolbar">
@@ -292,7 +413,7 @@
           <figure class="photo" id="dPhotoBox" hidden><img id="dPhoto" alt=""><figcaption data-i18n="photoCredit"></figcaption></figure>
           <div class="mini"><canvas id="miniGlobe"></canvas><span class="cap" id="dWhere"></span></div>
         </div>
-        <div class="links" id="dLinks"></div>
+        <div class="links"><span class="links" id="dLinks"></span><button class="btn outline sm" id="dShare" data-i18n="saveCard"></button></div>
       </div>
     </div>
   </section>
@@ -410,9 +531,36 @@ const T = {
   }
 };
 
+
+Object.assign(T.en, {
+  featuredTitle: 'Famous landmarks', featuredSub: 'Tap one to explore it in 3D. No drawing needed.', tourGo: 'Explore 3D →',
+  atlas: 'Atlas', atlasTitle: 'Your atlas', atlasLead: 'Every building you open is pinned to the globe.',
+  atlasEmpty: 'Nothing here yet. Find your first building!', saveCard: 'Save card', back: 'Back', bc: 'c. {n} BC'
+});
+Object.assign(T.ko, {
+  featuredTitle: '세계의 명소', featuredSub: '그림 없이도 눌러서 바로 3D로 볼 수 있어요.', tourGo: '3D로 보기 →',
+  atlas: '아틀라스', atlasTitle: '나의 아틀라스', atlasLead: '열어 본 건물은 지구본에 표시돼요.',
+  atlasEmpty: '아직 비어 있어요. 첫 건물을 찾아 보세요!', saveCard: '카드 저장', back: '뒤로', bc: '기원전 {n}년경'
+});
+Object.assign(T.ru, {
+  featuredTitle: 'Знаменитые места', featuredSub: 'Нажми на любое, чтобы сразу посмотреть его в 3D.', tourGo: 'Смотреть в 3D →',
+  atlas: 'Атлас', atlasTitle: 'Твой атлас', atlasLead: 'Каждое открытое здание отмечается на глобусе.',
+  atlasEmpty: 'Пока пусто. Найди первое здание!', saveCard: 'Сохранить карточку', back: 'Назад', bc: '≈{n} до н. э.'
+});
+
+T.en.floatHint = 'Tap a floating landmark to see it in 3D.';
+T.ko.floatHint = '떠다니는 명소를 눌러 3D로 보세요.';
+T.ru.floatHint = 'Нажми на парящее здание, чтобы увидеть его в 3D.';
+
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const TAU = Math.PI * 2;
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const hex2rgb = h => { h = h.replace('#', ''); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
+const TH = {                                      // цвета читаются из :root, так что палитра меняется в одном месте
+  primaryHex: cssv('--primary'), lavHex: cssv('--lavender'), surface: cssv('--surface'), card: cssv('--card'),
+  primary: hex2rgb(cssv('--primary')), lav: hex2rgb(cssv('--lavender')), light: hex2rgb(cssv('--light')), deep: hex2rgb(cssv('--deep'))
+};
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const saved = localStorage.getItem('towerLang');
 let lang = (saved === 'ko' || saved === 'en' || saved === 'ru') ? saved : 'en';
@@ -432,7 +580,7 @@ function applyLang() {
   document.querySelectorAll('[data-i18n-html]').forEach(el => el.innerHTML = t[el.dataset.i18nHtml]);
   $('infoSteps').innerHTML = t.infoSteps.map(s => `<li><span>${s}</span></li>`).join('');
   document.querySelectorAll('#langs button').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
-  renderContacts();
+  renderContacts(); updateAtlasCount();
 }
 document.querySelectorAll('#langs button').forEach(b => b.onclick = () => {
   lang = b.dataset.lang;
@@ -495,7 +643,7 @@ class Globe {
   constructor(canvas, layout, opts = {}) {
     this.c = canvas; this.g = canvas.getContext('2d'); this.layout = layout;
     this.rot = opts.rot ?? -1.7; this.tilt = opts.tilt ?? .38; this.auto = opts.auto !== false;
-    this.pin = null; this.target = null; this.raf = 0; this.last = 0; this.pts = null;
+    this.pin = null; this.pins = []; this.target = null; this.raf = 0; this.last = 0; this.pts = null;
     landReady.then(p => { this.pts = p; });
   }
   setPin(lat, lon) {                              // поворачивает Землю к нужному месту и ставит метку
@@ -524,7 +672,7 @@ class Globe {
     } else if (this.auto && !REDUCED) this.rot += dt * .00011;
 
     const disc = g.createRadialGradient(cx - R * .3, cy - R * .35, R * .1, cx, cy, R);   // сиреневый шар под точками
-    disc.addColorStop(0, 'rgba(234,221,255,.95)'); disc.addColorStop(1, 'rgba(234,221,255,.35)');
+    disc.addColorStop(0, `rgba(${TH.lav.join(',')},.95)`); disc.addColorStop(1, `rgba(${TH.lav.join(',')},.35)`);
     g.fillStyle = disc; g.beginPath(); g.arc(cx, cy, R, 0, TAU); g.fill();
 
     const cr = Math.cos(this.rot), sr = Math.sin(this.rot), ct = Math.cos(this.tilt), st = Math.sin(this.tilt);
@@ -541,7 +689,7 @@ class Globe {
         else if (z < -.02) back.push(cx + x * R, cy - y * R);
       }
       const dots = (arr, rad, a) => {
-        g.fillStyle = `rgba(103,80,164,${a})`; g.beginPath();
+        g.fillStyle = `rgba(${TH.primary.join(',')},${a})`; g.beginPath();
         for (let i = 0; i < arr.length; i += 2) { g.moveTo(arr[i] + rad, arr[i + 1]); g.arc(arr[i], arr[i + 1], rad, 0, TAU); }
         g.fill();
       };
@@ -550,21 +698,27 @@ class Globe {
     }
     g.strokeStyle = 'rgba(202,196,208,.9)'; g.lineWidth = 1; g.beginPath(); g.arc(cx, cy, R, 0, TAU); g.stroke();
 
+    (this.pins || []).forEach(q => {              // метки найденных зданий (атлас)
+      const f = q.lat * Math.PI / 180, l = q.lon * Math.PI / 180;
+      const [x, y, z] = project(Math.cos(f) * Math.sin(l), Math.sin(f), Math.cos(f) * Math.cos(l));
+      if (z > .05) {
+        g.fillStyle = TH.lavHex; g.strokeStyle = TH.primaryHex; g.lineWidth = 2;
+        g.beginPath(); g.arc(cx + x * R, cy - y * R, Math.max(4, R * .028), 0, TAU); g.fill(); g.stroke();
+      }
+    });
     if (this.pin) {                               // метка места здания
       const f = this.pin.lat * Math.PI / 180, l = this.pin.lon * Math.PI / 180;
       const [x, y, z] = project(Math.cos(f) * Math.sin(l), Math.sin(f), Math.cos(f) * Math.cos(l));
       if (z > .05) {
         const px = cx + x * R, py = cy - y * R, pulse = (t / 1100) % 1;
-        g.strokeStyle = `rgba(103,80,164,${.55 * (1 - pulse)})`; g.lineWidth = 2;
+        g.strokeStyle = `rgba(${TH.primary.join(',')},${.55 * (1 - pulse)})`; g.lineWidth = 2;
         g.beginPath(); g.arc(px, py, 6 + pulse * 18, 0, TAU); g.stroke();
-        g.fillStyle = '#FFD8E4'; g.strokeStyle = '#6750A4'; g.lineWidth = 2.5;
+        g.fillStyle = TH.lavHex; g.strokeStyle = TH.primaryHex; g.lineWidth = 2.5;
         g.beginPath(); g.arc(px, py, 6, 0, TAU); g.fill(); g.stroke();
       }
     }
   }
 }
-const homeLayout = (W, H) => W >= 900 ? [W * .76, H * .54, Math.min(H * .46, W * .29)] : [W * .5, H * .66, Math.min(W * .62, H * .4)];
-const globe = new Globe($('globeBg'), homeLayout);
 const miniGlobe = new Globe($('miniGlobe'), (W, H) => [W / 2, H / 2, Math.min(W, H) * .44], { rot: 0, tilt: .3, auto: true });
 
 /* ============ 3D ИЗ ТОЧЕК: превращаем список деталей здания в облако точек ============ */
@@ -666,10 +820,54 @@ function buildCloud(parts, total = 5200) {
     p[i * 3] = (q[0] - mx0) * sc; p[i * 3 + 1] = (q[1] - mn[1] - hh) * sc; p[i * 3 + 2] = (q[2] - mz0) * sc;
     h01[i] = (q[1] - mn[1]) / (2 * hh);
   });
-  return { p, h01, n: raw.length, gy: -hh * sc, rr: Math.max(.35, rMax * sc * 1.12) };
+  const rs = mulberry(11), sv = new Float32Array(raw.length * 3);
+  for (let i = 0; i < raw.length; i++) { sv[i * 3] = (rs() - .5) * 2.6; sv[i * 3 + 1] = rs() * 1.8 + .3; sv[i * 3 + 2] = (rs() - .5) * 2.6; }
+  return { p, h01, s: sv, n: raw.length, gy: -hh * sc, rr: Math.max(.35, rMax * sc * 1.12) };
 }
 
-/* ============ ПРОСМОТР 3D: вращение мышкой, масштаб колёсиком ============ */
+/* ============ ПРОСМОТР 3D: градиент по высоте, сборка из точек, вращение мышкой ============ */
+const BASE_RGB = TH.light, TINT_RGB = TH.deep;
+const mixc = t => BASE_RGB.map((v, i) => Math.round(v + (TINT_RGB[i] - v) * t));
+function renderCloud(g, W, H, C, v) {
+  const small = !!v.small;
+  const S = Math.min(W, H) * (small ? .36 : .4) * v.zoom, cx = W / 2, cy = H * (small ? .52 : .48), D = 4.2;
+  const cyw = Math.cos(v.yaw), syw = Math.sin(v.yaw), cp = Math.cos(v.pitch), sp = Math.sin(v.pitch);
+  const base = Math.max(small ? .7 : .9, S * (small ? .0065 : .0072));
+  const tr = (x, y, z) => {
+    const x1 = x * cyw + z * syw, z1 = -x * syw + z * cyw;
+    const y2 = y * cp - z1 * sp, z2 = y * sp + z1 * cp, f = D / (D - z2);
+    return [cx + x1 * S * f, cy - y2 * S * f, z2, f];
+  };
+  g.fillStyle = 'rgba(121,116,126,.34)'; g.beginPath();                 // кольца земли под зданием
+  [[C.rr, 120], [C.rr * .6, 72]].forEach(([rad, n]) => {
+    for (let i = 0; i < n; i++) {
+      const a = i / n * TAU, [x, y, , f] = tr(Math.cos(a) * rad, C.gy, Math.sin(a) * rad);
+      g.moveTo(x + base * .75 * f, y); g.arc(x, y, base * .75 * f, 0, TAU);
+    }
+  });
+  g.fill();
+  const B = Array.from({ length: 20 }, () => []), prog = v.prog;
+  for (let i = 0; i < C.n; i++) {
+    let px = C.p[i * 3], py = C.p[i * 3 + 1], pz = C.p[i * 3 + 2];
+    if (prog < 1) {                                                      // точки слетаются снизу вверх
+      const local = Math.max(0, Math.min(1, prog * 1.5 - C.h01[i] * .5));
+      if (local <= 0) continue;
+      const k = Math.pow(1 - local, 3);
+      px += C.s[i * 3] * k; py += C.s[i * 3 + 1] * k; pz += C.s[i * 3 + 2] * k;
+    }
+    const [x, y, z, f] = tr(px, py, pz);
+    const d = Math.max(0, Math.min(4, Math.floor((z + 1) / 2 * 5))), hb = Math.min(3, Math.floor(C.h01[i] * 4));
+    B[d * 4 + hb].push(x, y, f);
+  }
+  for (let d = 0; d < 5; d++) for (let hb = 0; hb < 4; hb++) {
+    const arr = B[d * 4 + hb]; if (!arr.length) continue;
+    const [r, gg, b] = mixc(hb / 3);                               // выше по зданию: от сиреневого к розово-малиновому
+    g.fillStyle = `rgba(${r},${gg},${b},${(.24 + d * .19).toFixed(2)})`; g.beginPath();
+    for (let i = 0; i < arr.length; i += 3) { const rad = base * arr[i + 2] * (.85 + d * .08); g.moveTo(arr[i] + rad, arr[i + 1]); g.arc(arr[i], arr[i + 1], rad, 0, TAU); }
+    g.fill();
+  }
+}
+
 class Viewer {
   constructor(canvas) {
     this.c = canvas; this.g = canvas.getContext('2d'); this.cloud = null; this.raf = 0; this.last = 0;
@@ -702,40 +900,15 @@ class Viewer {
     const C = this.cloud; if (!C) return;
     if (!this.auto && !this.drag) { this.idle += dt; if (this.idle > 3500) this.auto = true; }
     if (this.auto && !REDUCED) this.yaw += dt * .00045;
-
-    const S = Math.min(W, H) * .4 * this.zoom, cx = W / 2, cy = H * .48, D = 4.2;
-    const cyw = Math.cos(this.yaw), syw = Math.sin(this.yaw), cp = Math.cos(this.pitch), sp = Math.sin(this.pitch);
-    const prog = REDUCED ? 1 : Math.min(1, (t - this.t0) / 1700), reveal = (1 - Math.pow(1 - prog, 3)) * 1.03;
-    const base = Math.max(.9, S * .0072);
-    const tr = (x, y, z) => {
-      const x1 = x * cyw + z * syw, z1 = -x * syw + z * cyw;
-      const y2 = y * cp - z1 * sp, z2 = y * sp + z1 * cp, f = D / (D - z2);
-      return [cx + x1 * S * f, cy - y2 * S * f, z2, f];
-    };
-    g.fillStyle = 'rgba(121,116,126,.38)'; g.beginPath();            // кольцо земли под зданием
-    for (let i = 0; i < 120; i++) {
-      const a = i / 120 * TAU, [x, y, , f] = tr(Math.cos(a) * C.rr, C.gy, Math.sin(a) * C.rr);
-      g.moveTo(x + base * .8 * f, y); g.arc(x, y, base * .8 * f, 0, TAU);
-    }
-    g.fill();
-    const B = [[], [], [], [], []];
-    for (let i = 0; i < C.n; i++) {
-      if (C.h01[i] > reveal) continue;                               // здание «вырастает» снизу вверх
-      const [x, y, z, f] = tr(C.p[i * 3], C.p[i * 3 + 1], C.p[i * 3 + 2]);
-      B[Math.max(0, Math.min(4, Math.floor((z + 1) / 2 * 5)))].push(x, y, f);
-    }
-    B.forEach((arr, k) => {
-      g.fillStyle = `rgba(103,80,164,${.22 + k * .19})`; g.beginPath();
-      for (let i = 0; i < arr.length; i += 3) { const r = base * arr[i + 2] * (.85 + k * .08); g.moveTo(arr[i] + r, arr[i + 1]); g.arc(arr[i], arr[i + 1], r, 0, TAU); }
-      g.fill();
-    });
+    const prog = REDUCED ? 1 : Math.min(1, (t - this.t0) / 2600);
+    renderCloud(g, W, H, C, { yaw: this.yaw, pitch: this.pitch, zoom: this.zoom, prog });
   }
 }
 const viewer = new Viewer($('modelCanvas'));
 
 /* ============ НАВИГАЦИЯ ============ */
 let current = 'home';
-const NAVS = { home: 'btnHome', info: 'btnInfo' };
+const NAVS = { home: 'btnHome', info: 'btnInfo', atlas: 'btnAtlas' };
 function show(name) {
   current = name;
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -743,12 +916,14 @@ function show(name) {
   document.body.classList.toggle('is-home', name === 'home');         // Земля только на главной
   Object.entries(NAVS).forEach(([k, id]) => $(id).classList.toggle('active', k === name));
   if (name !== 'cam') stopCamera();
-  name === 'home' ? globe.start() : globe.stop();
+  if (name === 'home') floaters.start(); else floaters.stop();
+  if (name === 'atlas') { atlasGlobe.start(); renderAtlas(); } else atlasGlobe.stop();
   if (name === 'detail') { viewer.start(); miniGlobe.start(); } else { viewer.stop(); miniGlobe.stop(); }
   window.scrollTo(0, 0);
 }
 $('btnHome').onclick = () => show('home');
 $('btnInfo').onclick = () => show('info');
+$('btnAtlas').onclick = () => show('atlas');
 $('goMouse').onclick = () => show('mouse');
 $('goCam').onclick = () => show('cam');
 $('dBack').onclick = () => show(state.from);
@@ -763,13 +938,90 @@ async function api(path, body) {
 }
 const errText = e => e && e.status === 429 ? T[lang].busy : T[lang].fail;
 
-const wikiCache = new Map();
-function wikiInfo(title) {                        // фото и координаты из Википедии (берётся один раз)
-  if (!wikiCache.has(title)) {
-    wikiCache.set(title, fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(String(title).replace(/ /g, '_')))
-      .then(r => r.ok ? r.json() : null).catch(() => null));
+const WIKI_API = 'https://en.wikipedia.org/w/api.php';
+const wikiMemo = new Map();
+const bigThumb = u => u ? u.replace(/\/(\d+)px-/, '/960px-') : null;
+const pageInfo = p => {
+  if (!p || p.missing !== undefined || !p.title) return null;
+  const c = p.coordinates && p.coordinates[0];
+  return {
+    title: p.title,
+    url: p.fullurl || ('https://en.wikipedia.org/wiki/' + encodeURIComponent(p.title.replace(/ /g, '_'))),
+    thumb: p.thumbnail ? p.thumbnail.source : null,
+    lat: c ? c.lat : null, lon: c ? c.lon : null,
+    disambig: !!(p.pageprops && p.pageprops.disambiguation !== undefined),
+    index: p.index || 0
+  };
+};
+async function getJSON(url) {
+  try { const r = await fetch(url); return r.ok ? await r.json() : null; } catch { return null; }
+}
+async function wikiQuery(extra) {
+  const q = new URLSearchParams({
+    action: 'query', format: 'json', origin: '*', redirects: '1', prop: 'pageimages|coordinates|pageprops|info',
+    inprop: 'url', piprop: 'thumbnail', pithumbsize: '1000', colimit: '1', ppprop: 'disambiguation', ...extra
+  });
+  const j = await getJSON(WIKI_API + '?' + q);
+  return Object.values((j && j.query && j.query.pages) || {}).map(pageInfo).filter(Boolean).sort((a, b) => a.index - b.index);
+}
+async function restSummary(title) {                // быстрый способ: краткая справка со статьёй и главным фото
+  const j = await getJSON('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(String(title).replace(/ /g, '_')) + '?redirect=true');
+  if (!j || j.type === 'disambiguation' || !j.title) return null;
+  return {
+    title: j.title,
+    url: (j.content_urls && j.content_urls.desktop && j.content_urls.desktop.page) || ('https://en.wikipedia.org/wiki/' + encodeURIComponent(j.title.replace(/ /g, '_'))),
+    thumb: bigThumb(j.thumbnail && j.thumbnail.source) || (j.originalimage && j.originalimage.source) || null,
+    lat: j.coordinates ? j.coordinates.lat : null, lon: j.coordinates ? j.coordinates.lon : null, disambig: false
+  };
+}
+async function commonsPhoto(q) {                   // запасной источник: поиск фотографий в Wikimedia Commons
+  const p = new URLSearchParams({
+    action: 'query', format: 'json', origin: '*', generator: 'search', gsrsearch: q + ' filetype:bitmap', gsrnamespace: '6',
+    gsrlimit: '6', prop: 'imageinfo', iiprop: 'url|mime', iiurlwidth: '960'
+  });
+  const j = await getJSON('https://commons.wikimedia.org/w/api.php?' + p);
+  const pages = Object.values((j && j.query && j.query.pages) || {}).sort((a, b) => (a.index || 0) - (b.index || 0));
+  for (const pg of pages) {
+    const ii = pg.imageinfo && pg.imageinfo[0];
+    if (ii && /jpe?g|png/.test(ii.mime || '') && ii.thumburl) return ii.thumburl;
   }
-  return wikiCache.get(title);
+  return null;
+}
+function resolveWiki(item) {                       // находит настоящую статью и фото, даже если название чуть неточное
+  const key = (item.wiki || '') + '|' + (item.name || '');
+  if (!wikiMemo.has(key)) {
+    wikiMemo.set(key, (async () => {
+      const title = item.wiki || item.name;
+      const sv = await getJSON(API_BASE + '/api/photo?title=' + encodeURIComponent(title));   // самый надёжный путь: через наш сервер
+      let best = await restSummary(title);
+      if (sv && sv.thumb) {
+        if (!best) best = { title, url: sv.page || ('https://en.wikipedia.org/wiki/' + encodeURIComponent(String(title).replace(/ /g, '_'))), lat: null, lon: null, disambig: false };
+        best.thumb = sv.thumb; best.url = best.url || sv.page;
+        return best;
+      }
+      if (!best) { const a = (await wikiQuery({ titles: title }))[0]; best = a && !a.disambig ? a : null; }
+      if (!best || !best.thumb) {
+        const words = String(title).toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length >= 4);
+        const found = (await wikiQuery({ generator: 'search', gsrsearch: title, gsrlimit: '6' }))
+          .filter(c => !c.disambig && words.some(w => c.title.toLowerCase().includes(w)));
+        const alt = found.find(c => c.thumb) || found[0] || null;
+        if (!best) best = alt;
+        else if (alt) {
+          if (!best.thumb && alt.thumb) best.thumb = alt.thumb;
+          if (best.lat == null && alt.lat != null) { best.lat = alt.lat; best.lon = alt.lon; }
+        }
+      }
+      if (!best || !best.thumb) {
+        const img = await commonsPhoto(title);
+        if (img) {
+          if (!best) best = { title, url: 'https://en.wikipedia.org/w/index.php?search=' + encodeURIComponent(title), lat: null, lon: null, disambig: false };
+          best.thumb = img;
+        }
+      }
+      return best;
+    })());
+  }
+  return wikiMemo.get(key);
 }
 
 /* ============ ПОИСК ЗДАНИЙ ПО РИСУНКУ ============ */
@@ -792,15 +1044,18 @@ async function runGuess(canvas, hintEl, outEl, btn, view) {
   hintEl.className = 'hint';
   if (isBlank(canvas)) { hintEl.textContent = t.empty; return; }
   hintEl.textContent = t.thinking; outEl.innerHTML = ''; btn.disabled = true;
+  const sketch = exportImage(canvas);
+  const fx = new Dissolve(canvas); fx.start();     // рисунок рассыпается на точки, пока ИИ думает
   try {
-    const list = await api('/api/guess', { image: exportImage(canvas), lang });
+    const list = await api('/api/guess', { image: sketch, lang });
     if (!Array.isArray(list) || !list.length) { hintEl.textContent = t.none; return; }
+    list.sort((a, b) => (Number(b.match) || 0) - (Number(a.match) || 0));
     hintEl.textContent = '';
-    const thumbs = await Promise.all(list.map(p => wikiInfo(p.wiki).then(j => j && j.thumbnail ? j.thumbnail.source : null)));
+    const wikis = await Promise.all(list.map(p => resolveWiki(p)));
     outEl.innerHTML = `<p class="results-hint">${t.resultsHint}</p><div class="results">` + list.map((p, i) => {
-      const m = Math.max(0, Math.min(100, Math.round(Number(p.match) || 0)));
+      const m = Math.max(0, Math.min(100, Math.round(Number(p.match) || 0))), th = wikis[i] && wikis[i].thumb;
       return `<article class="result" tabindex="0" role="button" data-i="${i}">
-        ${thumbs[i] ? `<img src="${esc(thumbs[i])}" alt="">` : '<div class="noimg"></div>'}
+        ${th ? `<img src="${esc(th)}" alt="" loading="lazy" onerror="this.outerHTML='<div class=&quot;noimg&quot;></div>'">` : '<div class="noimg"></div>'}
         <div class="body">
           <h3>${esc(p.name)}</h3>
           <div class="meta">${esc([p.city, p.country].filter(Boolean).join(', '))}</div>
@@ -810,40 +1065,106 @@ async function runGuess(canvas, hintEl, outEl, btn, view) {
           <span class="go">${t.view3d} →</span>
         </div></article>`;
     }).join('') + '</div>';
-    const open = el => { const c = el.closest('.result'); if (c) openDetail(list[+c.dataset.i], view); };
+    const open = el => { const c = el.closest('.result'); if (c) { const i = +c.dataset.i; openDetail(list[i], view, { sketch, wiki: wikis[i] }); } };
     outEl.onclick = e => open(e.target);
     outEl.onkeydown = e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.result')) { e.preventDefault(); open(e.target); } };
     outEl.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
   } catch (e) {
     hintEl.className = 'hint error'; hintEl.textContent = errText(e);
-  } finally { btn.disabled = false; }
+  } finally { fx.stop(); btn.disabled = false; }
+}
+
+/* рисунок рассыпается на точки, а потом собирается обратно */
+class Dissolve {
+  constructor(src) { this.src = src; this.fx = src.parentElement.querySelector('canvas.fx'); this.raf = 0; this.k = 0; this.state = 'idle'; }
+  start() {
+    if (!this.fx) return;
+    const c = this.src, d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data, pts = [], step = 3;
+    for (let y = 0; y < c.height; y += step) for (let x = 0; x < c.width; x += step)
+      if (d[(y * c.width + x) * 4 + 3] > 110) pts.push({ x: x / c.width, y: y / c.height, a: Math.random() * TAU, r: Math.random() });
+    for (let i = pts.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pts[i], pts[j]] = [pts[j], pts[i]]; }
+    this.pts = pts.slice(0, 2600);
+    this.t0 = performance.now(); this.state = 'run';
+    this.src.style.opacity = '0'; this.fx.style.display = 'block';
+    const loop = t => { this.draw(t); this.raf = requestAnimationFrame(loop); };
+    this.raf = requestAnimationFrame(loop);
+  }
+  stop() {
+    if (this.state !== 'run') return;
+    this.state = 'back'; this.tb = performance.now(); this.k0 = this.k;
+  }
+  draw(t) {
+    const [W, H, dpr] = fit(this.fx), g = this.fx.getContext('2d');
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    const time = (t - this.t0) / 1000, ease = x => 1 - Math.pow(1 - x, 3);
+    if (this.state === 'run') this.k = ease(Math.min(1, time / 1.1));
+    else { const q = Math.min(1, (t - this.tb) / 550); this.k = this.k0 * (1 - ease(q)); if (q >= 1) return this.finish(); }
+    for (const p of this.pts) {
+      const bx = p.x * W, by = p.y * H, ang = p.a + time * (.5 + p.r), rad = this.k * (14 + p.r * 46) * (1 + .25 * Math.sin(time * 2.2 + p.a * 3));
+      g.fillStyle = `rgba(${(p.r > .78 ? TH.light : TH.primary).join(',')},.85)`;
+      g.beginPath(); g.arc(bx + Math.cos(ang) * rad, by + Math.sin(ang) * rad, 1.6 + p.r * 1.8, 0, TAU); g.fill();
+    }
+  }
+  finish() {
+    cancelAnimationFrame(this.raf); this.state = 'idle';
+    this.fx.style.display = 'none'; this.src.style.opacity = '';
+  }
 }
 
 /* ============ ЭКРАН ЗДАНИЯ ============ */
-const state = { item: null, from: 'mouse', token: 0, info: null };
+const state = { item: null, from: 'mouse', token: 0, info: null, sketch: null, wiki: null, preset: null };
+const fmtYear = y => { y = Number(y); if (!Number.isFinite(y)) return ''; return y < 0 ? T[lang].bc.replace('{n}', -y) : String(y); };
 
 function setPinFrom(lat, lon, force) {
   if (!force && miniGlobe.pin) return;
   miniGlobe.setPin(lat, lon);
 }
-function openDetail(item, from) {
+function coords() {                                // лучшие известные координаты здания
+  const w = state.wiki, i = state.info, p = state.preset, ok = v => v != null && Number.isFinite(Number(v));
+  if (w && ok(w.lat) && ok(w.lon)) return [Number(w.lat), Number(w.lon)];
+  if (i && ok(i.lat) && ok(i.lon)) return [Number(i.lat), Number(i.lon)];
+  if (p) return [p.lat, p.lon];
+  return null;
+}
+function renderLinks() {
+  const item = state.item, t = T[lang]; if (!item) return;
+  const w = state.wiki, c = coords();
+  const wurl = w && w.url ? w.url : 'https://en.wikipedia.org/w/index.php?search=' + encodeURIComponent(item.wiki || item.name);
+  const q = encodeURIComponent(c ? c[0] + ',' + c[1] : item.name);
+  $('dLinks').innerHTML =
+    `<a class="btn tonal sm" target="_blank" rel="noopener" href="${esc(wurl)}">${t.wikiLink}</a>` +
+    `<a class="btn outline sm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${q}">${t.mapLink}</a>`;
+}
+function noteFound() {                             // запоминает здание в атласе
+  const c = coords(), it = state.item;
+  if (!c || !it) return;
+  addFound({ wiki: it.wiki, name: it.name, city: it.city || '', country: it.country || '', lat: c[0], lon: c[1] });
+}
+
+function openDetail(item, from, extra = {}) {
   const my = ++state.token;
-  state.item = item; state.from = from; state.info = null;
+  state.item = item; state.from = from; state.info = null; state.sketch = extra.sketch || null; state.wiki = null;
+  state.preset = PRESETS.find(p => p.wiki === item.wiki) || null;
   show('detail');
+  const place = [item.city, item.country].filter(Boolean).join(', ');
   $('dType').textContent = ''; $('dTitle').textContent = item.name || '';
-  $('dSub').textContent = [item.city, item.country].filter(Boolean).join(', ');
+  $('dSub').textContent = place; $('dWhere').textContent = place;
   $('dStats').innerHTML = ''; $('dSummary').textContent = T[lang].infoLoading; $('dFact').hidden = true; $('dLinks').innerHTML = '';
-  $('dWhere').textContent = $('dSub').textContent; $('dPhotoBox').hidden = true;
+  $('dPhotoBox').hidden = true;
   miniGlobe.clearPin(); miniGlobe.auto = true;
   viewer.cloud = null;
-  wikiInfo(item.wiki).then(j => {
-    if (my !== state.token || !j) return;
-    if (j.thumbnail) {
-      const img = $('dPhoto'), small = j.thumbnail.source;
-      img.onerror = () => { img.onerror = null; img.src = small; };
-      img.src = small.replace(/\/\d+px-/, '/960px-'); $('dPhotoBox').hidden = false;
+  renderLinks();
+  const wp = extra.wiki ? Promise.resolve(extra.wiki) : resolveWiki(item);
+  wp.then(w => {
+    if (my !== state.token) return;
+    state.wiki = w;
+    if (w && w.thumb) {
+      const img = $('dPhoto');
+      img.onerror = () => { $('dPhotoBox').hidden = true; };
+      img.src = w.thumb; $('dPhotoBox').hidden = false;
     }
-    if (j.coordinates) setPinFrom(j.coordinates.lat, j.coordinates.lon, true);
+    const c = coords(); if (c) setPinFrom(c[0], c[1], true);
+    renderLinks(); noteFound();
   });
   loadInfo(my); loadModel(my);
 }
@@ -852,39 +1173,47 @@ async function loadInfo(my) {
   const item = state.item, t = T[lang];
   if (!item) return;
   $('dSummary').textContent = t.infoLoading;
+  const pr = state.preset;
+  const showStats = (year, h, arch) => {
+    const stats = [];
+    if (year != null && fmtYear(year)) stats.push([t.built, fmtYear(year)]);
+    if (h != null && Number.isFinite(Number(h))) stats.push([t.height, Math.round(h) + ' m']);
+    if (arch) stats.push([t.architect, arch]);
+    $('dStats').innerHTML = stats.map(s => `<div class="stat"><small>${esc(s[0])}</small><b>${esc(s[1])}</b></div>`).join('');
+  };
   try {
     const info = await api('/api/info', { wiki: item.wiki, name: item.name, lang });
     if (my !== state.token) return;
     state.info = info;
-    const stats = [];
-    if (info.year != null) stats.push([t.built, String(info.year)]);
-    if (info.height_m != null) stats.push([t.height, Math.round(info.height_m) + ' m']);
-    if (info.architect) stats.push([t.architect, info.architect]);
     $('dType').textContent = info.type || '';
     const place = [info.city, info.country].filter(Boolean).join(', ');
     if (place) { $('dSub').textContent = place; $('dWhere').textContent = place; }
-    $('dStats').innerHTML = stats.map(s => `<div class="stat"><small>${esc(s[0])}</small><b>${esc(s[1])}</b></div>`).join('');
+    showStats(info.year, info.height_m, info.architect);
     $('dSummary').textContent = info.summary || '';
     $('dFact').hidden = !info.fact;
     $('dFact').innerHTML = info.fact ? `<b>${t.didYou}</b>${esc(info.fact)}` : '';
-    setPinFrom(info.lat, info.lon, false);
-    const q = encodeURIComponent((info.lat != null && info.lon != null) ? info.lat + ',' + info.lon : item.name);
-    $('dLinks').innerHTML =
-      `<a class="btn tonal sm" target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/${encodeURIComponent(String(item.wiki).replace(/ /g, '_'))}">${t.wikiLink}</a>` +
-      `<a class="btn outline sm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${q}">${t.mapLink}</a>`;
+    const c = coords(); if (c) setPinFrom(c[0], c[1], false);
+    renderLinks(); noteFound();
   } catch (e) {
     if (my !== state.token) return;
+    if (pr) showStats(pr.year, pr.h, null);        // для готовых зданий хотя бы факты из памяти
     $('dSummary').textContent = e.status === 429 ? t.busy : t.infoFail;
+    renderLinks(); noteFound();
   }
 }
 
 async function loadModel(my) {
   const item = state.item, t = T[lang];
   $('vOverlay').hidden = false; $('vDots').hidden = false; $('dRetry').hidden = true; $('vMsg').textContent = t.loading3d;
+  if (state.preset) {                              // готовая модель: мгновенно и бесплатно
+    const cloud = buildCloud(state.preset.parts, 7500);
+    viewer.setCloud(cloud); $('vOverlay').hidden = true;
+    return;
+  }
   try {
     const res = await api('/api/model', { wiki: item.wiki, name: item.name });
     if (my !== state.token) return;
-    const cloud = buildCloud(res.parts);
+    const cloud = buildCloud(res.parts, 7500);
     if (!cloud) throw new Error('empty');
     viewer.setCloud(cloud);
     $('vOverlay').hidden = true;
@@ -895,6 +1224,30 @@ async function loadModel(my) {
   }
 }
 $('dRetry').onclick = () => loadModel(state.token);
+
+/* открытка: картинка, которую можно сохранить и отправить */
+async function saveCard() {
+  const it = state.item; if (!it || !viewer.cloud) return;
+  try { await document.fonts.ready; } catch {}
+  const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  g.fillStyle = TH.surface; g.fillRect(0, 0, W, H);
+  g.fillStyle = TH.card; g.beginPath(); g.roundRect(60, 60, 960, 960, 56); g.fill();
+  const tmp = document.createElement('canvas'); tmp.width = 960; tmp.height = 960;
+  renderCloud(tmp.getContext('2d'), 960, 960, viewer.cloud, { yaw: viewer.yaw, pitch: viewer.pitch, zoom: 1.1, prog: 1 });
+  g.drawImage(tmp, 60, 60);
+  const fam = '"Nunito","Noto Sans KR",sans-serif', place = [state.info && state.info.city || it.city, state.info && state.info.country || it.country].filter(Boolean).join(', ');
+  let size = 80; g.fillStyle = '#1D1B20';
+  do { g.font = `800 ${size}px ${fam}`; size -= 4; } while (g.measureText(it.name).width > 700 && size > 36);
+  g.fillText(it.name, 60, 1130);
+  g.font = `500 40px ${fam}`; g.fillStyle = '#49454F'; g.fillText(place, 60, 1196);
+  g.font = `700 32px ${fam}`; g.fillStyle = TH.primaryHex; g.fillText('Tower Sketch', 60, 1290);
+  if (state.sketch) {
+    await new Promise(res => { const im = new Image(); im.onload = () => { g.fillStyle = '#fff'; g.beginPath(); g.roundRect(790, 1070, 230, 172, 24); g.fill(); g.save(); g.clip(); g.drawImage(im, 790, 1070, 230, 172); g.restore(); g.strokeStyle = '#CAC4D0'; g.lineWidth = 2; g.beginPath(); g.roundRect(790, 1070, 230, 172, 24); g.stroke(); res(); }; im.onerror = res; im.src = state.sketch; });
+  }
+  c.toBlob(b => { const a = document.createElement('a'); a.download = 'tower-sketch.png'; a.href = URL.createObjectURL(b); a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }, 'image/png');
+}
+$('dShare').onclick = saveCard;
 
 /* ============ РИСОВАНИЕ МЫШЬЮ ============ */
 function setupStroke(ctx) { ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = INK; }
@@ -1049,10 +1402,165 @@ window.addEventListener('pointerdown', e => {
   if (localStorage.getItem('towerMusic') !== 'off') setMusic(true);
 }, true);
 
+/* ============ ГОТОВЫЕ ЗДАНИЯ НА ГЛАВНОЙ (3D-модели собраны вручную, ИИ для них не нужен) ============ */
+const EIFFEL = [
+  { t: 'path', pts: [[-62, 0, -62], [-52, 30, -52], [-38, 57, -38], [-22, 115, -22], [-10, 200, -10], [-4, 276, -4]], r: 5, r2: 1.5 },
+  { t: 'path', pts: [[62, 0, -62], [52, 30, -52], [38, 57, -38], [22, 115, -22], [10, 200, -10], [4, 276, -4]], r: 5, r2: 1.5 },
+  { t: 'path', pts: [[-62, 0, 62], [-52, 30, 52], [-38, 57, 38], [-22, 115, 22], [-10, 200, 10], [-4, 276, 4]], r: 5, r2: 1.5 },
+  { t: 'path', pts: [[62, 0, 62], [52, 30, 52], [38, 57, 38], [22, 115, 22], [10, 200, 10], [4, 276, 4]], r: 5, r2: 1.5 },
+  { t: 'box', x: 0, y: 55, z: 0, w: 72, d: 72, h: 4 }, { t: 'box', x: 0, y: 113, z: 0, w: 42, d: 42, h: 4 },
+  { t: 'box', x: 0, y: 274, z: 0, w: 18, d: 18, h: 5 }, { t: 'cyl', x: 0, y: 279, z: 0, r: 5, r2: 1, h: 51 }
+];
+const GIZA = [
+  { t: 'box', x: 0, y: 0, z: 0, w: 230, d: 230, h: 139, w2: 4, d2: 4 },
+  { t: 'box', x: -330, y: 0, z: 330, w: 215, d: 215, h: 136, w2: 4, d2: 4 },
+  { t: 'box', x: -590, y: 0, z: 610, w: 103, d: 103, h: 65, w2: 3, d2: 3 }
+];
+const BURJ = [
+  { t: 'cyl', x: 0, y: 0, z: 0, r: 30, r2: 27, h: 160 }, { t: 'cyl', x: 0, y: 160, z: 0, r: 27, r2: 23, h: 150 },
+  { t: 'cyl', x: 0, y: 310, z: 0, r: 23, r2: 19, h: 140 }, { t: 'cyl', x: 0, y: 450, z: 0, r: 19, r2: 15, h: 130 },
+  { t: 'cyl', x: 0, y: 580, z: 0, r: 15, r2: 11, h: 120 }, { t: 'cyl', x: 0, y: 700, z: 0, r: 11, r2: 8, h: 60 },
+  { t: 'cyl', x: 0, y: 760, z: 0, r: 8, r2: .8, h: 68 }
+];
+const COLOSSEUM = [
+  { t: 'cyl', x: 0, y: 0, z: 0, r: 94, r2: 94, h: 48, sx: 1, sz: .83, hollow: true },
+  { t: 'cyl', x: 0, y: 0, z: 0, r: 70, r2: 70, h: 30, sx: 1, sz: .8, hollow: true },
+  { t: 'cyl', x: 0, y: 0, z: 0, r: 52, r2: 52, h: 12, sx: 1, sz: .72, hollow: true }
+];
+const TAJ = [
+  { t: 'box', x: 0, y: 0, z: 0, w: 100, d: 100, h: 7 }, { t: 'box', x: 0, y: 7, z: 0, w: 57, d: 57, h: 24 },
+  { t: 'cyl', x: 0, y: 31, z: 0, r: 14, r2: 14, h: 6 }, { t: 'sphere', x: 0, y: 37, z: 0, r: 18, half: true },
+  { t: 'cyl', x: 0, y: 55, z: 0, r: 1.2, r2: .3, h: 11 },
+  ...[[-1, -1], [1, -1], [-1, 1], [1, 1]].flatMap(([a, b]) => [
+    { t: 'cyl', x: a * 46, y: 7, z: b * 46, r: 3.3, r2: 2.7, h: 40 }, { t: 'sphere', x: a * 46, y: 47, z: b * 46, r: 3.8, half: true },
+    { t: 'sphere', x: a * 19, y: 31, z: b * 19, r: 5, half: true }
+  ])
+];
+const NSEOUL = [
+  { t: 'cyl', x: 0, y: 0, z: 0, r: 9, r2: 5, h: 120 }, { t: 'cyl', x: 0, y: 118, z: 0, r: 5, r2: 21, h: 8 },
+  { t: 'cyl', x: 0, y: 126, z: 0, r: 21, r2: 21, h: 10 }, { t: 'cyl', x: 0, y: 136, z: 0, r: 21, r2: 6, h: 8 },
+  { t: 'cyl', x: 0, y: 144, z: 0, r: 5, r2: 3.5, h: 46 }, { t: 'cyl', x: 0, y: 190, z: 0, r: 1.8, r2: .4, h: 46 }
+];
+const PISA = (() => {
+  const lv = [[7, 9.6], [6.4, 9.2], [6.4, 9.2], [6.4, 9.2], [6.4, 9.2], [6.4, 9.2], [6.4, 9.2], [5, 6.6]], out = [];
+  let y = 0;
+  lv.forEach((l, i) => { const x = i * .55; out.push({ t: 'cyl', x, y, z: 0, r: l[1], r2: l[1], h: l[0] }); y += l[0]; out.push({ t: 'cyl', x, y: y - .5, z: 0, r: l[1] + .9, r2: l[1] + .9, h: .8 }); });
+  return out;
+})();
+const PETRONAS = [-52, 52].flatMap(x => [
+  { t: 'cyl', x, y: 0, z: 0, r: 21, r2: 19, h: 150 }, { t: 'cyl', x, y: 150, z: 0, r: 19, r2: 15, h: 120 },
+  { t: 'cyl', x, y: 270, z: 0, r: 15, r2: 11, h: 80 }, { t: 'cyl', x, y: 350, z: 0, r: 11, r2: 7, h: 50 },
+  { t: 'cyl', x, y: 400, z: 0, r: 4.5, r2: .5, h: 52 }
+]).concat([{ t: 'box', x: 0, y: 165, z: 0, w: 62, d: 8, h: 8 }, { t: 'path', pts: [[-31, 160, 0], [0, 192, 0], [31, 160, 0]], r: 1.6 }]);
+
+const PRESETS = [
+  { wiki: 'Eiffel Tower', name: { en: 'Eiffel Tower', ko: '에펠탑', ru: 'Эйфелева башня' }, place: { en: 'Paris, France', ko: '프랑스 파리', ru: 'Париж, Франция' }, lat: 48.8584, lon: 2.2945, year: 1889, h: 330, parts: EIFFEL },
+  { wiki: 'Great Pyramid of Giza', name: { en: 'Great Pyramid of Giza', ko: '기자의 대피라미드', ru: 'Великая пирамида Гизы' }, place: { en: 'Giza, Egypt', ko: '이집트 기자', ru: 'Гиза, Египет' }, lat: 29.9792, lon: 31.1342, year: -2560, h: 139, parts: GIZA },
+  { wiki: 'Burj Khalifa', name: { en: 'Burj Khalifa', ko: '부르즈 칼리파', ru: 'Бурдж-Халифа' }, place: { en: 'Dubai, UAE', ko: '아랍에미리트 두바이', ru: 'Дубай, ОАЭ' }, lat: 25.1972, lon: 55.2744, year: 2010, h: 828, parts: BURJ },
+  { wiki: 'Colosseum', name: { en: 'Colosseum', ko: '콜로세움', ru: 'Колизей' }, place: { en: 'Rome, Italy', ko: '이탈리아 로마', ru: 'Рим, Италия' }, lat: 41.8902, lon: 12.4922, year: 80, h: 48, parts: COLOSSEUM },
+  { wiki: 'Taj Mahal', name: { en: 'Taj Mahal', ko: '타지마할', ru: 'Тадж-Махал' }, place: { en: 'Agra, India', ko: '인도 아그라', ru: 'Агра, Индия' }, lat: 27.1751, lon: 78.0421, year: 1653, h: 73, parts: TAJ },
+  { wiki: 'N Seoul Tower', name: { en: 'N Seoul Tower', ko: 'N서울타워', ru: 'Сеульская башня N' }, place: { en: 'Seoul, South Korea', ko: '대한민국 서울', ru: 'Сеул, Южная Корея' }, lat: 37.5512, lon: 126.9882, year: 1975, h: 236, parts: NSEOUL },
+  { wiki: 'Leaning Tower of Pisa', name: { en: 'Leaning Tower of Pisa', ko: '피사의 사탑', ru: 'Пизанская башня' }, place: { en: 'Pisa, Italy', ko: '이탈리아 피사', ru: 'Пиза, Италия' }, lat: 43.723, lon: 10.3966, year: 1372, h: 56, parts: PISA },
+  { wiki: 'Petronas Towers', name: { en: 'Petronas Towers', ko: '페트로나스 트윈 타워', ru: 'Башни Петронас' }, place: { en: 'Kuala Lumpur, Malaysia', ko: '말레이시아 쿠알라룸푸르', ru: 'Куала-Лумпур, Малайзия' }, lat: 3.1579, lon: 101.7116, year: 1998, h: 452, parts: PETRONAS }
+];
+
+/* ---- простые здания только для фона главной (в 3D-просмотр не попадают) ---- */
+const stack = (spec, x = 0, z = 0) => { let y = 0; return spec.map(([r, r2, h]) => { const o = { t: 'cyl', x, y, z, r, r2, h }; y += h; return o; }); };
+const BG_EXTRA = [
+  [...[0, 1].map(i => ({ t: 'box', x: 0, y: 0, z: 0, w: 22, d: 22, h: 100 })), { t: 'box', x: 0, y: 100, z: 0, w: 24, d: 24, h: 14 }, { t: 'box', x: 0, y: 114, z: 0, w: 18, d: 18, h: 30, w2: 12, d2: 12 }, { t: 'cyl', x: 0, y: 144, z: 0, r: 7, r2: .5, h: 40 }, { t: 'sphere', x: 0, y: 128, z: 12.5, r: 6 }],                  // Big Ben
+  [{ t: 'sphere', x: -34, y: 0, z: 0, r: 30, half: true }, { t: 'sphere', x: 0, y: 0, z: 0, r: 36, half: true }, { t: 'sphere', x: 34, y: 0, z: 0, r: 26, half: true }, { t: 'box', x: 0, y: 0, z: 0, w: 120, d: 46, h: 5 }],       // Sydney Opera House
+  [...stack([[11, 8, 190], [8, 6, 20]]), { t: 'cyl', x: 0, y: 150, z: 0, r: 18, r2: 18, h: 12 }, { t: 'cyl', x: 0, y: 210, z: 0, r: 2, r2: .3, h: 90 }],    // CN Tower
+  [...stack([[3, 3, 70], [3, 3, 8]]), { t: 'cyl', x: 0, y: 70, z: 0, r: 24, r2: 24, h: 4 }, { t: 'cyl', x: 0, y: 74, z: 0, r: 13, r2: 18, h: 5 }, { t: 'cyl', x: 0, y: 79, z: 0, r: 10, r2: 3, h: 5 }, { t: 'cyl', x: 0, y: 84, z: 0, r: 1, r2: .3, h: 22 }],  // Space Needle
+  [{ t: 'cyl', x: 0, y: 0, z: 0, r: 12, r2: 7, h: 240 }, { t: 'cyl', x: 0, y: 240, z: 0, r: 15, r2: 15, h: 8 }, { t: 'cyl', x: 0, y: 248, z: 0, r: 8, r2: 4, h: 30 }, { t: 'cyl', x: 0, y: 278, z: 0, r: 3, r2: .4, h: 70 }],            // Skytree
+  [{ t: 'cyl', x: 0, y: 0, z: 0, r: 6, r2: 6, h: 100 }, { t: 'sphere', x: 0, y: 105, z: 0, r: 22 }, { t: 'cyl', x: 0, y: 125, z: 0, r: 4, r2: 4, h: 60 }, { t: 'sphere', x: 0, y: 190, z: 0, r: 13 }, { t: 'cyl', x: 0, y: 200, z: 0, r: 2, r2: .3, h: 40 }],   // Oriental Pearl
+  [{ t: 'box', x: 0, y: 0, z: 0, w: 52, d: 52, h: 80 }, { t: 'box', x: 0, y: 80, z: 0, w: 44, d: 44, h: 50 }, { t: 'box', x: 0, y: 130, z: 0, w: 32, d: 32, h: 55, w2: 26, d2: 26 }, { t: 'box', x: 0, y: 185, z: 0, w: 16, d: 16, h: 24, w2: 8, d2: 8 }, { t: 'cyl', x: 0, y: 209, z: 0, r: 1.2, r2: .3, h: 36 }],  // Empire State
+  [...[0, 1, 2, 3, 4, 5, 6, 7].map(i => ({ t: 'box', x: 0, y: i * 21, z: 0, w: 22 - (i % 2) * 1, d: 22, h: 18, w2: 28, d2: 28 })), { t: 'box', x: 0, y: 168, z: 0, w: 22, d: 22, h: 22 }, { t: 'cyl', x: 0, y: 190, z: 0, r: 2, r2: .4, h: 40 }],  // Taipei 101
+  [{ t: 'cyl', x: 0, y: 0, z: 0, r: 20, r2: 24, h: 70 }, { t: 'cyl', x: 0, y: 70, z: 0, r: 24, r2: 20, h: 40 }, { t: 'cyl', x: 0, y: 110, z: 0, r: 20, r2: 12, h: 40 }, { t: 'cyl', x: 0, y: 150, z: 0, r: 12, r2: 3, h: 20 }],  // Gherkin
+  [{ t: 'cyl', x: 0, y: 0, z: 0, r: 46, r2: 46, h: 26 }, { t: 'sphere', x: 0, y: 26, z: 0, r: 46, half: true }, ...[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([a, b]) => ({ t: 'cyl', x: a * 70, y: 0, z: b * 28, r: 9, r2: 9, h: 46 })), { t: 'box', x: 0, y: 0, z: 0, w: 130, d: 60, h: 14 }],  // St Peter's-like dome
+  [0, 1, 2, 3, 4].flatMap(i => [{ t: 'box', x: 0, y: i * 20, z: 0, w: 56 - i * 9, d: 56 - i * 9, h: 12 }, { t: 'box', x: 0, y: i * 20 + 12, z: 0, w: 66 - i * 9, d: 66 - i * 9, h: 4, w2: 58 - i * 9, d2: 58 - i * 9 }]).concat([{ t: 'cyl', x: 0, y: 100, z: 0, r: 1.6, r2: .3, h: 34 }]),       // Pagoda
+  [...stack([[16, 16, 60], [13, 13, 22]], 0, 0), { t: 'sphere', x: 0, y: 82, z: 0, r: 15 }, ...[[-26, 0], [26, 0], [0, -26], [0, 26]].flatMap(([a, b]) => [{ t: 'cyl', x: a, y: 0, z: b, r: 8, r2: 6, h: 40 }, { t: 'sphere', x: a, y: 40, z: b, r: 8 }]), { t: 'cyl', x: 0, y: 95, z: 0, r: .8, r2: .2, h: 16 }],        // St Basil's
+  [{ t: 'box', x: 0, y: 0, z: 0, w: 30, d: 30, h: 50, w2: 22, d2: 22 }, { t: 'box', x: 0, y: 50, z: 0, w: 22, d: 22, h: 60, w2: 14, d2: 14 }, { t: 'box', x: 0, y: 110, z: 0, w: 14, d: 14, h: 60, w2: 6, d2: 6 }, { t: 'cyl', x: 0, y: 170, z: 0, r: 2, r2: .3, h: 30 }],                 // Lotte World Tower
+  [{ t: 'cyl', x: 0, y: 0, z: 0, r: 4, r2: 4, h: 70 }, { t: 'path', pts: [[-4, 0, 0], [-34, 30, 0], [-26, 70, 0], [-4, 90, 0]], r: 2.2 }, { t: 'path', pts: [[-4, 0, 0], [16, 30, 0], [24, 70, 0], [4, 92, 0]], r: 2.2 }, { t: 'sphere', x: 0, y: 84, z: 0, r: 10, half: true }],  // sail tower
+  [{ t: 'box', x: 0, y: 0, z: 0, w: 120, d: 70, h: 8 }, { t: 'box', x: 0, y: 8, z: 0, w: 80, d: 44, h: 8 }, ...[[-1, -1], [1, -1], [-1, 1], [1, 1], [0, 0]].map(([a, b]) => ({ t: 'cyl', x: a * 30, y: 16, z: b * 14, r: 8, r2: 2, h: 50 }))],            // Angkor
+  [{ t: 'cyl', x: 0, y: 0, z: 0, r: 9, r2: 9, h: 90 }, ...[0, 1, 2, 3].map(i => ({ t: 'cyl', x: 0, y: 90 + i * 12, z: 0, r: 12 - i * 2.5, r2: 12 - i * 2.5, h: 4 })), { t: 'cyl', x: 0, y: 140, z: 0, r: 1, r2: .2, h: 36 }]       // pole tower
+];
+const BG_MODELS = PRESETS.map(p => buildCloud(p.parts, 1400)).concat(BG_EXTRA.map(p => buildCloud(p, 1400)));
+
+
+
+/* здания парят на фоне главной: сами по себе, трогать их нельзя; крупные ближе и ярче, мелкие дальше и бледнее */
+const SPOTS = (() => {
+  const r = mulberry(21), out = [], N = 22;
+  for (let i = 0; i < N; i++) {
+    const fx = (i * .6180339 + .08) % 1, band = i % 3;            // золотое сечение распределяет здания ровно, без кучек
+    const s = [.36, .25, .16][band] * (.8 + r() * .5);
+    out.push({ m: (i * 5) % BG_MODELS.length, x: .04 + fx * .94, y: .1 + ((i * .37 + r() * .3) % 1) * .84, s, sp: .7 + r() * .8, ph: r() * 6.28, ys: (r() < .5 ? -1 : 1) * (.0002 + r() * .0002), a: [.9, .65, .45][band] });
+  }
+  return out.sort((p, q) => p.s - q.s);
+})();
+class Floaters {
+  constructor(canvas) { this.c = canvas; this.g = canvas.getContext('2d'); this.raf = 0; this.t0 = 0; this.tx = 0; this.ty = 0; this.px = 0; this.py = 0; }
+  start() {
+    if (this.raf) return;
+    this.t0 = performance.now();
+    const loop = t => { this.draw(t); this.raf = requestAnimationFrame(loop); };
+    this.raf = requestAnimationFrame(loop);
+  }
+  stop() { cancelAnimationFrame(this.raf); this.raf = 0; }
+  draw(t) {
+    const [W, H, dpr] = fit(this.c);
+    if (!W || !H) return;
+    const g = this.g; g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    this.px += (this.tx - this.px) * .05; this.py += (this.ty - this.py) * .05;
+    const narrow = W < 900, k = Math.min(W * (narrow ? 1.1 : .8), H * 1.25);
+    SPOTS.forEach((sp, i) => {
+      const prog = REDUCED ? 1 : Math.min(1, (t - this.t0 - i * 120) / 2400);
+      if (prog <= 0) return;
+      const b = sp.s * k;
+      const bob = REDUCED ? 0 : Math.sin(t * .0008 * sp.sp + sp.ph) * (8 + sp.s * 16);
+      const drift = REDUCED ? 0 : Math.cos(t * .0005 * sp.sp + sp.ph) * 10;
+      const x = sp.x * W + drift + this.px * sp.s * 40, y = sp.y * H + bob + this.py * sp.s * 26;
+      const left = !narrow && sp.x < .5 ? .5 : 1;                 // слева текст: там здания бледнее, чтобы не мешали читать
+      g.save();
+      g.globalAlpha = Math.min(1, sp.a * left * Math.min(1, prog * 3));
+      g.translate(x - b / 2, y - b / 2);
+      renderCloud(g, b, b, BG_MODELS[sp.m], { yaw: t * sp.ys + sp.ph, pitch: .16 + Math.sin(t * .0006 + sp.ph) * .05, zoom: 1, prog, small: true });
+      g.restore();
+    });
+  }
+}
+const floaters = new Floaters($('globeBg'));
+window.addEventListener('mousemove', e => { floaters.tx = e.clientX / innerWidth - .5; floaters.ty = e.clientY / innerHeight - .5; });
+
+/* ============ АТЛАС: все найденные здания на глобусе ============ */
+const atlasGlobe = new Globe($('atlasCanvas'), (W, H) => [W / 2, H / 2, Math.min(W * .5, H * .46)], { rot: 0, tilt: .3 });
+const FKEY = 'towerFound';
+const getFound = () => { try { const a = JSON.parse(localStorage.getItem(FKEY) || '[]'); return Array.isArray(a) ? a : []; } catch { return []; } };
+function addFound(it) {
+  if (!it || !it.wiki || it.lat == null || it.lon == null) return;
+  const a = getFound();
+  if (a.some(x => x.wiki === it.wiki)) return;
+  a.push(it);
+  try { localStorage.setItem(FKEY, JSON.stringify(a.slice(-200))); } catch {}
+  updateAtlasCount();
+}
+function updateAtlasCount() { const n = getFound().length; $('atlasCount').textContent = n ? '(' + n + ')' : ''; }
+function renderAtlas() {
+  const a = getFound();
+  atlasGlobe.pins = a;
+  $('atlasChips').innerHTML = a.map((x, i) => `<button type="button" data-i="${i}">${esc(x.name)}</button>`).join('');
+  $('atlasEmpty').textContent = a.length ? '' : T[lang].atlasEmpty;
+  $('atlasChips').onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const x = a[+b.dataset.i];
+    openDetail({ name: x.name, wiki: x.wiki, city: x.city, country: x.country }, 'atlas');
+  };
+}
+
 /* ============ СТАРТ ============ */
 applyLang();
 show('home');
-window.__tower = { buildCloud, viewer, miniGlobe, globe, openDetail, show, state };   // для тестов
+window.__tower = { buildCloud, viewer, miniGlobe, floaters, openDetail, show, state };   // для тестов
 </script>
 </body>
 </html>
