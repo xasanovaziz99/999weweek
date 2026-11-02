@@ -82,11 +82,12 @@ const WUA = { headers: { 'User-Agent': 'TowerSketch/1.0 (student project; xasano
 async function wj(url) { try { const r = await fetch(url, { ...WUA, signal: AbortSignal.timeout(7000) }); return r.ok ? await r.json() : null; } catch { return null; } }
 const big = u => u ? u.replace(/\/(\d+)px-/, '/960px-') : null;
 async function findPhoto(title) {
-  let page = null, thumb = null;
+  let page = null, thumb = null, lat = null, lon = null;
   const sum = await wj('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(title.replace(/ /g, '_')) + '?redirect=true');
   if (sum && sum.type !== 'disambiguation' && sum.title) {
     page = sum.content_urls?.desktop?.page || ('https://en.wikipedia.org/wiki/' + encodeURIComponent(sum.title.replace(/ /g, '_')));
     thumb = big(sum.thumbnail?.source) || sum.originalimage?.source || null;
+    if (sum.coordinates && Number.isFinite(sum.coordinates.lat)) { lat = sum.coordinates.lat; lon = sum.coordinates.lon; }
   }
   if (!thumb) {
     const q = new URLSearchParams({ action: 'query', format: 'json', generator: 'search', gsrsearch: title, gsrlimit: '6', prop: 'pageimages|info', piprop: 'thumbnail', pithumbsize: '960', inprop: 'url' });
@@ -102,7 +103,11 @@ async function findPhoto(title) {
     const pg = Object.values(j?.query?.pages || {}).sort((a, b) => a.index - b.index).find(p => /jpe?g|png/.test(p.imageinfo?.[0]?.mime || '') && p.imageinfo[0].thumburl);
     if (pg) thumb = pg.imageinfo[0].thumburl;
   }
-  return { page, thumb };
+  if (lat == null) {                                      // нет координат в статье: спрашиваем геокодер OpenStreetMap
+    const g = await wj('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(title));
+    if (Array.isArray(g) && g[0] && Number.isFinite(Number(g[0].lat))) { lat = Number(g[0].lat); lon = Number(g[0].lon); }
+  }
+  return { page, thumb, lat, lon };
 }
 app.get('/api/photo', limit(300, 3600e3), async (req, res) => {
   const title = String(req.query.title || '').slice(0, 120).trim();
@@ -130,7 +135,7 @@ app.post('/api/guess', limit(20, 3600e3), dailyCap, async (req, res) => {
           'Return ONLY a JSON array of 6 objects (best match first), no markdown. Prefer widely known landmarks that have their own English Wikipedia article, and give each article title exactly as it appears on Wikipedia. Keys: ' +
           '"name" (name in ' + language + '), "wiki" (exact English Wikipedia article title), ' +
           '"city" and "country" (in ' + language + '), "match" (integer 0-100, how similar the shape is), ' +
-          '"why" (one short sentence in ' + language + ' explaining the resemblance). ' +
+          '"lat" and "lon" (decimal coordinates of the landmark), "why" (one short sentence in ' + language + ' explaining the resemblance). ' +
           'If the sketch is empty or unrecognizable, return an empty array.' }
       ] }]
     });
@@ -156,7 +161,7 @@ app.post('/api/info', limit(40, 3600e3), async (req, res) => {
 
     const msg = await ai.messages.create({
       model: MODEL,
-      max_tokens: 700,
+      max_tokens: 2000,
       messages: [{ role: 'user', content:
         'Give accurate facts about the landmark "' + name + '" (English Wikipedia article: "' + wiki + '"). ' +
         'Return ONLY a JSON object, no markdown, with keys: ' +
@@ -169,7 +174,7 @@ app.post('/api/info', limit(40, 3600e3), async (req, res) => {
     });
     const text = msg.content.map(b => b.text || '').join('');
     const info = pickJSON(text, '{', '}');
-    if (!info) return res.status(502).json({ error: 'bad answer' });
+    if (!info) { console.error('info bad answer, stop:', msg.stop_reason, text.slice(0, 200)); return res.status(502).json({ error: 'bad answer' }); }
     remember(key, info);
     res.json(info);
   } catch (e) {
