@@ -510,7 +510,15 @@
   .results-hint, .hint { font-size: .95rem; }
   /* ===== экран здания: карта и маршрут ===== */
   .viewer-card.routecard { aspect-ratio: auto; display: flex; flex-direction: column; border: 1px solid var(--line); background: var(--card); }
-  #routeMap { height: min(56vh, 470px); background: #0e0e11; }
+  .route-stage { position: relative; height: min(60vh, 520px); background: radial-gradient(90% 80% at 50% 40%, #151a20, #0a0a0d); }
+  #routeGlobe { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+  #routeMap { position: absolute; inset: 0; background: #0e0e11; }
+  #routeMap[hidden] { display: none; }
+  .route-tabs { display: flex; gap: 6px; padding: 12px 14px 0; }
+  .route-tabs button { height: 30px; padding: 0 14px; border-radius: 9px; border: 1px solid var(--frame); background: transparent; color: var(--ink2); cursor: pointer; font-size: .95rem; }
+  .route-tabs button.on { background: rgba(255,255,255,.14); color: var(--ink); border-color: rgba(255,255,255,.6); }
+  .rbtn { position: absolute; right: 12px; bottom: 12px; z-index: 500; width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--frame); background: rgba(16,16,20,.8); color: var(--ink); font-size: 1.2rem; cursor: pointer; }
+  .rbtn:hover { border-color: rgba(255,255,255,.7); }
   .route-info { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; padding: 14px 18px 2px; }
   .route-info b { font-size: 2.2rem; line-height: 1; color: var(--ink); }
   .route-info span { color: var(--ink2); }
@@ -592,7 +600,12 @@
     <button class="btn tonal sm" id="dBack"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg><span data-i18n="back"></span></button>
     <div class="detail">
       <div class="viewer-card routecard">
-        <div id="routeMap"></div>
+        <div class="route-tabs" id="routeTabs"><button data-tab="globe" class="on"></button><button data-tab="map"></button><button data-tab="sat"></button></div>
+        <div class="route-stage">
+          <canvas id="routeGlobe"></canvas>
+          <div id="routeMap" hidden></div>
+          <button class="rbtn" id="routeReplay" aria-label="replay">↻</button>
+        </div>
         <div class="route-info" id="routeInfo"></div>
         <div class="route-links" id="routeLinks"></div>
       </div>
@@ -742,9 +755,9 @@ Object.assign(T.ru, {
   atlasEmpty: 'Пока пусто. Найди первое здание!', saveCard: 'Сохранить карточку', back: 'Назад', bc: '≈{n} до н. э.'
 });
 
-Object.assign(T.en, { routeFrom: 'from', yourLoc: 'your location', seoul: 'Seoul', byAir: 'by air', byRoad: 'by road', btnDir: 'Route in Google Maps', btnStreet: 'Street View', btnEarth: 'Google Earth 3D', noCoords: 'Looking for the location…', resultsHint: 'Tap a building to see where it is and how far.', view3d: 'Show route', featuredSub: 'Tap one to see where it is.', tourGo: 'Show route →' });
-Object.assign(T.ko, { routeFrom: '출발', yourLoc: '내 위치', seoul: '서울', byAir: '비행', byRoad: '도로', btnDir: '구글 지도 길찾기', btnStreet: '스트리트 뷰', btnEarth: '구글 어스 3D', noCoords: '위치를 찾는 중…', resultsHint: '건물을 눌러 위치와 거리를 확인하세요.', view3d: '경로 보기', featuredSub: '눌러서 위치를 확인하세요.', tourGo: '경로 보기 →' });
-Object.assign(T.ru, { routeFrom: 'от', yourLoc: 'твоего места', seoul: 'Сеула', byAir: 'самолётом', byRoad: 'по дороге', btnDir: 'Маршрут в Google Картах', btnStreet: 'Street View', btnEarth: 'Google Earth 3D', noCoords: 'Ищем место…', resultsHint: 'Нажми на здание, чтобы увидеть, где оно и как далеко.', view3d: 'Показать маршрут', featuredSub: 'Нажми, чтобы увидеть, где это.', tourGo: 'Показать маршрут →' });
+Object.assign(T.en, { tabGlobe: 'Globe', tabMap: 'Map', tabSat: 'Satellite', routeFrom: 'from', yourLoc: 'your location', seoul: 'Seoul', byAir: 'by air', byRoad: 'by road', btnDir: 'Route in Google Maps', btnStreet: 'Street View', btnEarth: 'Google Earth 3D', noCoords: 'Looking for the location…', resultsHint: 'Tap a building to see where it is and how far.', view3d: 'Show route', featuredSub: 'Tap one to see where it is.', tourGo: 'Show route →' });
+Object.assign(T.ko, { tabGlobe: '지구본', tabMap: '지도', tabSat: '위성', routeFrom: '출발', yourLoc: '내 위치', seoul: '서울', byAir: '비행', byRoad: '도로', btnDir: '구글 지도 길찾기', btnStreet: '스트리트 뷰', btnEarth: '구글 어스 3D', noCoords: '위치를 찾는 중…', resultsHint: '건물을 눌러 위치와 거리를 확인하세요.', view3d: '경로 보기', featuredSub: '눌러서 위치를 확인하세요.', tourGo: '경로 보기 →' });
+Object.assign(T.ru, { tabGlobe: 'Глобус', tabMap: 'Карта', tabSat: 'Спутник', routeFrom: 'от', yourLoc: 'твоего места', seoul: 'Сеула', byAir: 'самолётом', byRoad: 'по дороге', btnDir: 'Маршрут в Google Картах', btnStreet: 'Street View', btnEarth: 'Google Earth 3D', noCoords: 'Ищем место…', resultsHint: 'Нажми на здание, чтобы увидеть, где оно и как далеко.', view3d: 'Показать маршрут', featuredSub: 'Нажми, чтобы увидеть, где это.', tourGo: 'Показать маршрут →' });
 T.en.floatHint = 'Tap a floating landmark to see it in 3D.';
 T.ko.floatHint = '떠다니는 명소를 눌러 3D로 보세요.';
 T.ru.floatHint = 'Нажми на парящее здание, чтобы увидеть его в 3D.';
@@ -873,7 +886,7 @@ class Globe {
   constructor(canvas, layout, opts = {}) {
     this.c = canvas; this.g = canvas.getContext('2d'); this.layout = layout;
     this.rot = opts.rot ?? -1.7; this.tilt = opts.tilt ?? .38; this.auto = opts.auto !== false;
-    this.pin = null; this.pins = []; this.target = null; this.raf = 0; this.last = 0; this.pts = null;
+    this.pin = null; this.pins = []; this.target = null; this.raf = 0; this.last = 0; this.pts = null; this.arc = null; this.free = false;
     landReady.then(p => { this.pts = p; });
   }
   setPin(lat, lon) {                              // поворачивает Землю к нужному месту и ставит метку
@@ -883,6 +896,17 @@ class Globe {
     this.target = { rot: lon * Math.PI / 180, tilt: lat * Math.PI / 180 * .75 };
   }
   clearPin() { this.pin = null; this.target = null; }
+  setArc(a, b, dur = 4200) {                       // анимированный перелёт по большому кругу: камера летит за точкой
+    const pts = arcPoints(a, b, 120), km = haversine(a, b), lift = .16 * Math.min(1, km / 11000);
+    this.arc = { ll: pts, v: pts.map(([la, lo], i) => { const f = la * Math.PI / 180, l = lo * Math.PI / 180, r = 1 + lift * Math.sin(Math.PI * i / (pts.length - 1)); return [Math.cos(f) * Math.sin(l) * r, Math.sin(f) * r, Math.cos(f) * Math.cos(l) * r]; }), t0: performance.now() + 350, dur, e: 0 };
+    this.free = false; this.auto = false;
+  }
+  enableDrag() {                                   // потяни глобус, чтобы покрутить
+    const c = this.c; let prev = null;
+    c.addEventListener('pointerdown', e => { prev = [e.clientX, e.clientY]; this.free = true; this.target = null; c.setPointerCapture(e.pointerId); c.style.cursor = 'grabbing'; });
+    c.addEventListener('pointermove', e => { if (!prev) return; this.rot -= (e.clientX - prev[0]) * .006; this.tilt = Math.max(-1.3, Math.min(1.3, this.tilt + (e.clientY - prev[1]) * .005)); prev = [e.clientX, e.clientY]; });
+    ['pointerup', 'pointercancel'].forEach(ev => c.addEventListener(ev, () => { prev = null; c.style.cursor = 'grab'; }));
+  }
   start() {
     if (this.raf) return;
     this.last = performance.now();
@@ -896,6 +920,14 @@ class Globe {
     if (!W || !H) return;
     const g = this.g; g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     const [cx, cy, R] = this.layout(W, H);
+    let headV = null;
+    if (this.arc) {
+      const A = this.arc, p = Math.max(0, Math.min(1, (t - A.t0) / A.dur)); A.e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+      const idx = A.e * (A.ll.length - 1), i0 = Math.floor(idx), i1 = Math.min(i0 + 1, A.ll.length - 1), f = idx - i0;
+      const L0 = A.ll[i0], L1 = A.ll[i1], V0 = A.v[i0], V1 = A.v[i1];
+      headV = [V0[0] + (V1[0] - V0[0]) * f, V0[1] + (V1[1] - V0[1]) * f, V0[2] + (V1[2] - V0[2]) * f];
+      if (!this.free) this.target = { rot: (L0[1] + (L1[1] - L0[1]) * f) * Math.PI / 180, tilt: (L0[0] + (L1[0] - L0[0]) * f) * Math.PI / 180 * .75 };
+    }
     if (this.target) {
       const d = wrapAngle(this.target.rot - this.rot + Math.PI) - Math.PI, k = 1 - Math.exp(-dt / 260);
       this.rot += d * k; this.tilt += (this.target.tilt - this.tilt) * k;
@@ -936,6 +968,25 @@ class Globe {
         g.beginPath(); g.arc(cx + x * R, cy - y * R, Math.max(4, R * .028), 0, TAU); g.fill(); g.stroke();
       }
     });
+    if (this.arc && headV) {                      // линия перелёта и самолётик
+      const A = this.arc, idx = A.e * (A.v.length - 1), pr = v => { const [x, y, z] = project(v[0], v[1], v[2]); return [cx + x * R, cy - y * R, z]; };
+      const run = [];
+      for (let k = 0; k <= Math.floor(idx); k++) run.push(pr(A.v[k]));
+      run.push(pr(headV));
+      g.lineCap = 'round'; g.lineJoin = 'round';
+      [[8, .12], [2.4, .95]].forEach(([w, a]) => {
+        g.strokeStyle = `rgba(236,248,255,${a})`; g.lineWidth = w; g.beginPath(); let pen = false;
+        run.forEach(q => { if (q[2] > 0) { pen ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); pen = true; } else pen = false; });
+        g.stroke();
+      });
+      const o = pr(A.v[0]);
+      if (o[2] > 0) { g.strokeStyle = 'rgba(255,255,255,.9)'; g.lineWidth = 2; g.beginPath(); g.arc(o[0], o[1], 5, 0, TAU); g.stroke(); }
+      const hp = run[run.length - 1];
+      if (hp[2] > 0 && A.e < 1) {
+        const gl = g.createRadialGradient(hp[0], hp[1], 0, hp[0], hp[1], 22); gl.addColorStop(0, 'rgba(255,255,255,.95)'); gl.addColorStop(.25, 'rgba(190,225,255,.5)'); gl.addColorStop(1, 'rgba(190,225,255,0)');
+        g.fillStyle = gl; g.beginPath(); g.arc(hp[0], hp[1], 22, 0, TAU); g.fill();
+      }
+    }
     if (this.pin) {                               // метка места здания
       const f = this.pin.lat * Math.PI / 180, l = this.pin.lon * Math.PI / 180;
       const [x, y, z] = project(Math.cos(f) * Math.sin(l), Math.sin(f), Math.cos(f) * Math.cos(l));
@@ -950,6 +1001,8 @@ class Globe {
   }
 }
 const miniGlobe = new Globe($('miniGlobe'), (W, H) => [W / 2, H / 2, Math.min(W, H) * .44], { rot: 0, tilt: .3, auto: true });
+const routeGlobe = new Globe($('routeGlobe'), (W, H) => [W / 2, H / 2, Math.min(W, H) * .42], { rot: 2.2, tilt: .4, auto: false });
+routeGlobe.enableDrag();
 
 /* ============ 3D ИЗ ТОЧЕК: превращаем список деталей здания в облако точек ============ */
 const mulberry = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
@@ -1144,7 +1197,7 @@ function show(name) {
   current = name;
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   $('view-' + name).classList.add('active');
-  if (name === 'detail') { stopCamera(); setTimeout(() => { try { routeMap && routeMap.invalidateSize(); renderRoute(); } catch {} }, 80); } else { if (mode === 'cam') startCamera(); }
+  if (name === 'detail') { stopCamera(); routeGlobe.start(); setTimeout(() => { try { renderRoute(); if (routeTab !== 'globe') drawLeaflet(); } catch {} }, 80); } else { routeGlobe.stop(); if (mode === 'cam') startCamera(); }
 }
 $('dBack').onclick = () => { show('draw'); window.scrollTo(0, savedY); };
 
@@ -1565,8 +1618,50 @@ function askLocation() {
   navigator.geolocation.getCurrentPosition(p => { userLoc = [p.coords.latitude, p.coords.longitude]; routeKey = ''; try { renderRoute(); } catch {} }, () => {}, { timeout: 8000, maximumAge: 600000 });
 }
 const fmtDur = h => { let m = Math.round(h * 60 / 5) * 5; const H = Math.floor(m / 60); m %= 60; return (H ? H + ' h' : '') + (H && m ? ' ' : '') + (m ? m + ' min' : '') || '5 min'; };
+let routeTab = 'globe', routeCtx = null, tileLayers = null, roadPts = null;
+function setRouteTab(tab) {
+  routeTab = tab;
+  document.querySelectorAll('#routeTabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  $('routeGlobe').style.visibility = tab === 'globe' ? 'visible' : 'hidden';
+  $('routeMap').hidden = tab === 'globe'; $('routeReplay').style.display = tab === 'globe' ? '' : 'none';
+  if (tab !== 'globe') drawLeaflet();
+}
+document.querySelectorAll('#routeTabs button').forEach(b => b.onclick = () => setRouteTab(b.dataset.tab));
+$('routeReplay').onclick = () => { if (routeCtx) { routeGlobe.free = false; routeGlobe.setArc(routeCtx.from, routeCtx.dest); } };
+function drawLeaflet() {
+  if (typeof L === 'undefined' || !routeCtx) return;
+  const { from, dest, label } = routeCtx;
+  if (!routeMap) {
+    routeMap = L.map('routeMap', { zoomControl: true, worldCopyJump: false, minZoom: 2, zoomSnap: .5 });
+    const esri = 'https://server.arcgisonline.com/ArcGIS/rest/services/';
+    tileLayers = {
+      map: [L.tileLayer(esri + 'Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16, attribution: 'Tiles © Esri' }), L.tileLayer(esri + 'Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 })],
+      sat: [L.tileLayer(esri + 'World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, maxNativeZoom: 18, attribution: 'Tiles © Esri, Maxar, Earthstar Geographics' }), L.tileLayer(esri + 'Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, opacity: .8 })]
+    };
+    routeGroup = L.layerGroup().addTo(routeMap);
+  }
+  routeMap.invalidateSize();
+  Object.values(tileLayers).flat().forEach(l => routeMap.hasLayer(l) && routeMap.removeLayer(l));
+  tileLayers[routeTab === 'sat' ? 'sat' : 'map'].forEach(l => l.addTo(routeMap));
+  routeGroup.clearLayers();
+  const icon = (cls, size) => L.divIcon({ className: '', html: `<div class="rpin ${cls}"></div>`, iconSize: [size, size], iconAnchor: [size / 2, size / 2] });
+  const name = esc(state.item && state.item.name || '');
+  if (routeTab === 'sat') {                          // спутник: летим к самому зданию
+    L.marker(dest, { icon: icon('', 14) }).bindTooltip(name, { direction: 'top', permanent: true }).addTo(routeGroup);
+    routeMap.setView(from.length ? [dest[0] + (from[0] - dest[0]) * 0, dest[1]] : dest, 5, { animate: false });
+    routeMap.flyTo(dest, 17, { duration: 2.6 });
+  } else {
+    const pts = roadPts || arcPoints(from, dest);
+    L.polyline(pts, { color: '#CFE8FF', weight: 10, opacity: .18, lineCap: 'round' }).addTo(routeGroup);
+    const line = L.polyline(pts, { color: '#F2FAFF', weight: 3, opacity: .95, lineCap: 'round' }).addTo(routeGroup);
+    L.marker([from[0], pts[0][1]], { icon: icon('o', 10) }).bindTooltip(esc(label), { direction: 'top' }).addTo(routeGroup);
+    L.marker([dest[0], pts[pts.length - 1][1]], { icon: icon('', 14) }).bindTooltip(name, { direction: 'top' }).addTo(routeGroup);
+    routeMap.fitBounds(line.getBounds(), { padding: [50, 50], maxZoom: 12 });
+  }
+}
 function renderRoute() {
   const t = T[lang], dest = coords(), info = $('routeInfo'); if (!info) return;
+  document.querySelectorAll('#routeTabs button').forEach(b => b.textContent = { globe: t.tabGlobe, map: t.tabMap, sat: t.tabSat }[b.dataset.tab]);
   if (!dest) { info.innerHTML = `<span>${t.noCoords}</span>`; $('routeLinks').innerHTML = ''; return; }
   const from = userLoc || SEOUL, label = userLoc ? t.yourLoc : t.seoul, fl = from.join(','), dl = dest.join(',');
   const km = haversine(from, dest);
@@ -1579,32 +1674,20 @@ function renderRoute() {
     `<a class="btn tonal sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=${fl}&destination=${dl}">${t.btnDir}</a>` +
     `<a class="btn outline sm" target="_blank" rel="noopener" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${dl}">${t.btnStreet}</a>` +
     `<a class="btn outline sm" target="_blank" rel="noopener" href="https://earth.google.com/web/@${dest[0]},${dest[1]},0a,900d,35y,0h,65t,0r">${t.btnEarth}</a>`;
-  if (typeof L === 'undefined') return;
-  const key = fl + '>' + dl + lang; if (key === routeKey) return; routeKey = key;
+  const key = fl + '>' + dl;
+  if (key === routeKey) { if (routeTab !== 'globe') drawLeaflet(); return; }
+  routeKey = key; roadPts = null; routeCtx = { from, dest, label, km };
   const tok = ++routeTok;
-  if (!routeMap) {
-    routeMap = L.map('routeMap', { zoomControl: true, attributionControl: true, worldCopyJump: false, minZoom: 1 });
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 19, attribution: '© OpenStreetMap · © CARTO' }).addTo(routeMap);
-    routeGroup = L.layerGroup().addTo(routeMap);
-  }
-  routeGroup.clearLayers();
-  const draw = (pts) => {
-    L.polyline(pts, { color: '#CFE8FF', weight: 10, opacity: .18, lineCap: 'round' }).addTo(routeGroup);
-    const line = L.polyline(pts, { color: '#F2FAFF', weight: 3, opacity: .95, lineCap: 'round' }).addTo(routeGroup);
-    const oLon = pts[0][1], dLon = pts[pts.length - 1][1];
-    L.marker([from[0], oLon], { icon: L.divIcon({ className: '', html: '<div class="rpin o"></div>', iconSize: [10, 10], iconAnchor: [5, 5] }) }).bindTooltip(label, { direction: 'top' }).addTo(routeGroup);
-    L.marker([dest[0], dLon], { icon: L.divIcon({ className: '', html: '<div class="rpin"></div>', iconSize: [14, 14], iconAnchor: [7, 7] }) }).bindTooltip(esc(state.item && state.item.name || ''), { direction: 'top' }).addTo(routeGroup);
-    routeMap.invalidateSize(); routeMap.fitBounds(line.getBounds(), { padding: [44, 44], maxZoom: 14 });
-  };
-  draw(arcPoints(from, dest));
+  routeGlobe.setPin(dest[0], dest[1]); routeGlobe.setArc(from, dest);                 // перелёт на глобусе
+  if (routeTab !== 'globe') drawLeaflet();
   if (km < 2500) {                                   // рядом: пробуем настоящий автомаршрут
     const ac = new AbortController(), to = setTimeout(() => ac.abort(), 7000);
     fetch(`https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${dest[1]},${dest[0]}?overview=full&geometries=geojson`, { signal: ac.signal })
       .then(r => r.json()).then(j => {
         clearTimeout(to); if (tok !== routeTok || !j.routes || !j.routes[0]) return;
         const r = j.routes[0]; if (r.distance / 1000 > km * 2.2) return;
-        routeGroup.clearLayers(); draw(r.geometry.coordinates.map(([x, y]) => [y, x]));
-        show(r.distance / 1000, r.duration / 3600, true);
+        roadPts = r.geometry.coordinates.map(([x, y]) => [y, x]); show(r.distance / 1000, r.duration / 3600, true);
+        if (routeTab === 'map') drawLeaflet();
       }).catch(() => {});
   }
 }
