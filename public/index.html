@@ -6,7 +6,7 @@
 <title>Tower Sketch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Nunito:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Neucha&family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Nunito:wght@400;500;700&display=swap" rel="stylesheet">
 
 <style>
   /* ===== ЦВЕТА САЙТА: три цвета из палитры Material 3 + нейтральные ===== */
@@ -416,7 +416,6 @@
   .stage.game .target { display: flex; }
   .stage.game .guide { top: 70px; }
   .target button { border: 0; background: color-mix(in srgb, var(--on) 14%, transparent); color: var(--on); height: 30px; padding: 0 12px; border-radius: 8px; font: 700 .8rem/1 inherit; font-family: inherit; cursor: pointer; }
-  .stage.searched .dock { bottom: auto; top: 14px; left: auto; right: 14px; transform: none; }
   .stage.searched .chipbtn, .stage.searched .target { display: none; }
   .logo { white-space: nowrap; }
   @media (max-width: 520px) { .logo { font-size: 0; gap: 0; } }
@@ -448,11 +447,77 @@
   .target { background: #fff; color: var(--primary); }
   .target button { background: #ffe3f1; color: var(--primary); }
   .stage canvas.fx.on { background: transparent; transition: background .9s; }
-  .stage canvas.fx.on.solid { background: color-mix(in srgb, var(--paper) 90%, transparent); }
+  .stage canvas.fx.on.solid { background: color-mix(in srgb, var(--paper) 86%, transparent); }
   .stage.mouse video { display: none; }
   .stage.mouse canvas { cursor: crosshair; }
   .stage.cam:not(.mouse) canvas#canvas { cursor: default; }
-  #results { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+  /* после поиска экран делится на две колонки: слева рисунок в 3D, справа результаты */
+  #view-draw.searched .work { display: grid; grid-template-columns: minmax(380px, 46%) 1fr; align-items: start; }
+  #view-draw.searched .stage.big { position: sticky; top: 0; height: 100vh; border-bottom: 0; border-right: 1px solid var(--line); }
+  #view-draw.searched .stage.big.searched { height: 100vh; }
+  .stage.searched .dock { top: auto; right: auto; bottom: 18px; left: 50%; transform: translateX(-50%); }
+  #view-draw.searched #results { max-width: none; padding: 76px 36px 30px 32px; }
+  #view-draw.searched .res-wrap { grid-template-columns: 1fr; gap: 18px; }
+  #view-draw.searched .rmap { position: relative; top: auto; height: 250px; grid-column: 1; grid-row: auto; order: -1; }
+  #view-draw.searched .res-wrap .results-col { grid-column: 1; grid-row: auto; }
+  #view-draw.searched .score { margin-top: 0; margin-bottom: 18px; }
+  #view-draw.searched .results-hint { margin-top: 0; }
+  @media (max-width: 900px) {
+    #view-draw.searched .work { display: block; }
+    #view-draw.searched .stage.big, #view-draw.searched .stage.big.searched { position: relative; height: 62vh; border-right: 0; border-bottom: 1px solid var(--line); }
+    #view-draw.searched #results { padding: 22px 18px; }
+  }
+  /* ===== единый рукописный шрифт; кислотно-зелёный только у текстов сверху и справа, рамки нейтральные ===== */
+  :root { --acid: #B8FF1F; --ink: #F2F2EF; --ink2: #B4B4BC; --frame: rgba(255,255,255,.38); }
+  html { font-size: 21px; }
+  .chipbtn, .langs button, .target { font-size: 1.05rem !important; }
+  .btn { font-size: 1.05rem; }
+  html, body, body *, button, input, textarea, select { font-family: 'Neucha', 'Gaegu', cursive !important; font-weight: 400 !important; letter-spacing: 0 !important; font-style: normal; }
+  .btn, .btn:not(.tonal):not(.outline):not(.text), .btn.tonal, .btn.outline, .dock .btn.outline, .chipbtn, .target { background: rgba(18,18,22,.82); color: var(--ink); border: 1.5px solid var(--frame); box-shadow: none; }
+  .btn:hover, .btn:not(.tonal):not(.outline):not(.text):hover, .btn.tonal:hover, .btn.outline:hover, .chipbtn:hover, .stage.game #gameBtn { background: rgba(255,255,255,.12); color: var(--ink); border-color: rgba(255,255,255,.7); box-shadow: 0 0 0 4px rgba(255,255,255,.08); }
+  .chipbtn, .chipbtn:hover, .stage.game #gameBtn, .target, .target button { color: var(--acid); }
+  .target button { background: rgba(255,255,255,.12); }
+  .btn svg { fill: var(--ink); }
+  .btn.text { background: transparent; color: var(--ink2); border: 0; }
+  .langs button { color: var(--acid); }
+  .langs button.on { background: rgba(255,255,255,.16); color: var(--acid); }
+  header #btnMusic, header #btnMusic.on { color: var(--acid); }
+  header nav { border-color: var(--frame); }
+  header #btnMusic svg { fill: var(--acid); color: var(--acid); }
+  .ph { color: rgba(236,242,255,.34) !important; font-size: clamp(2rem, 5vw, 4rem) !important; letter-spacing: 0 !important; }
+  .guide span, .gest span, .results-hint, .hint { color: var(--ink2); }
+  .guide strong { color: var(--ink); }
+  /* ===== компактнее и прозрачнее ===== */
+  html { font-size: 18px; }
+  #gameBtn { display: none !important; }
+  .chipbtn { font-size: .95rem !important; height: 32px; padding: 0 14px; border-radius: 9px; }
+  .langs button { font-size: .86rem !important; height: 30px; padding: 0 11px; }
+  .langs button[data-lang="ko"] { font-size: 1.02rem !important; }
+  .langs button:focus-visible { outline: none; }
+  header #btnMusic { height: 30px; }
+  .guide { width: 218px; gap: 6px; top: 12px; left: 12px; }
+  .guide div { padding: 5px 10px; gap: 8px; border-radius: 10px; background: rgba(16,16,20,.5); border: 1px solid rgba(255,255,255,.2); }
+  .guide em { font-size: 24px; }
+  .guide p { line-height: 1.15; margin: 0; } .guide span { display: block; }
+  .guide strong { font-size: .92rem; color: rgba(242,242,239,.82); line-height: 1.15; }
+  .guide span { font-size: .74rem; color: rgba(210,210,216,.62); line-height: 1.25; }
+  .gest { border: 1px solid rgba(255,255,255,.25); background: rgba(16,16,20,.6); }
+  .gest em { font-size: 22px; }
+  .gest span { font-size: .85rem; }
+  .ph { font-size: clamp(1.3rem, 3vw, 2.3rem) !important; color: rgba(236,242,255,.2) !important; }
+  .dock .btn { height: 40px; padding: 0 16px; font-size: .98rem !important; border-radius: 10px; background: rgba(18,18,22,.6); border-color: rgba(255,255,255,.28); color: rgba(242,242,239,.9); }
+  .results-hint, .hint { font-size: .95rem; }
+  /* иконки жестов */
+  .guide em, .gest em { font-style: normal; font-size: 34px; line-height: 1; flex: none; }
+  .gest em { font-size: 26px; }
+  .stage canvas#canvas, .stage.cam:not(.mouse) canvas#canvas { cursor: crosshair; }
+  .guide svg { width: 44px; height: 44px; flex: none; fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .guide svg .a { stroke: var(--primary); }
+  .gest svg { width: 30px; height: 30px; fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .gest svg .a { stroke: var(--primary); }
+  #view-draw.searched .dock{flex-wrap:nowrap;gap:8px}#view-draw.searched .dock button{padding-left:16px;padding-right:16px;white-space:nowrap}
+#results { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
   .score { margin-top: 26px; padding: 18px 22px; border-radius: 16px; background: var(--primary); color: var(--on); display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
   .score b { font-size: 3rem; line-height: 1; letter-spacing: -.04em; }
   .score span { font-weight: 700; }
@@ -480,6 +545,7 @@
 <main>
   <!-- ГЛАВНАЯ = ОГРОМНОЕ ПОЛОТНО: рисуй мышкой или рукой перед камерой -->
   <section class="view active" id="view-draw">
+    <div class="work">
     <div class="stage big" id="stage">
       <video id="video" playsinline muted></video>
       <canvas id="canvas"></canvas>
@@ -499,6 +565,7 @@
       </div>
     </div>
     <div id="results"></div>
+    </div>
     <footer class="home-contacts" id="homeContacts"></footer>
   </section>
 
@@ -666,35 +733,35 @@ T.ko.floatHint = '떠다니는 명소를 눌러 3D로 보세요.';
 T.ru.floatHint = 'Нажми на парящее здание, чтобы увидеть его в 3D.';
 
 T.en.gDraw = 'Draw'; T.en.gDrawD = 'Touch your thumb and index finger together and move your hand.';
-T.en.gSearch = 'Search'; T.en.gSearchD = 'Open your whole hand and hold it still for a second.';
+T.en.gSearch = 'Open mouth'; T.en.gSearchD = 'Open your mouth wide for a second to search.';
 T.en.gClear = 'Clear'; T.en.gClearD = 'Make a fist and hold it for a second.';
 T.ko.gDraw = '그리기'; T.ko.gDrawD = '엄지와 검지를 맞대고 손을 움직이세요.';
-T.ko.gSearch = '찾기'; T.ko.gSearchD = '손을 활짝 펴고 1초 동안 멈추세요.';
+T.ko.gSearch = '입 벌리기'; T.ko.gSearchD = '입을 크게 1초 동안 벌리면 검색해요.';
 T.ko.gClear = '지우기'; T.ko.gClearD = '주먹을 쥐고 1초 동안 유지하세요.';
 T.ru.gDraw = 'Рисовать'; T.ru.gDrawD = 'Соедини большой и указательный пальцы и двигай рукой.';
-T.ru.gSearch = 'Искать'; T.ru.gSearchD = 'Раскрой всю ладонь и задержи на секунду.';
+T.ru.gSearch = 'Открой рот'; T.ru.gSearchD = 'Широко открой рот на секунду — начнётся поиск.';
 T.ru.gClear = 'Стереть'; T.ru.gClearD = 'Сожми кулак и задержи на секунду.';
 
 Object.assign(T.en, {
   guess: 'Find building', ph: 'Draw here — with your mouse or your hand',
   gameBtn: 'Draw from memory', gameDraw: 'Draw from memory:', gameNext: 'Another', gameScore: 'Your drawing is', gameMiss: 'The AI did not recognise it. It saw:',
-  gDraw: 'Pen grip', gDrawD: 'Touch thumb and index finger like holding a pen.', gSearch: 'Fist', gSearchD: 'Hold a fist for a second to search.', gClear: 'Open palm', gClearD: 'Hold your palm open to clear.',
+  gDraw: 'Pen grip', gDrawD: 'Touch thumb and index finger like holding a pen.', gSearch: 'Open mouth', gSearchD: 'Open your mouth wide for a second to search.', gClear: 'Open palm', gClearD: 'Hold your palm open to clear.',
   gSearching: 'Searching…', gClearing: 'Clearing…', camReady: '',
-  toMouse: 'Draw with mouse', toCam: 'Draw with webcam', phCam: 'Show your hand and pinch to draw', phMouse: 'Draw here with your mouse'
+  toMouse: 'Camera off', toCam: 'Camera on', phCam: 'Draw with your hand or the mouse', phMouse: 'Draw here with your mouse'
 });
 Object.assign(T.ko, {
   guess: '건물 찾기', ph: '여기에 마우스나 손으로 그려 보세요',
   gameBtn: '기억으로 그리기', gameDraw: '기억으로 그려 보세요:', gameNext: '다른 건물', gameScore: '내 그림의 유사도', gameMiss: 'AI가 알아보지 못했어요. AI의 생각:',
-  gDraw: '펜 잡기', gDrawD: '펜을 잡듯 엄지와 검지를 붙이세요.', gSearch: '주먹', gSearchD: '주먹을 1초 쥐면 검색해요.', gClear: '손바닥', gClearD: '손바닥을 펴면 지워져요.',
+  gDraw: '펜 잡기', gDrawD: '펜을 잡듯 엄지와 검지를 붙이세요.', gSearch: '입 벌리기', gSearchD: '입을 크게 1초 동안 벌리면 검색해요.', gClear: '손바닥', gClearD: '손바닥을 펴면 지워져요.',
   gSearching: '검색 중…', gClearing: '지우는 중…', camReady: '',
-  toMouse: '마우스로 그리기', toCam: '웹캠으로 그리기', phCam: '손을 보여 주고 핀치하며 그려 보세요', phMouse: '여기에 마우스로 그려 보세요'
+  toMouse: '카메라 끄기', toCam: '카메라 켜기', phCam: '손이나 마우스로 그려 보세요', phMouse: '여기에 마우스로 그려 보세요'
 });
 Object.assign(T.ru, {
   guess: 'Найти здание', ph: 'Рисуй здесь — мышкой или рукой',
   gameBtn: 'Рисовать по памяти', gameDraw: 'Нарисуй по памяти:', gameNext: 'Другое', gameScore: 'Твой рисунок похож на', gameMiss: 'ИИ не узнал рисунок. Он увидел:',
-  gDraw: 'Как ручку', gDrawD: 'Соедини большой и указательный пальцы, как будто держишь ручку.', gSearch: 'Кулак', gSearchD: 'Держи кулак секунду — начнётся поиск.', gClear: 'Ладонь', gClearD: 'Покажи открытую ладонь — рисунок сотрётся.',
+  gDraw: 'Как ручку', gDrawD: 'Соедини большой и указательный пальцы, как будто держишь ручку.', gSearch: 'Открой рот', gSearchD: 'Широко открой рот на секунду — начнётся поиск.', gClear: 'Ладонь', gClearD: 'Покажи открытую ладонь — рисунок сотрётся.',
   gSearching: 'Ищу…', gClearing: 'Стираю…', camReady: '',
-  toMouse: 'Рисовать мышкой', toCam: 'Рисовать камерой', phCam: 'Покажи руку и соедини пальцы, чтобы рисовать', phMouse: 'Рисуй здесь мышкой'
+  toMouse: 'Выключить камеру', toCam: 'Включить камеру', phCam: 'Рисуй рукой или мышкой', phMouse: 'Рисуй здесь мышкой'
 });
 
 const $ = id => document.getElementById(id);
@@ -1161,18 +1228,18 @@ function resolveWiki(item) {                       // находит насто�
 
 /* ============ ПОИСК ЗДАНИЙ ПО РИСУНКУ ============ */
 const INK = TH.primaryHex;                      // янтарная линия на тёмном полотне
-function exportImage(canvas) {                    // обрезаем по рисунку, линии чёрные на белом → JPEG для ИИ
-  const W = canvas.width, H = canvas.height, d = canvas.getContext('2d').getImageData(0, 0, W, H).data;
-  let x0 = W, x1 = 0, y0 = H, y1 = 0;
-  for (let y = 0; y < H; y += 2) for (let x = 0; x < W; x += 2) if (d[(y * W + x) * 4 + 3] > 40) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
-  if (x1 <= x0 || y1 <= y0) { x0 = 0; y0 = 0; x1 = W; y1 = H; }
-  const pad = Math.max(x1 - x0, y1 - y0) * .16, sw = x1 - x0 + pad * 2, sh = y1 - y0 + pad * 2;
+function exportImage() {                          // линии чёрные на белом, обрезано по рисунку → JPEG для ИИ
+  const list = strokes.filter(st => st.length).map(st => st.map(p => [p[0] * SW, p[1] * SH]));
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  list.forEach(st => st.forEach(([x, y]) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }));
+  if (x1 < x0) { x0 = y0 = 0; x1 = SW; y1 = SH; }
+  const dim = Math.max(x1 - x0, y1 - y0, 40), pad = dim * .16, sw = x1 - x0 + pad * 2, sh = y1 - y0 + pad * 2;
   const t = document.createElement('canvas'); t.width = 640; t.height = 480;
   const k = Math.min(t.width / sw, t.height / sh), g = t.getContext('2d');
-  const m = document.createElement('canvas'); m.width = t.width; m.height = t.height;
-  const mg = m.getContext('2d'); mg.drawImage(canvas, x0 - pad, y0 - pad, sw, sh, (t.width - sw * k) / 2, (t.height - sh * k) / 2, sw * k, sh * k);
-  mg.globalCompositeOperation = 'source-in'; mg.fillStyle = '#111'; mg.fillRect(0, 0, t.width, t.height);
-  g.fillStyle = '#fff'; g.fillRect(0, 0, t.width, t.height); g.drawImage(m, 0, 0);
+  g.fillStyle = '#fff'; g.fillRect(0, 0, t.width, t.height);
+  g.lineCap = g.lineJoin = 'round'; g.strokeStyle = '#111'; g.lineWidth = Math.max(5, dim * k * .028);
+  const ox = (t.width - sw * k) / 2, oy = (t.height - sh * k) / 2;
+  list.forEach(st => { g.beginPath(); st.forEach(([x, y], i) => { const X = ox + (x - x0 + pad) * k, Y = oy + (y - y0 + pad) * k; i ? g.lineTo(X, Y) : g.moveTo(X, Y); }); if (st.length === 1) g.lineTo(ox + (st[0][0] - x0 + pad) * k + .1, oy + (st[0][1] - y0 + pad) * k); g.stroke(); });
   return t.toDataURL('image/jpeg', .88);
 }
 function isBlank(canvas) {
@@ -1207,10 +1274,24 @@ function sketchCloud(canvas) {
   }
   return { p, h01, s: sv, from: fr, n: N, gy: ymin, rr: Math.max(.45, Math.min(1.1, (x1 - x0) / m / 2 * 1.1)) };
 }
+const SPR = (() => {                               // стеклянный шарик: прозрачный, с яркой кромкой и бликами
+  const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d');
+  const gr = g.createRadialGradient(32, 32, 6, 32, 32, 31);
+  gr.addColorStop(0, 'rgba(200,225,245,.04)'); gr.addColorStop(.7, 'rgba(10,20,30,.22)'); gr.addColorStop(1, 'rgba(210,235,255,.30)');
+  g.fillStyle = gr; g.beginPath(); g.arc(32, 32, 31, 0, TAU); g.fill();
+  g.lineWidth = 3; g.strokeStyle = 'rgba(120,205,255,.4)'; g.beginPath(); g.arc(33, 32, 29, 0, TAU); g.stroke();
+  g.strokeStyle = 'rgba(255,140,205,.3)'; g.beginPath(); g.arc(31, 32, 29, 0, TAU); g.stroke();
+  g.lineWidth = 2.4; g.strokeStyle = 'rgba(245,252,255,.85)'; g.beginPath(); g.arc(32, 32, 29.5, 0, TAU); g.stroke();
+  const hl = g.createRadialGradient(22, 19, 0, 22, 19, 12);
+  hl.addColorStop(0, 'rgba(255,255,255,.95)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = hl; g.beginPath(); g.arc(22, 19, 12, 0, TAU); g.fill();
+  g.fillStyle = 'rgba(210,235,255,.5)'; g.beginPath(); g.arc(43, 44, 3.2, 0, TAU); g.fill();
+  return c;
+})();
 class Sketch3D {
   constructor(src, onExit) {
     this.src = src; this.fx = src.parentElement.querySelector('canvas.fx'); this.onExit = onExit;
-    this.raf = 0; this.yaw = .5; this.pitch = .18; this.auto = true; this.t0 = 0; this.cloud = null;
+    this.raf = 0; this.yaw = 0; this.pitch = .2; this.auto = true; this.t0 = 0;
     const c = this.fx; let prev = null, moved = 0;
     c.onpointerdown = e => { prev = [e.clientX, e.clientY]; moved = 0; this.auto = false; c.setPointerCapture(e.pointerId); };
     c.onpointermove = e => {
@@ -1221,11 +1302,34 @@ class Sketch3D {
     };
     c.onpointerup = c.onpointercancel = () => { if (prev && moved < 6) { this.stop(); if (this.onExit) this.onExit(); } prev = null; };
   }
+  build() {                                        // штрихи → ряды стеклянных шариков, выдавленные вглубь слоями
+    const list = strokes.filter(st => st.length).map(st => st.map(p => [p[0] * SW, p[1] * SH]));
+    if (!list.length) return false;
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9, total = 0;
+    list.forEach(st => st.forEach(([x, y], i) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); if (i) total += Math.hypot(x - st[i - 1][0], y - st[i - 1][1]); }));
+    this.dim = Math.max(x1 - x0, y1 - y0, 40); const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    this.offx = cx - SW / 2; this.offy = cy - SH / 2;
+    this.rad = Math.max(3, lineW() / DPR / 2); const nl = 7, D = this.dim * .1;
+    const step = Math.max(this.rad * .55, 1.5, total * nl / 15000), P = [];
+    list.forEach(st => {
+      if (st.length === 1) { P.push([st[0][0] - cx, cy - st[0][1]]); return; }
+      for (let i = 1; i < st.length; i++) {
+        const a = st[i - 1], b = st[i], n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / step));
+        for (let k = 0; k < n; k++) P.push([a[0] + (b[0] - a[0]) * k / n - cx, cy - (a[1] + (b[1] - a[1]) * k / n)]);
+      }
+      const e = st[st.length - 1]; P.push([e[0] - cx, cy - e[1]]);
+    });
+    this.n = P.length * nl; this.X = new Float32Array(this.n); this.Y = new Float32Array(this.n); this.Z = new Float32Array(this.n);
+    this.X2 = new Float32Array(this.n); this.Y2 = new Float32Array(this.n); this.Z2 = new Float32Array(this.n); this.R2 = new Float32Array(this.n);
+    this.order = new Uint32Array(this.n);
+    let q = 0; P.forEach(([x, y]) => { for (let l = 0; l < nl; l++) { this.X[q] = x; this.Y[q] = y; this.Z[q] = (l / (nl - 1) - .5) * 2 * D; q++; } });
+    return true;
+  }
   start() {
-    this.cloud = sketchCloud(this.src); if (!this.cloud) return false;
+    if (!this.build()) return false;
     sk3d.get(this.src) && sk3d.get(this.src).stop();
     sk3d.set(this.src, this); this.t0 = performance.now(); this.fx.classList.remove('solid'); this.fx.classList.add('on');
-    this.src.style.transition = 'opacity .5s'; this.src.style.opacity = '0';          // линии растворяются в точки, а не исчезают
+    this.src.style.transition = 'opacity .45s'; this.src.style.opacity = '0';
     const loop = t => { this.draw(t); this.raf = requestAnimationFrame(loop); };
     this.raf = requestAnimationFrame(loop); return true;
   }
@@ -1238,10 +1342,30 @@ class Sketch3D {
     const [W, H, dpr] = fit(this.fx), g = this.fx.getContext('2d');
     if (!W || !H) return;
     g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
-    if (this.auto && !REDUCED) this.yaw += .006;
-    const el = (t - this.t0) / 1000, k = REDUCED ? 1 : Math.max(0, Math.min(1, (el - .55) / 1.35)), e = k * k * (3 - 2 * k);
-    if (el > 1.2) this.fx.classList.add('solid');
-    renderCloud(g, W, H, this.cloud, { yaw: this.yaw - (1 - e) * .9, pitch: this.pitch, zoom: .92, prog: 1, mix: e, from: this.cloud.from });
+    const el = (t - this.t0) / 1000, kk = REDUCED ? 1 : Math.max(0, Math.min(1, (el - .3) / 1.6)), e = kk * kk * (3 - 2 * kk);
+    if (el > 1) this.fx.classList.add('solid');
+    if (this.auto && !REDUCED) this.yaw += .005;
+    const yaw = this.yaw * e, pitch = this.pitch * e, cy_ = Math.cos(yaw), sy_ = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const fitS = Math.min(2, .6 * Math.min(W, H) / this.dim), sc = 1 + (fitS - 1) * e;
+    const cx = W / 2 + this.offx * (1 - e), cy = H / 2 + this.offy * (1 - e), CAM = 2400, half = this.dim * sc * .5;
+    // мягкая тень под фигурой
+    g.save(); g.globalAlpha = e; g.translate(cx, cy + half * .95 + 8); g.scale(1, .16);
+    const sh = g.createRadialGradient(0, 0, 0, 0, 0, half * 1.05); sh.addColorStop(0, 'rgba(120,190,255,.28)'); sh.addColorStop(1, 'rgba(120,190,255,0)');
+    g.fillStyle = sh; g.beginPath(); g.arc(0, 0, half * 1.05, 0, TAU); g.fill(); g.restore();
+    const n = this.n, X2 = this.X2, Y2 = this.Y2, Z2 = this.Z2, R2 = this.R2, order = this.order;
+    for (let i = 0; i < n; i++) {
+      const x = this.X[i] * sc, y = this.Y[i] * sc, z = this.Z[i] * sc * e;
+      const x1 = x * cy_ + z * sy_, z1 = -x * sy_ + z * cy_, y2 = y * cp - z1 * sp, z2 = y * sp + z1 * cp, f = CAM / (CAM - z2);
+      X2[i] = cx + x1 * f; Y2[i] = cy - y2 * f; Z2[i] = z2; R2[i] = this.rad * sc * f; order[i] = i;
+    }
+    order.sort((a, b) => Z2[a] - Z2[b]);
+    const fade = Math.min(1, el / .3), zr = half * 1.1 || 1;
+    for (let k = 0; k < n; k++) {
+      const i = order[k], d = (Z2[i] / zr + 1) / 2;
+      g.globalAlpha = fade * (.55 + .45 * Math.max(0, Math.min(1, d)));
+      const r = R2[i]; g.drawImage(SPR, X2[i] - r, Y2[i] - r, r * 2, r * 2);
+    }
+    g.globalAlpha = 1;
   }
 }
 const exit3D = canvas => { const s = sk3d.get(canvas); if (s) s.stop(); };
@@ -1262,18 +1386,18 @@ function showMap(outId, list, wikis) {
   $(outId).querySelectorAll('.result').forEach(el => el.addEventListener('mouseenter', () => { const q = pins[+el.dataset.i]; if (q) gl.setPin(q.lat, q.lon); }));
 }
 
+function setSearched(on) { $('stage').classList.toggle('searched', on); $('view-draw').classList.toggle('searched', on); }
 async function runGuess(canvas, hintEl, outEl, btn, view) {
   const t = T[lang];
   hintEl.className = 'hint';
   if (isBlank(canvas)) { hintEl.textContent = t.empty; return; }
   hintEl.textContent = t.thinking; outEl.innerHTML = ''; btn.disabled = true;
-  const sketch = exportImage(canvas);
-  const fx = new Sketch3D(canvas, () => { outEl.innerHTML = ''; stopMap(outEl.id); $('stage').classList.remove('searched'); });
+  const sketch = exportImage();
+  const fx = new Sketch3D(canvas, () => { outEl.innerHTML = ''; stopMap(outEl.id); setSearched(false); });
   fx.start();
-  setTimeout(() => { if (sk3d.get(canvas) === fx) $('stage').classList.add('searched'); }, 1900);     // полотно уменьшается, когда рисунок уже стал 3D     // рисунок превращается в 3D из точек, пока ИИ думает
   try {
     const list = await api('/api/guess', { image: sketch, lang });
-    if (!Array.isArray(list) || !list.length) { hintEl.textContent = t.none; fx.stop(); $('stage').classList.remove('searched'); return; }
+    if (!Array.isArray(list) || !list.length) { hintEl.textContent = t.none; fx.stop(); setSearched(false); return; }
     list.sort((a, b) => (Number(b.match) || 0) - (Number(a.match) || 0));
     hintEl.textContent = '';
     const wikis = await Promise.all(list.map(p => resolveWiki(p)));
@@ -1291,12 +1415,13 @@ async function runGuess(canvas, hintEl, outEl, btn, view) {
         </div></article>`;
     }).join('') + '</div></div><div class="rmap"><canvas></canvas></div></div>';
     showMap(outEl.id, list, wikis);
+    setSearched(true);                         // экран делится: слева 3D-рисунок, справа результаты
     const open = el => { const c = el.closest('.result'); if (c) { const i = +c.dataset.i; openDetail(list[i], view, { sketch, wiki: wikis[i] }); } };
     outEl.onclick = e => open(e.target);
     outEl.onkeydown = e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.result')) { e.preventDefault(); open(e.target); } };
     window.scrollTo({ top: 0, behavior: REDUCED ? 'auto' : 'smooth' });
   } catch (e) {
-    hintEl.className = 'hint error'; hintEl.textContent = errText(e); fx.stop(); $('stage').classList.remove('searched');
+    hintEl.className = 'hint error'; hintEl.textContent = errText(e); fx.stop(); setSearched(false);
   } finally { btn.disabled = false; }
 }
 
@@ -1474,13 +1599,37 @@ $('dShare').onclick = saveCard;
 const stage = $('stage'), cv = $('canvas'), cctx = cv.getContext('2d'), video = $('video'), cursor = $('cursor'), hintEl = $('hint');
 let SW = 1, SH = 1, DPR = 1;
 const strokes = []; let curStroke = null;
-function lineW() { return Math.max(5, Math.min(SW, SH) / 85) * DPR; }
-function segDraw(a, b) { cctx.beginPath(); cctx.moveTo(a[0] * cv.width, a[1] * cv.height); cctx.lineTo(b[0] * cv.width, b[1] * cv.height); cctx.stroke(); }
-function redraw() {
-  cctx.clearRect(0, 0, cv.width, cv.height);
-  cctx.lineWidth = lineW(); cctx.lineCap = 'round'; cctx.lineJoin = 'round'; cctx.strokeStyle = INK;
-  for (const st of strokes) for (let i = 0; i < st.length; i++) segDraw(st[Math.max(0, i - 1)], st[i]);
+function lineW() { return Math.max(8, Math.min(SW, SH) / 52) * DPR; }
+let dirty = false;
+function queueRedraw() { if (!dirty) { dirty = true; requestAnimationFrame(redraw); } }
+const gtmp = document.createElement('canvas');     // временный слой: из него вырезается «стеклянная трубка»
+function drawMarker(st) {                          // настоящее стекло: прозрачное тело, яркая кромка, тёмная полоса преломления, блики, лёгкая радужная окантовка
+  if (!st.length) return;
+  const W = lineW(), pts = st.map(p => [p[0] * cv.width, p[1] * cv.height]);
+  const pathOn = c => {
+    c.beginPath(); c.moveTo(pts[0][0], pts[0][1]);
+    if (pts.length === 1) c.lineTo(pts[0][0] + .01, pts[0][1]);
+    for (let i = 1; i < pts.length - 1; i++) c.quadraticCurveTo(pts[i][0], pts[i][1], (pts[i][0] + pts[i + 1][0]) / 2, (pts[i][1] + pts[i + 1][1]) / 2);
+    if (pts.length > 1) c.lineTo(pts[pts.length - 1][0], pts[pts.length - 1][1]);
+  };
+  const c = cctx, S = (col, w, dx = 0, dy = 0) => { c.save(); c.translate(dx, dy); c.strokeStyle = col; c.lineWidth = w; pathOn(c); c.stroke(); c.restore(); };
+  c.save(); c.lineCap = 'round'; c.lineJoin = 'round';
+  S('rgba(0,0,0,.38)', W * 1.05, W * .22, W * .34);                                     // тень от стекла
+  S('rgba(255,120,200,.16)', W * 1.12, W * .1, 0); S('rgba(110,200,255,.2)', W * 1.12, -W * .1, 0);   // дисперсия на краях
+  S('rgba(190,215,235,.13)', W);                                                          // прозрачное тело
+  S('rgba(8,16,26,.30)', W * .78);                                                        // тёмная полоса внутри: преломление
+  S('rgba(225,242,255,.14)', W * .42, W * .06, W * .08);                                  // светлая линза в центре
+  // тонкая яркая кромка: вырезаем середину из временного слоя
+  if (gtmp.width !== cv.width || gtmp.height !== cv.height) { gtmp.width = cv.width; gtmp.height = cv.height; }
+  const t = gtmp.getContext('2d'); t.clearRect(0, 0, gtmp.width, gtmp.height); t.lineCap = 'round'; t.lineJoin = 'round';
+  t.strokeStyle = '#fff'; t.lineWidth = W; pathOn(t); t.stroke();
+  t.globalCompositeOperation = 'destination-out'; t.lineWidth = W * .84; pathOn(t); t.stroke(); t.globalCompositeOperation = 'source-over';
+  c.globalAlpha = .7; c.drawImage(gtmp, 0, 0); c.globalAlpha = 1;
+  S('rgba(255,255,255,.92)', Math.max(1.2, W * .13), -W * .2, -W * .21);                // главный блик
+  S('rgba(200,230,255,.55)', Math.max(1, W * .07), W * .22, W * .2);                     // отражённый блик снизу
+  c.restore();
 }
+function redraw() { dirty = false; cctx.clearRect(0, 0, cv.width, cv.height); strokes.forEach(drawMarker); }
 function sizeCanvas() {
   if (stage.classList.contains('searched') || sk3d.has(cv)) return;     // пока показан 3D, рисунок не трогаем
   const r = stage.getBoundingClientRect(); if (!r.width || !r.height) return;
@@ -1489,14 +1638,23 @@ function sizeCanvas() {
 }
 new ResizeObserver(sizeCanvas).observe(stage); sizeCanvas();
 function inkChanged() { stage.classList.toggle('ink', strokes.length > 0); }
-function beginStroke(x, y) { curStroke = [[x / SW, y / SH]]; strokes.push(curStroke); cctx.lineWidth = lineW(); cctx.lineCap = 'round'; cctx.strokeStyle = INK; segDraw(curStroke[0], curStroke[0]); inkChanged(); }
-function moveStroke(x, y) { if (!curStroke) return; const p = [x / SW, y / SH]; segDraw(curStroke[curStroke.length - 1], p); curStroke.push(p); }
-function endStroke() { curStroke = null; }
+function beginStroke(x, y) { curStroke = [[x / SW, y / SH]]; strokes.push(curStroke); inkChanged(); queueRedraw(); }
+function moveStroke(x, y) {
+  if (!curStroke) return;
+  const q = curStroke[curStroke.length - 1], p = [x / SW, y / SH];
+  if (Math.hypot((p[0] - q[0]) * SW, (p[1] - q[1]) * SH) < 2.5) return;      // дрожание руки не рисуем
+  curStroke.push(p); queueRedraw();
+}
+function strokeLen(st) { let l = 0; for (let i = 1; i < st.length; i++) l += Math.hypot((st[i][0] - st[i - 1][0]) * SW, (st[i][1] - st[i - 1][1]) * SH); return l; }
+function endStroke() {
+  if (curStroke && strokeLen(curStroke) < 24) { const i = strokes.indexOf(curStroke); if (i >= 0) strokes.splice(i, 1); inkChanged(); queueRedraw(); }   // случайные точки убираем
+  curStroke = null;
+}
 let mouseDown = false;
-cv.addEventListener('pointerdown', e => { if (mode === 'cam' && stream) return; hintEl.textContent = ''; mouseDown = true; cv.setPointerCapture(e.pointerId); const r = cv.getBoundingClientRect(); beginStroke(e.clientX - r.left, e.clientY - r.top); });
+cv.addEventListener('pointerdown', e => { hintEl.textContent = ''; mouseDown = true; cv.setPointerCapture(e.pointerId); const r = cv.getBoundingClientRect(); beginStroke(e.clientX - r.left, e.clientY - r.top); });
 cv.addEventListener('pointermove', e => { if (!mouseDown) return; const r = cv.getBoundingClientRect(); moveStroke(e.clientX - r.left, e.clientY - r.top); });
 ['pointerup', 'pointercancel'].forEach(ev => cv.addEventListener(ev, () => { mouseDown = false; endStroke(); }));
-function resetResults() { exit3D(cv); stopMap('results'); $('results').innerHTML = ''; stage.classList.remove('searched'); sizeCanvas(); }
+function resetResults() { exit3D(cv); stopMap('results'); $('results').innerHTML = ''; setSearched(false); sizeCanvas(); }
 $('undo').onclick = () => { strokes.pop(); inkChanged(); resetResults(); redraw(); };
 $('clear').onclick = () => { strokes.length = 0; inkChanged(); hintEl.textContent = ''; resetResults(); redraw(); };
 $('find').onclick = () => { if (sk3d.has(cv)) return; runGuess(cv, hintEl, $('results'), $('find'), 'draw'); };
@@ -1505,7 +1663,7 @@ $('find').onclick = () => { if (sk3d.has(cv)) return; runGuess(cv, hintEl, $('re
 let mode = (() => { try { return localStorage.getItem('towerMode') === 'mouse' ? 'mouse' : 'cam'; } catch { return 'cam'; } })();
 function renderMode() {
   const t = T[lang];
-  $('modeBtn').textContent = mode === 'cam' ? '🖱  ' + t.toMouse : '📷  ' + t.toCam;
+  $('modeBtn').textContent = mode === 'cam' ? t.toMouse : t.toCam;
   $('ph').textContent = mode === 'cam' ? t.phCam : t.phMouse;
   stage.classList.toggle('mouse', mode === 'mouse');
 }
@@ -1545,10 +1703,11 @@ function scoreHtml(list) {
 }
 
 /* ============ РУКА: камера включается сама, жесты вместо кнопок ============ */
+const ICON = { pen: '<em>✍️</em>', fist: '<em>😮</em>', palm: '<em>🖐️</em>' };
 function renderGuide() {
   const t = T[lang];
-  $('guide').innerHTML = [['🤏', t.gDraw, t.gDrawD], ['✊', t.gSearch, t.gSearchD], ['✋', t.gClear, t.gClearD]]
-    .map(([i, a, b]) => `<div><b>${i}</b><p><strong>${a}</strong><span>${b}</span></p></div>`).join('');
+  $('guide').innerHTML = [[ICON.pen, t.gDraw, t.gDrawD], [ICON.fist, t.gSearch, t.gSearchD], [ICON.palm, t.gClear, t.gClearD]]
+    .map(([i, a, b]) => `<div>${i}<p><strong>${a}</strong><span>${b}</span></p></div>`).join('');
 }
 let holdG = null, holdT = 0, holdLock = false;
 function gestureStep(g) {                         // жест держишь секунду: плашка заполняется, потом действие срабатывает само
@@ -1556,11 +1715,11 @@ function gestureStep(g) {                         // жест держишь с�
   if (g !== holdG) { holdG = g; holdT = now; holdLock = false; }
   if (!g || holdLock) { if (!g) el.classList.remove('on'); return; }
   const p = Math.min(1, (now - holdT) / 1000);
-  el.innerHTML = `<b>${g === 'search' ? '✊' : '✋'}</b><span>${g === 'search' ? t.gSearching : t.gClearing}</span><i style="--p:${Math.round(p * 100)}%"></i>`;
+  el.innerHTML = `${g === 'search' ? ICON.fist : ICON.palm}<span>${g === 'search' ? t.gSearching : t.gClearing}</span><i style="--p:${Math.round(p * 100)}%"></i>`;
   el.classList.add('on');
-  if (p >= 1) { holdLock = true; el.classList.remove('on'); if (g === 'search') $('find').click(); else $('clear').click(); }
+  if (p >= 1) { holdLock = true; el.classList.remove('on'); if (g === 'search') { if (strokes.length && !stage.classList.contains('searched')) $('find').click(); } else $('clear').click(); }
 }
-let starting = false, stream = null, landmarker = null, rafId = 0, lastVT = -1, smooth = null, handDown = false, camTried = false;
+let pinchFrames = 0, releaseFrames = 0, starting = false, stream = null, landmarker = null, rafId = 0, lastVT = -1, smooth = null, handDown = false, camTried = false;
 async function loadModelHands() {
   if (landmarker) return;
   const base = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
@@ -1570,6 +1729,19 @@ async function loadModelHands() {
     baseOptions: { modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task' },
     runningMode: 'VIDEO', numHands: 1
   });
+}
+let faceLm = null, mouthOpen = false, faceTick = 0;
+async function loadFace() {                       // лицо нужно только для жеста «открытый рот»; если не загрузилось, остальное работает
+  if (faceLm) return;
+  try {
+    const base = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+    const { FaceLandmarker, FilesetResolver } = await import(base + '/vision_bundle.mjs');
+    const fileset = await FilesetResolver.forVisionTasks(base + '/wasm');
+    faceLm = await FaceLandmarker.createFromOptions(fileset, {
+      baseOptions: { modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task' },
+      runningMode: 'VIDEO', numFaces: 1, outputFaceBlendshapes: true
+    });
+  } catch { faceLm = null; }
 }
 async function startCamera() {
   if (mode !== 'cam' || stream || starting) return;
@@ -1586,9 +1758,10 @@ async function startCamera() {
   if (mode !== 'cam') { stream.getTracks().forEach(tr => tr.stop()); stream = null; return; }
   video.srcObject = stream; await video.play(); stage.classList.add('cam');
   try { await loadModelHands(); } catch { setMode('mouse'); hintEl.className = 'hint'; hintEl.textContent = t.fail; return; }
-  loop();
+  loop(); loadFace();
 }
 function stopCamera() {
+  mouthOpen = false;
   cancelAnimationFrame(rafId); rafId = 0; smooth = null; handDown = false; endStroke();
   $('gest').classList.remove('on'); holdG = null; stage.classList.remove('cam');
   if (stream) stream.getTracks().forEach(tr => tr.stop());
@@ -1598,6 +1771,13 @@ function loop() {
   if (!stream) return;
   if (video.currentTime !== lastVT && video.videoWidth) {
     lastVT = video.currentTime;
+    if (faceLm && (faceTick++ & 1) === 0) {
+      try {
+        const fr = faceLm.detectForVideo(video, performance.now()), c = fr.faceBlendshapes && fr.faceBlendshapes[0] && fr.faceBlendshapes[0].categories;
+        const jaw = c && c.find(x => x.categoryName === 'jawOpen');
+        mouthOpen = !!jaw && jaw.score > .45;
+      } catch { mouthOpen = false; }
+    }
     const res = landmarker.detectForVideo(video, performance.now());
     if (res.landmarks.length) {
       const h = res.landmarks[0], tip = h[8], thumb = h[4];
@@ -1606,14 +1786,16 @@ function loop() {
       smooth = smooth ? [smooth[0] + (rx - smooth[0]) * .5, smooth[1] + (ry - smooth[1]) * .5] : [rx, ry];
       const dd = (a, b) => Math.hypot(a.x - b.x, a.y - b.y), handSize = dd(h[0], h[9]) || .1, pr = dd(tip, thumb) / handSize;
       const ext = (a, b) => dd(h[a], h[0]) > dd(h[b], h[0]) * 1.12, up = [ext(8, 6), ext(12, 10), ext(16, 14), ext(20, 18)];
-      const pinch = pr < .28;
-      const gesture = pinch ? null : up.every(Boolean) && dd(h[4], h[17]) / handSize > .8 ? 'clear' : (!up.some(Boolean) && pr > .5) ? 'search' : null;
+      const curled = !up[2] && !up[3];                          // безымянный и мизинец загнуты, как при хвате ручки
+      const pinch = handDown ? pr < .42 : (pr < .26 && curled);
+      pinchFrames = pinch ? pinchFrames + 1 : 0; releaseFrames = pinch ? 0 : releaseFrames + 1;
+      const gesture = pinch ? null : up.every(Boolean) && dd(h[4], h[17]) / handSize > .8 ? 'clear' : mouthOpen ? 'search' : null;
       gestureStep(gesture);
-      cursor.style.display = 'block'; cursor.style.left = smooth[0] + 'px'; cursor.style.top = smooth[1] + 'px'; cursor.classList.toggle('draw', pinch);
-      const can = pinch && !sk3d.has(cv) && !stage.classList.contains('searched');
-      if (can) { if (!handDown) { handDown = true; hintEl.textContent = ''; beginStroke(smooth[0], smooth[1]); } else moveStroke(smooth[0], smooth[1]); }
-      else if (handDown) { handDown = false; endStroke(); }
-    } else { cursor.style.display = 'none'; if (handDown) { handDown = false; endStroke(); } gestureStep(null); }
+      cursor.style.display = 'block'; cursor.style.left = smooth[0] + 'px'; cursor.style.top = smooth[1] + 'px'; cursor.classList.toggle('draw', handDown);
+      const can = !sk3d.has(cv) && !stage.classList.contains('searched');
+      if (can && pinch && pinchFrames >= 4 && !mouseDown) { if (!handDown) { handDown = true; hintEl.textContent = ''; beginStroke(smooth[0], smooth[1]); } else moveStroke(smooth[0], smooth[1]); }
+      else if (handDown && (releaseFrames >= 2 || !can)) { handDown = false; endStroke(); }
+    } else { cursor.style.display = 'none'; pinchFrames = 0; if (handDown) { handDown = false; endStroke(); } gestureStep(mouthOpen ? 'search' : null); }
   }
   rafId = requestAnimationFrame(loop);
 }
@@ -1681,7 +1863,7 @@ const Music = (() => {
     if (!ctx) init();
     await ctx.resume();
     master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
-    master.gain.linearRampToValueAtTime(.55, ctx.currentTime + 3);
+    master.gain.linearRampToValueAtTime(.13, ctx.currentTime + 3);
     nextT = ctx.currentTime + .2; clearTimeout(timer); tick();
   }
   function stop() {
