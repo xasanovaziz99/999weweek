@@ -12,10 +12,10 @@
   /* ===== ЦВЕТА САЙТА: три цвета из палитры Material 3 + нейтральные ===== */
   :root {
     /* ===== ПАЛИТРА: меняй только эти строки, и весь сайт перекрасится ===== */
-    --primary:  #FF3D9A;   /* цвет 1: токсичный розовый — линии, кнопки, точки */
-    --lavender: #3B1D2E;   /* тёмно-розовая подложка: выбранное */
-    --light:    #FFC2DF;   /* нижняя часть 3D */
-    --deep:     #FF2E88;   /* верхняя часть 3D */
+    --primary:  #CFE8FF;   /* цвет 1: холодное стекло — линии, точки, акценты */
+    --lavender: #1D232A;   /* тёмная подложка: выбранное */
+    --light:    #E9F5FF;   /* светлый */
+    --deep:     #8EC9FF;   /* голубой */
     /* цвет 2 — графит, цвет 3 — светло-серый текст */
     --surface: #16161A; --card: #1E1E23; --paper: #101013;
     --ink: #EDEDEF; --ink2: #9B9BA4; --line: #33333B; --on: #16161A;
@@ -508,6 +508,22 @@
   .ph { font-size: clamp(1.3rem, 3vw, 2.3rem) !important; color: rgba(236,242,255,.2) !important; }
   .dock .btn { height: 40px; padding: 0 16px; font-size: .98rem !important; border-radius: 10px; background: rgba(18,18,22,.6); border-color: rgba(255,255,255,.28); color: rgba(242,242,239,.9); }
   .results-hint, .hint { font-size: .95rem; }
+  /* ===== экран здания: карта и маршрут ===== */
+  .viewer-card.routecard { aspect-ratio: auto; display: flex; flex-direction: column; border: 1px solid var(--line); background: var(--card); }
+  #routeMap { height: min(56vh, 470px); background: #0e0e11; }
+  .route-info { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; padding: 14px 18px 2px; }
+  .route-info b { font-size: 2.2rem; line-height: 1; color: var(--ink); }
+  .route-info span { color: var(--ink2); }
+  .route-links { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 18px 18px; }
+  .route-links a { text-decoration: none; }
+  .leaflet-container { background: #0e0e11; font-family: inherit; }
+  .leaflet-control-attribution { background: rgba(16,16,19,.7) !important; color: #888 !important; font-size: 10px !important; }
+  .leaflet-control-attribution a { color: #aaa !important; }
+  .leaflet-control-zoom a { background: #17171b !important; color: #eee !important; border-color: #333 !important; }
+  .media { grid-template-columns: 1fr; } .mini, #dShare { display: none !important; }
+  .photo { aspect-ratio: 16 / 8; }
+  .rpin { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 3px solid #8EC9FF; box-shadow: 0 0 0 6px rgba(142,201,255,.25); }
+  .rpin.o { width: 10px; height: 10px; border: 2px solid #fff; background: #0e0e11; box-shadow: none; }
   /* иконки жестов */
   .guide em, .gest em { font-style: normal; font-size: 34px; line-height: 1; flex: none; }
   .gest em { font-size: 26px; }
@@ -527,6 +543,8 @@
   @media (max-width: 700px) { .guide { width: 190px; } .guide span { display: none; } .dock .btn.lg { height: 46px; padding: 0 18px; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 </head>
 
 <body class="is-home">
@@ -573,14 +591,10 @@
   <section class="view" id="view-detail">
     <button class="btn tonal sm" id="dBack"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg><span data-i18n="back"></span></button>
     <div class="detail">
-      <div class="viewer-card">
-        <canvas id="modelCanvas"></canvas>
-        <div class="v-overlay" id="vOverlay">
-          <div class="dots" id="vDots"><i></i><i></i><i></i></div>
-          <p id="vMsg"></p>
-          <button class="btn tonal sm" id="dRetry" hidden data-i18n="retry"></button>
-        </div>
-        <p class="v-hint" data-i18n="viewerHint"></p>
+      <div class="viewer-card routecard">
+        <div id="routeMap"></div>
+        <div class="route-info" id="routeInfo"></div>
+        <div class="route-links" id="routeLinks"></div>
       </div>
       <div class="info-card">
         <span class="chip" id="dType"></span>
@@ -728,6 +742,9 @@ Object.assign(T.ru, {
   atlasEmpty: 'Пока пусто. Найди первое здание!', saveCard: 'Сохранить карточку', back: 'Назад', bc: '≈{n} до н. э.'
 });
 
+Object.assign(T.en, { routeFrom: 'from', yourLoc: 'your location', seoul: 'Seoul', byAir: 'by air', byRoad: 'by road', btnDir: 'Route in Google Maps', btnStreet: 'Street View', btnEarth: 'Google Earth 3D', noCoords: 'Looking for the location…', resultsHint: 'Tap a building to see where it is and how far.', view3d: 'Show route', featuredSub: 'Tap one to see where it is.', tourGo: 'Show route →' });
+Object.assign(T.ko, { routeFrom: '출발', yourLoc: '내 위치', seoul: '서울', byAir: '비행', byRoad: '도로', btnDir: '구글 지도 길찾기', btnStreet: '스트리트 뷰', btnEarth: '구글 어스 3D', noCoords: '위치를 찾는 중…', resultsHint: '건물을 눌러 위치와 거리를 확인하세요.', view3d: '경로 보기', featuredSub: '눌러서 위치를 확인하세요.', tourGo: '경로 보기 →' });
+Object.assign(T.ru, { routeFrom: 'от', yourLoc: 'твоего места', seoul: 'Сеула', byAir: 'самолётом', byRoad: 'по дороге', btnDir: 'Маршрут в Google Картах', btnStreet: 'Street View', btnEarth: 'Google Earth 3D', noCoords: 'Ищем место…', resultsHint: 'Нажми на здание, чтобы увидеть, где оно и как далеко.', view3d: 'Показать маршрут', featuredSub: 'Нажми, чтобы увидеть, где это.', tourGo: 'Показать маршрут →' });
 T.en.floatHint = 'Tap a floating landmark to see it in 3D.';
 T.ko.floatHint = '떠다니는 명소를 눌러 3D로 보세요.';
 T.ru.floatHint = 'Нажми на парящее здание, чтобы увидеть его в 3D.';
@@ -793,6 +810,7 @@ function applyLang() {
   document.querySelectorAll('[data-i18n-html]').forEach(el => el.innerHTML = t[el.dataset.i18nHtml]);
   document.querySelectorAll('#langs button').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
   renderContacts(); renderGuide(); renderTarget(); renderMode();
+  try { renderRoute(); } catch {}
 }
 document.querySelectorAll('#langs button').forEach(b => b.onclick = () => {
   lang = b.dataset.lang;
@@ -1118,7 +1136,7 @@ class Viewer {
     renderCloud(g, W, H, C, { yaw: this.yaw, pitch: this.pitch, zoom: this.zoom, prog });
   }
 }
-const viewer = new Viewer($('modelCanvas'));
+const viewer = new Viewer(document.createElement('canvas'));          // старая 3D-модель больше не показывается
 
 /* ============ НАВИГАЦИЯ: одно полотно и экран здания ============ */
 let current = 'draw', savedY = 0;
@@ -1126,7 +1144,7 @@ function show(name) {
   current = name;
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   $('view-' + name).classList.add('active');
-  if (name === 'detail') { stopCamera(); viewer.start(); miniGlobe.start(); } else { viewer.stop(); miniGlobe.stop(); if (mode === 'cam') startCamera(); }
+  if (name === 'detail') { stopCamera(); setTimeout(() => { try { routeMap && routeMap.invalidateSize(); renderRoute(); } catch {} }, 80); } else { if (mode === 'cam') startCamera(); }
 }
 $('dBack').onclick = () => { show('draw'); window.scrollTo(0, savedY); };
 
@@ -1510,9 +1528,80 @@ function openDetail(item, from, extra = {}) {
       img.src = w.thumb; $('dPhotoBox').hidden = false;
     }
     const c = coords(); if (c) setPinFrom(c[0], c[1], true);
-    renderLinks(); 
+    renderLinks(); renderRoute();
   });
-  loadInfo(my); loadModel(my);
+  loadInfo(my); renderRoute(); askLocation();
+}
+
+/* ===== маршрут от тебя (или от Сеула) до здания ===== */
+const SEOUL = [37.5665, 126.9780];
+let userLoc = null, locTried = false, routeMap = null, routeGroup = null, routeTok = 0, routeKey = '';
+const rad = d => d * Math.PI / 180;
+function haversine(a, b) {
+  const dl = rad(b[0] - a[0]), dn = rad(b[1] - a[1]);
+  const h = Math.sin(dl / 2) ** 2 + Math.cos(rad(a[0])) * Math.cos(rad(b[0])) * Math.sin(dn / 2) ** 2;
+  return 12742 * Math.asin(Math.sqrt(h));
+}
+function arcPoints(a, b, n = 80) {                 // дуга по большому кругу, долгота «разворачивается», чтобы линия не рвалась на 180°
+  const la1 = rad(a[0]), lo1 = rad(a[1]), la2 = rad(b[0]), lo2 = rad(b[1]);
+  const d = 2 * Math.asin(Math.sqrt(Math.sin((la2 - la1) / 2) ** 2 + Math.cos(la1) * Math.cos(la2) * Math.sin((lo2 - lo1) / 2) ** 2));
+  if (d < 1e-6) return [a, b];
+  const pts = []; let prev = a[1];
+  for (let i = 0; i <= n; i++) {
+    const f = i / n, A = Math.sin((1 - f) * d) / Math.sin(d), B = Math.sin(f * d) / Math.sin(d);
+    const x = A * Math.cos(la1) * Math.cos(lo1) + B * Math.cos(la2) * Math.cos(lo2), y = A * Math.cos(la1) * Math.sin(lo1) + B * Math.cos(la2) * Math.sin(lo2), z = A * Math.sin(la1) + B * Math.sin(la2);
+    let lon = Math.atan2(y, x) * 180 / Math.PI; while (lon - prev > 180) lon -= 360; while (prev - lon > 180) lon += 360; prev = lon;
+    pts.push([Math.atan2(z, Math.hypot(x, y)) * 180 / Math.PI, lon]);
+  }
+  return pts;
+}
+function askLocation() {
+  if (locTried || !navigator.geolocation) return; locTried = true;
+  navigator.geolocation.getCurrentPosition(p => { userLoc = [p.coords.latitude, p.coords.longitude]; routeKey = ''; try { renderRoute(); } catch {} }, () => {}, { timeout: 8000, maximumAge: 600000 });
+}
+const fmtDur = h => { let m = Math.round(h * 60 / 5) * 5; const H = Math.floor(m / 60); m %= 60; return (H ? H + ' h' : '') + (H && m ? ' ' : '') + (m ? m + ' min' : '') || '5 min'; };
+function renderRoute() {
+  const t = T[lang], dest = coords(), info = $('routeInfo'); if (!info) return;
+  if (!dest) { info.innerHTML = `<span>${t.noCoords}</span>`; $('routeLinks').innerHTML = ''; return; }
+  const from = userLoc || SEOUL, label = userLoc ? t.yourLoc : t.seoul, fl = from.join(','), dl = dest.join(',');
+  const km = haversine(from, dest);
+  const show = (distKm, durH, road) => {
+    const nf = new Intl.NumberFormat(lang === 'ru' ? 'ru-RU' : lang === 'ko' ? 'ko-KR' : 'en-US');
+    info.innerHTML = `<b>${nf.format(Math.round(distKm))} km</b><span>${t.routeFrom} ${esc(label)} · ${road ? t.byRoad : t.byAir} ≈ ${fmtDur(durH)}</span>`;
+  };
+  show(km, km / 800 + .7, false);
+  $('routeLinks').innerHTML =
+    `<a class="btn tonal sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=${fl}&destination=${dl}">${t.btnDir}</a>` +
+    `<a class="btn outline sm" target="_blank" rel="noopener" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${dl}">${t.btnStreet}</a>` +
+    `<a class="btn outline sm" target="_blank" rel="noopener" href="https://earth.google.com/web/@${dest[0]},${dest[1]},0a,900d,35y,0h,65t,0r">${t.btnEarth}</a>`;
+  if (typeof L === 'undefined') return;
+  const key = fl + '>' + dl + lang; if (key === routeKey) return; routeKey = key;
+  const tok = ++routeTok;
+  if (!routeMap) {
+    routeMap = L.map('routeMap', { zoomControl: true, attributionControl: true, worldCopyJump: false, minZoom: 1 });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 19, attribution: '© OpenStreetMap · © CARTO' }).addTo(routeMap);
+    routeGroup = L.layerGroup().addTo(routeMap);
+  }
+  routeGroup.clearLayers();
+  const draw = (pts) => {
+    L.polyline(pts, { color: '#CFE8FF', weight: 10, opacity: .18, lineCap: 'round' }).addTo(routeGroup);
+    const line = L.polyline(pts, { color: '#F2FAFF', weight: 3, opacity: .95, lineCap: 'round' }).addTo(routeGroup);
+    const oLon = pts[0][1], dLon = pts[pts.length - 1][1];
+    L.marker([from[0], oLon], { icon: L.divIcon({ className: '', html: '<div class="rpin o"></div>', iconSize: [10, 10], iconAnchor: [5, 5] }) }).bindTooltip(label, { direction: 'top' }).addTo(routeGroup);
+    L.marker([dest[0], dLon], { icon: L.divIcon({ className: '', html: '<div class="rpin"></div>', iconSize: [14, 14], iconAnchor: [7, 7] }) }).bindTooltip(esc(state.item && state.item.name || ''), { direction: 'top' }).addTo(routeGroup);
+    routeMap.invalidateSize(); routeMap.fitBounds(line.getBounds(), { padding: [44, 44], maxZoom: 14 });
+  };
+  draw(arcPoints(from, dest));
+  if (km < 2500) {                                   // рядом: пробуем настоящий автомаршрут
+    const ac = new AbortController(), to = setTimeout(() => ac.abort(), 7000);
+    fetch(`https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${dest[1]},${dest[0]}?overview=full&geometries=geojson`, { signal: ac.signal })
+      .then(r => r.json()).then(j => {
+        clearTimeout(to); if (tok !== routeTok || !j.routes || !j.routes[0]) return;
+        const r = j.routes[0]; if (r.distance / 1000 > km * 2.2) return;
+        routeGroup.clearLayers(); draw(r.geometry.coordinates.map(([x, y]) => [y, x]));
+        show(r.distance / 1000, r.duration / 3600, true);
+      }).catch(() => {});
+  }
 }
 
 async function loadInfo(my) {
@@ -1539,7 +1628,7 @@ async function loadInfo(my) {
     $('dFact').hidden = !info.fact;
     $('dFact').innerHTML = info.fact ? `<b>${t.didYou}</b>${esc(info.fact)}` : '';
     const c = coords(); if (c) setPinFrom(c[0], c[1], false);
-    renderLinks(); 
+    renderLinks(); renderRoute();
   } catch (e) {
     if (my !== state.token) return;
     if (pr) showStats(pr.year, pr.h, null);        // для готовых зданий хотя бы факты из памяти
@@ -1569,7 +1658,7 @@ async function loadModel(my) {
     $('vMsg').textContent = e.status === 429 ? T[lang].busy : T[lang].model_fail;
   }
 }
-$('dRetry').onclick = () => loadModel(state.token);
+
 
 /* открытка: картинка, которую можно сохранить и отправить */
 async function saveCard() {
@@ -1804,58 +1893,64 @@ function loop() {
 const Music = (() => {
   let ctx, master, bus, timer, audioEl, on = false, nextT = 0, segI = 0;
   const mf = m => 440 * Math.pow(2, (m - 69) / 12);
-  // --- Бетховен «К Элизе»: время в шестнадцатых, 1 доля = 1 шестнадцатая ---
-  function elise() {
-    const ev = [], N = [[0, 76, 1], [1, 75, 1], [2, 76, 1], [3, 75, 1], [4, 76, 1], [5, 71, 1], [6, 74, 1], [7, 72, 1], [8, 69, 2.5], [11, 60, 1], [12, 64, 1], [13, 69, 1],
-      [14, 71, 2.5], [17, 64, 1], [18, 68, 1], [19, 71, 1], [20, 72, 2.5], [23, 64, 1], [24, 76, 1], [25, 75, 1], [26, 76, 1], [27, 75, 1], [28, 76, 1], [29, 71, 1], [30, 74, 1], [31, 72, 1],
-      [32, 69, 2.5], [35, 60, 1], [36, 64, 1], [37, 69, 1], [38, 71, 2.5], [41, 64, 1], [42, 72, 1], [43, 71, 1], [44, 69, 6]];
-    N.forEach(([t, m, d]) => ev.push([t, m, d * 1.4, .15]));
-    [[8, 45], [14, 40], [20, 45], [26, 45], [32, 45], [38, 40], [44, 45]].forEach(([t, b]) => {
-      ev.push([t, b, 7, .17]); ev.push([t + 1.5, b + 12, 2, .05]); ev.push([t + 3.5, b + 19, 2, .05]);
-    });
-    return { bpm: 205, beats: 60, ev };
+  // --- тихое минимал-техно: 124 уд/мин, бочка, хэт, бас, мягкие аккорды и редкие арпеджио (всё синтезируется кодом) ---
+  const BPM = 124, STEP = 60 / BPM / 4, ROOTS = [33, 29, 31, 28];            // A, F, G, E в нижней октаве
+  const PENT = [69, 72, 74, 76, 79, 81, 84];
+  let step = 0, noiseBuf = null, dry = null;
+  function noise() { if (!noiseBuf) { noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; } return noiseBuf; }
+  function kick(t) {
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine';
+    o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(42, t + .13);
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.62, t + .004); g.gain.exponentialRampToValueAtTime(.0001, t + .42);
+    o.connect(g); g.connect(dry); o.start(t); o.stop(t + .45);
   }
-  // --- Бетховен «Ода к радости» (до мажор) ---
-  function ode() {
-    const ev = [], mel = [[0, 76, 1], [1, 76, 1], [2, 77, 1], [3, 79, 1], [4, 79, 1], [5, 77, 1], [6, 76, 1], [7, 74, 1],
-      [8, 72, 1], [9, 72, 1], [10, 74, 1], [11, 76, 1], [12, 76, 1.5], [13.5, 74, .5], [14, 74, 2],
-      [16, 76, 1], [17, 76, 1], [18, 77, 1], [19, 79, 1], [20, 79, 1], [21, 77, 1], [22, 76, 1], [23, 74, 1],
-      [24, 72, 1], [25, 72, 1], [26, 74, 1], [27, 76, 1], [28, 74, 1.5], [29.5, 72, .5], [30, 72, 2]];
-    mel.forEach(([t, m, d]) => ev.push([t, m, d * 1.5, .15]));
-    const C = [48, 55], G = [43, 50];
-    [[0, C], [4, G], [8, C], [12, G], [16, C], [20, G], [24, C], [28, G], [30, C]].forEach(([t, ch]) => {
-      ev.push([t, ch[0], 3.5, .13]); ev.push([t + 1, ch[1] + 12, 2.5, .05]); ev.push([t + 2, ch[1], 2.5, .06]);
-    });
-    return { bpm: 76, beats: 36, ev };
+  function hat(t, v, len) {
+    const n = ctx.createBufferSource(), hp = ctx.createBiquadFilter(), g = ctx.createGain(); n.buffer = noise(); hp.type = 'highpass'; hp.frequency.value = 7500;
+    g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + len); n.connect(hp); hp.connect(g); g.connect(dry); n.start(t); n.stop(t + len + .02);
   }
-  const SEGS = [elise(), ode(), elise(), ode()];
+  function bass(m, t, len, v) {
+    const o = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain(); o.type = 'sawtooth'; o.frequency.value = mf(m);
+    lp.type = 'lowpass'; lp.frequency.setValueAtTime(700, t); lp.frequency.exponentialRampToValueAtTime(140, t + len); lp.Q.value = 4;
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(v, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + len);
+    o.connect(lp); lp.connect(g); g.connect(dry); o.start(t); o.stop(t + len + .05);
+  }
+  function pad(root, t, len) {
+    [0, 3, 7, 12].forEach((iv, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain(); o.type = i % 2 ? 'triangle' : 'sine'; o.frequency.value = mf(root + 24 + iv) * (1 + (i - 1.5) * .0015);
+      g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.028, t + len * .35); g.gain.linearRampToValueAtTime(.0001, t + len * 1.15);
+      o.connect(g); g.connect(bus); o.start(t); o.stop(t + len * 1.2);
+    });
+  }
+  function pluck(m, t) {
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'triangle'; o.frequency.value = mf(m);
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.05, t + .005); g.gain.exponentialRampToValueAtTime(.0001, t + .5);
+    o.connect(g); g.connect(bus); o.start(t); o.stop(t + .55);
+  }
+  function playStep(t) {
+    const s = step % 16, bar = Math.floor(step / 16), root = ROOTS[Math.floor(bar / 2) % 4];
+    if (s % 4 === 0) kick(t);
+    if (s % 4 === 2) hat(t, .13, .06); else if (Math.random() < .3) hat(t, .035, .03);
+    if (s === 8 || s === 15) hat(t, .08, .16);
+    if (s % 4 === 2) bass(root + (s === 10 && bar % 2 ? 12 : 0), t, STEP * 2.6, .2);
+    if (s === 0 && bar % 2 === 0) pad(root, t, STEP * 32);
+    if (bar >= 2 && Math.random() < .3) pluck(PENT[Math.floor(Math.random() * PENT.length)] + (root - 33), t);
+    step++;
+  }
   function init() {
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     master = ctx.createGain(); master.gain.value = 0;
-    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3600;
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5200;
     bus = ctx.createGain(); bus.connect(lp); lp.connect(master); master.connect(ctx.destination);
-    const len = ctx.sampleRate * 3, ir = ctx.createBuffer(2, len, ctx.sampleRate);        // большой зал: реверб из затухающего шума
+    dry = ctx.createGain(); dry.gain.value = 1; dry.connect(master);
+    const len = ctx.sampleRate * 2.4, ir = ctx.createBuffer(2, len, ctx.sampleRate);
     for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3); }
-    const verb = ctx.createConvolver(); verb.buffer = ir; const vg = ctx.createGain(); vg.gain.value = .55;
+    const verb = ctx.createConvolver(); verb.buffer = ir; const vg = ctx.createGain(); vg.gain.value = .6;
     bus.connect(verb); verb.connect(vg); vg.connect(lp);
-  }
-  function piano(m, t, dur, vol) {                // рояль: гармоники с быстрым затуханием
-    const f = mf(m), len = Math.min(dur + 1.4, 2 + dur), g = ctx.createGain();
-    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(vol, t + .008); g.gain.exponentialRampToValueAtTime(vol * .35, t + .25); g.gain.exponentialRampToValueAtTime(.0001, t + len);
-    [[1, 1], [2, .42], [3, .22], [4, .1], [5, .05]].forEach(([k, a]) => {
-      const o = ctx.createOscillator(), og = ctx.createGain(); o.frequency.value = f * k * (1 + (Math.random() - .5) * .0008); og.gain.value = a;
-      o.connect(og); og.connect(g); o.start(t); o.stop(t + len + .05);
-    });
-    g.connect(bus);
   }
   function tick() {
     if (!on) return;
-    while (nextT < ctx.currentTime + 3) {
-      const sg = SEGS[segI % SEGS.length], B = 60 / sg.bpm;
-      sg.ev.forEach(([b, m, d, v]) => piano(m, nextT + b * B + Math.random() * .012, d * B, v * (.9 + Math.random() * .2)));
-      nextT += sg.beats * B; segI++;
-    }
-    timer = setTimeout(tick, 800);
+    while (nextT < ctx.currentTime + 1.5) { playStep(nextT); nextT += STEP; }
+    timer = setTimeout(tick, 400);
   }
   async function start() {
     on = true;
@@ -1863,8 +1958,8 @@ const Music = (() => {
     if (!ctx) init();
     await ctx.resume();
     master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
-    master.gain.linearRampToValueAtTime(.13, ctx.currentTime + 3);
-    nextT = ctx.currentTime + .2; clearTimeout(timer); tick();
+    master.gain.linearRampToValueAtTime(.12, ctx.currentTime + 3);
+    nextT = ctx.currentTime + .2; step = 0; clearTimeout(timer); tick();
   }
   function stop() {
     on = false; clearTimeout(timer);
