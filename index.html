@@ -1217,6 +1217,7 @@ function resolveWiki(item) {                       // находит насто�
       if (sv && sv.thumb) {
         if (!best) best = { title, url: sv.page || ('https://en.wikipedia.org/wiki/' + encodeURIComponent(String(title).replace(/ /g, '_'))), lat: null, lon: null, disambig: false };
         best.thumb = sv.thumb; best.url = best.url || sv.page;
+        if (best.lat == null && sv.lat != null) { best.lat = sv.lat; best.lon = sv.lon; }
         return best;
       }
       if (!best) { const a = (await wikiQuery({ titles: title }))[0]; best = a && !a.disambig ? a : null; }
@@ -1481,7 +1482,7 @@ class Dissolve {
 }
 
 /* ============ ЭКРАН ЗДАНИЯ ============ */
-const state = { item: null, from: 'mouse', token: 0, info: null, sketch: null, wiki: null, preset: null };
+const state = { geo: null, item: null, from: 'mouse', token: 0, info: null, sketch: null, wiki: null, preset: null };
 const fmtYear = y => { y = Number(y); if (!Number.isFinite(y)) return ''; return y < 0 ? T[lang].bc.replace('{n}', -y) : String(y); };
 
 function setPinFrom(lat, lon, force) {
@@ -1493,6 +1494,9 @@ function coords() {                                // лучшие извест�
   if (w && ok(w.lat) && ok(w.lon)) return [Number(w.lat), Number(w.lon)];
   if (i && ok(i.lat) && ok(i.lon)) return [Number(i.lat), Number(i.lon)];
   if (p) return [p.lat, p.lon];
+  const it = state.item;
+  if (it && ok(it.lat) && ok(it.lon)) return [Number(it.lat), Number(it.lon)];
+  if (state.geo) return state.geo;
   return null;
 }
 function renderLinks() {
@@ -1507,7 +1511,7 @@ function renderLinks() {
 
 function openDetail(item, from, extra = {}) {
   const my = ++state.token;
-  state.item = item; state.from = from; state.info = null; state.sketch = extra.sketch || null; state.wiki = null;
+  state.item = item; state.from = from; state.info = null; state.geo = null; state.sketch = extra.sketch || null; state.wiki = null;
   state.preset = PRESETS.find(p => p.wiki === item.wiki) || null;
   savedY = window.scrollY; show('detail'); window.scrollTo(0, 0);
   const place = [item.city, item.country].filter(Boolean).join(', ');
@@ -1529,6 +1533,7 @@ function openDetail(item, from, extra = {}) {
     }
     const c = coords(); if (c) setPinFrom(c[0], c[1], true);
     renderLinks(); renderRoute();
+    if (!c) geocodeItem(item, my);
   });
   loadInfo(my); renderRoute(); askLocation();
 }
@@ -1604,6 +1609,16 @@ function renderRoute() {
   }
 }
 
+async function geocodeItem(item, my) {              // запасной путь: координаты из геокодера OpenStreetMap
+  if (coords()) return;
+  const q = [item.name, item.city, item.country].filter(Boolean).join(', ');
+  try {
+    const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q));
+    const j = await r.json();
+    if (my !== state.token || !Array.isArray(j) || !j[0]) return;
+    state.geo = [Number(j[0].lat), Number(j[0].lon)]; renderRoute();
+  } catch {}
+}
 async function loadInfo(my) {
   const item = state.item, t = T[lang];
   if (!item) return;
