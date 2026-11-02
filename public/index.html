@@ -12,13 +12,13 @@
   /* ===== ЦВЕТА САЙТА: три цвета из палитры Material 3 + нейтральные ===== */
   :root {
     /* ===== ПАЛИТРА: меняй только эти строки, и весь сайт перекрасится ===== */
-    --primary:  #6750A4;   /* главный цвет: кнопки, точки, акценты */
-    --lavender: #EADDFF;   /* светлая версия того же цвета: плашки, выбранное */
-    --light:    #9A82DB;   /* оттенок для нижней части 3D-моделей */
-    --deep:     #3F2D7A;   /* оттенок для верхней части 3D-моделей */
-    /* нейтральные: фон и текст (в счёт цветов не входят) */
-    --surface: #FEF7FF; --card: #F3EDF7; --paper: #FFFFFF;
-    --ink: #1D1B20; --ink2: #49454F; --line: #CAC4D0;
+    --primary:  #FF3D9A;   /* цвет 1: токсичный розовый — линии, кнопки, точки */
+    --lavender: #3B1D2E;   /* тёмно-розовая подложка: выбранное */
+    --light:    #FFC2DF;   /* нижняя часть 3D */
+    --deep:     #FF2E88;   /* верхняя часть 3D */
+    /* цвет 2 — графит, цвет 3 — светло-серый текст */
+    --surface: #16161A; --card: #1E1E23; --paper: #101013;
+    --ink: #EDEDEF; --ink2: #9B9BA4; --line: #33333B; --on: #16161A;
   }
 
   * { box-sizing: border-box; margin: 0; }
@@ -78,7 +78,7 @@
 
   /* ---------- главная ---------- */
   .hero { max-width: 560px; padding: clamp(20px, 5vh, 56px) 0 0; }
-  .hero h1 { font-size: clamp(2rem, 4.4vw, 3.3rem); line-height: 1.12; font-weight: 500; letter-spacing: -.02em; }
+  .hero h1 { font-size: clamp(2.6rem, 6vw, 4.6rem); line-height: 1.12; font-weight: 500; letter-spacing: -.02em; }
   .hero h1 span { color: var(--primary); }
   .hero p { margin-top: 16px; font-size: 1.05rem; color: var(--ink2); max-width: 440px; }
   .modes { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
@@ -297,17 +297,174 @@
   }
   /* главная: текст крупнее, кнопки и контакты ниже */
   .hero { padding-top: clamp(28px, 7vh, 80px); }
-  .hero p { font-size: 1.3rem; line-height: 1.55; max-width: 520px; margin-top: 20px; }
   .modes { margin-top: clamp(40px, 8vh, 76px); }
   .home-contacts { margin-top: clamp(40px, 9vh, 90px); gap: 22px; }
   .home-contacts a { font-size: .92rem; }
+
+  /* рисование: большое полотно, без лишнего */
+  .draw { max-width: 1180px; margin: 0 auto; }
+  .draw .stage { max-width: none; width: min(100%, calc((100vh - 190px) * 1.3333)); min-width: min(100%, 320px); }
+  #view-cam .stage { width: min(100%, 1120px, calc((100vh - 140px) * 1.3333)); }
+  .draw .toolbar { margin: 14px 0 6px; justify-content: center; }
+  .stage canvas.fx.on { display: block; pointer-events: auto; background: var(--paper); cursor: grab; touch-action: none; }
+  .stage canvas.fx.on:active { cursor: grabbing; }
+  .res-wrap { display: grid; gap: 18px; margin-top: 18px; }
+  .rmap { position: relative; height: 240px; border-radius: 28px; background: var(--card); overflow: hidden; }
+  .rmap canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  @media (min-width: 900px) {
+    .res-wrap { grid-template-columns: 1fr 340px; align-items: start; }
+    .rmap { position: sticky; top: 84px; height: 340px; grid-column: 2; grid-row: 1; }
+    .res-wrap .results-col { grid-column: 1; grid-row: 1; }
+  }
+
+  /* ===== ночной чертёж: тёмно-синий, янтарь, кремовый; без белых пустот и «пластика» ===== */
+  body {
+    background:
+      linear-gradient(color-mix(in srgb, var(--ink) 4.5%, transparent) 1px, transparent 1px) 0 0 / 56px 56px,
+      linear-gradient(90deg, color-mix(in srgb, var(--ink) 4.5%, transparent) 1px, transparent 1px) 0 0 / 56px 56px,
+      radial-gradient(900px 600px at 82% 30%, color-mix(in srgb, var(--primary) 9%, transparent), transparent 70%),
+      var(--surface);
+    background-attachment: fixed;
+  }
+  header {
+    top: 0; margin: 0; padding: 10px 28px; border-radius: 0; box-shadow: none;
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    border: 0; border-bottom: 1px solid var(--line);
+  }
+  .logo { font-weight: 800; letter-spacing: .02em; text-transform: uppercase; font-size: .95rem; }
+  .btn { border-radius: 10px; color: var(--on); }
+  .btn:not(.tonal):not(.outline):not(.text) { background: var(--primary); box-shadow: none; }
+  .btn:not(.tonal):not(.outline):not(.text):hover { transform: none; filter: brightness(1.08); box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 22%, transparent); }
+  .btn.tonal { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+  .btn.tonal:hover { box-shadow: inset 0 0 0 1px var(--primary); filter: none; }
+  .btn.outline { color: var(--ink); }
+  .btn.outline:hover { box-shadow: inset 0 0 0 1px var(--primary); }
+  .btn.text { color: var(--ink2); }
+  .btn.text.active, .btn.text.on { background: transparent; color: var(--primary); box-shadow: inset 0 -2px 0 var(--primary); border-radius: 0; }
+  .btn.text { border-radius: 0; }
+  .langs { border-radius: 10px; }
+  .langs button { color: var(--ink2); }
+  .langs button.on { background: var(--primary); color: var(--on); }
+  .hero h1 { font-weight: 800; letter-spacing: -.04em; line-height: 1; color: var(--ink); }
+  .hero h1 span { background: none; -webkit-background-clip: initial; background-clip: initial; color: var(--primary); }
+  .f-card, .result, .steps li, .stat, .card, .viewer-card, .atlas-wrap, .stage, .photo, .mini, .fact, .rmap { border-radius: 16px; }
+  .result, .steps li, .card, .stat, .fact { background: var(--card); border: 1px solid var(--line); box-shadow: none; }
+  .result:hover { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent); }
+  .fact { box-shadow: inset 3px 0 0 var(--primary); }
+  .stat { background: var(--card); }
+  .chip, .chips button { background: transparent; color: var(--primary); border: 1px solid var(--line); }
+  .stage {
+    background: linear-gradient(color-mix(in srgb, var(--ink) 5%, transparent) 1px, transparent 1px) 0 0 / 40px 40px,
+                linear-gradient(90deg, color-mix(in srgb, var(--ink) 5%, transparent) 1px, transparent 1px) 0 0 / 40px 40px, var(--paper);
+    border: 1px solid var(--line); box-shadow: 0 0 60px color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+  .stage canvas.fx.on { background: var(--paper); }
+  .stage video { opacity: .8; }
+  .viewer-card, .atlas-wrap, .rmap { background: radial-gradient(110% 90% at 50% 0%, color-mix(in srgb, var(--primary) 8%, var(--card)), var(--paper)); border: 1px solid var(--line); box-shadow: none; }
+  .photo, .mini { background: var(--card); }
+  .steps li::before { background: var(--primary); color: var(--on); }
+  .result .noimg, .noimg {
+    background: radial-gradient(circle, color-mix(in srgb, var(--primary) 45%, transparent) 1.6px, transparent 2.2px) 0 0 / 14px 14px, var(--card);
+  }
+  .home-contacts a { color: var(--ink2); }
+  .home-contacts a:hover { color: var(--primary); }
+  .hint { color: var(--ink2); }
+
+  /* жесты веб-камеры */
+  .gest {
+    position: absolute; left: 50%; top: 14px; transform: translateX(-50%); z-index: 3; display: none; align-items: center; gap: 10px;
+    padding: 10px 16px; border-radius: 12px; background: color-mix(in srgb, var(--surface) 88%, transparent); color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--primary); font-weight: 700; white-space: nowrap;
+  }
+  .gest.on { display: flex; }
+  .gest b { font-size: 1.4rem; line-height: 1; }
+  .gest i { display: block; width: 90px; height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; }
+  .gest i::after { content: ''; display: block; height: 100%; width: var(--p, 0%); background: var(--primary); }
+  .guide { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 2; pointer-events: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .stage:has(canvas.fx.on) .guide { display: none; }
+  .guide div { display: flex; gap: 12px; align-items: center; padding: 10px 14px; border-radius: 12px; background: color-mix(in srgb, var(--surface) 84%, transparent); border: 1px solid var(--line); }
+  .guide b { font-size: 1.9rem; line-height: 1; }
+  .guide strong { display: block; font-size: .95rem; color: var(--primary); }
+  .guide span { font-size: .85rem; color: var(--ink2); line-height: 1.35; }
+  @media (max-width: 700px) { .guide { grid-template-columns: 1fr; gap: 6px; } .guide span { display: none; } .guide div { padding: 6px 10px; } .guide b { font-size: 1.4rem; } }
+
+  /* ===== версия «огромное полотно»: графит + токсичный розовый ===== */
+  body { background: var(--surface); }
+  header { height: 56px; padding: 0 22px; flex-wrap: nowrap; }
+  main { max-width: none; padding: 0; }
+  .view:not(#view-draw) { max-width: 1180px; margin: 0 auto; padding: 24px 24px 80px; }
+  .stage.big { width: 100%; max-width: none; aspect-ratio: auto; height: calc(100vh - 57px); min-height: 440px; border-radius: 0; border: 0; border-bottom: 1px solid var(--line); box-shadow: none; transition: height .55s cubic-bezier(.2,.8,.2,1); }
+  .stage.big.searched { height: 54vh; min-height: 340px; }
+  .stage canvas { cursor: crosshair; }
+  .stage video { opacity: .55; }
+  .ph { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 0 24px; pointer-events: none; font-size: clamp(1.6rem, 4vw, 3.4rem); font-weight: 800; letter-spacing: -.03em; color: color-mix(in srgb, var(--ink) 16%, transparent); transition: opacity .3s; }
+  .stage.ink .ph, .stage:has(canvas.fx.on) .ph { opacity: 0; }
+  .dock { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 4; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .dock .btn.outline { background: color-mix(in srgb, var(--surface) 70%, transparent); }
+  .stage .hint { position: absolute; left: 0; right: 0; bottom: 84px; z-index: 4; pointer-events: none; text-shadow: 0 1px 8px var(--paper); }
+  .stage .hint.error { color: var(--primary); }
+  .guide { top: 14px; left: 14px; right: auto; bottom: auto; display: none; grid-template-columns: 1fr; gap: 8px; width: 270px; }
+  .stage.cam .guide { display: grid; }
+  .stage.searched .guide { display: none; }
+  .guide div { padding: 8px 12px; gap: 10px; }
+  .guide b { font-size: 1.5rem; }
+  .guide span { font-size: .78rem; }
+  .gest { top: 78px; }
+  .chipbtn { position: absolute; top: 14px; right: 14px; z-index: 4; height: 36px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 75%, transparent); color: var(--ink); font: 700 .85rem/1 inherit; font-family: inherit; cursor: pointer; }
+  .chipbtn:hover, .stage.game .chipbtn { border-color: var(--primary); color: var(--primary); }
+  .target { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); z-index: 4; display: none; align-items: center; gap: 12px; padding: 8px 8px 8px 18px; border-radius: 12px; background: var(--primary); color: var(--on); font-weight: 800; font-size: 1.1rem; white-space: nowrap; }
+  .stage.game .target { display: flex; }
+  .stage.game .guide { top: 70px; }
+  .target button { border: 0; background: color-mix(in srgb, var(--on) 14%, transparent); color: var(--on); height: 30px; padding: 0 12px; border-radius: 8px; font: 700 .8rem/1 inherit; font-family: inherit; cursor: pointer; }
+  .stage.searched .dock { bottom: auto; top: 14px; left: auto; right: 14px; transform: none; }
+  .stage.searched .chipbtn, .stage.searched .target { display: none; }
+  .logo { white-space: nowrap; }
+  @media (max-width: 520px) { .logo { font-size: 0; gap: 0; } }
+  /* без верхней панели: только язык в рамке справа */
+  header { position: fixed; top: 12px; right: 14px; left: auto; height: auto; padding: 0; background: none; border: 0; z-index: 20; }
+  header .logo { display: none; }
+  header nav { gap: 0; flex-wrap: nowrap; border: 1px solid var(--line); border-radius: 10px; background: color-mix(in srgb, var(--surface) 80%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); overflow: hidden; }
+  header .langs { box-shadow: none; border-radius: 0; margin: 0; }
+  header #btnMusic { height: 34px; padding: 0 12px; border-radius: 0; box-shadow: none !important; color: var(--ink2); }
+  header #btnMusic.on { color: var(--primary); }
+  .stage.big { height: 100vh; }
+  .stage.big.searched { height: 54vh; }
+  .stage.game .target { top: 14px; }
+  .stage.game .guide { top: 70px; }
+  .view:not(#view-draw) { padding-top: 64px; }
+
+  /* кнопки: белые, текст розовый */
+  .btn, .btn:not(.tonal):not(.outline):not(.text), .btn.tonal, .btn.outline { background: #fff; color: var(--primary); box-shadow: none; font-weight: 800; }
+  .btn:hover, .btn:not(.tonal):not(.outline):not(.text):hover, .btn.tonal:hover, .btn.outline:hover { background: #ffe3f1; color: var(--primary); box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 25%, transparent); filter: none; transform: none; }
+  .dock .btn.outline { background: #fff; }
+  .btn svg { fill: var(--primary); }
+  .btn.text { background: transparent; color: var(--ink2); box-shadow: none; }
+  .langs button { color: var(--ink2); }
+  .langs button.on { background: #fff; color: var(--primary); }
+  .chipbtn { background: #fff; color: var(--primary); border-color: #fff; font-weight: 800; }
+  .chipbtn:hover, .stage.game #gameBtn { background: #ffe3f1; border-color: var(--primary); color: var(--primary); }
+  #modeBtn { top: 62px; } #gameBtn { top: 106px; }
+  .stage.searched #modeBtn { display: none; }
+  .target { background: #fff; color: var(--primary); }
+  .target button { background: #ffe3f1; color: var(--primary); }
+  .stage canvas.fx.on { background: transparent; transition: background .9s; }
+  .stage canvas.fx.on.solid { background: color-mix(in srgb, var(--paper) 90%, transparent); }
+  .stage.mouse video { display: none; }
+  .stage.mouse canvas { cursor: crosshair; }
+  .stage.cam:not(.mouse) canvas#canvas { cursor: default; }
+  #results { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+  .score { margin-top: 26px; padding: 18px 22px; border-radius: 16px; background: var(--primary); color: var(--on); display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .score b { font-size: 3rem; line-height: 1; letter-spacing: -.04em; }
+  .score span { font-weight: 700; }
+  .home-contacts { max-width: 1180px; margin: 0 auto; padding: 34px 24px 40px; display: flex; gap: 22px; flex-wrap: wrap; justify-content: center; }
+  .home-contacts a { font-size: .85rem; color: var(--ink2); text-decoration: none; }
+  .home-contacts a:hover { color: var(--primary); }
+  @media (max-width: 700px) { .guide { width: 190px; } .guide span { display: none; } .dock .btn.lg { height: 46px; padding: 0 18px; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 </head>
 
 <body class="is-home">
-
-<canvas id="globeBg" aria-hidden="true"></canvas>
 
 <header>
   <span class="logo">
@@ -315,78 +472,34 @@
     Tower Sketch
   </span>
   <nav>
-    <button class="btn text sm" id="btnHome" data-i18n="home"></button>
-    <button class="btn text sm" id="btnInfo" data-i18n="info"></button>
-    <button class="btn text sm" id="btnAtlas"><span data-i18n="atlas"></span> <span id="atlasCount"></span></button>
-    <button class="btn text sm" id="btnMusic"><svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg><span data-i18n="music"></span></button>
+    <button class="btn text sm" id="btnMusic" aria-label="Music"><svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg></button>
     <div class="langs" id="langs"><button data-lang="en">EN</button><button data-lang="ko">한국어</button><button data-lang="ru">RU</button></div>
   </nav>
 </header>
 
 <main>
-  <!-- ГЛАВНАЯ -->
-  <section class="view active" id="view-home">
-    <div class="hero">
-      <h1 data-i18n-html="heroTitle"></h1>
-      <p data-i18n="heroText"></p>
-      <div class="modes">
-        <button class="btn lg" id="goMouse"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg><span data-i18n="modeMouse"></span></button>
-        <button class="btn lg tonal" id="goCam"><svg viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4z"/></svg><span data-i18n="modeCam"></span></button>
+  <!-- ГЛАВНАЯ = ОГРОМНОЕ ПОЛОТНО: рисуй мышкой или рукой перед камерой -->
+  <section class="view active" id="view-draw">
+    <div class="stage big" id="stage">
+      <video id="video" playsinline muted></video>
+      <canvas id="canvas"></canvas>
+      <canvas class="fx" id="fx"></canvas>
+      <p class="ph" id="ph"></p>
+      <div class="cursor" id="cursor"></div>
+      <div class="target" id="target"></div>
+      <button class="chipbtn" id="modeBtn"></button>
+      <button class="chipbtn" id="gameBtn" data-i18n="gameBtn"></button>
+      <div class="gest" id="gest"></div>
+      <div class="guide" id="guide"></div>
+      <p class="hint" id="hint"></p>
+      <div class="dock">
+        <button class="btn lg" id="find" data-i18n="guess"></button>
+        <button class="btn outline lg" id="undo" data-i18n="undo"></button>
+        <button class="btn outline lg" id="clear" data-i18n="clear"></button>
       </div>
     </div>
-    <div class="home-contacts" id="homeContacts"></div>
-  </section>
-
-  <!-- КАК ЭТО РАБОТАЕТ -->
-  <section class="view narrow" id="view-info">
-    <h2 data-i18n="infoTitle"></h2>
-    <p class="lead" data-i18n="infoLead"></p>
-    <ol class="steps" id="infoSteps"></ol>
-  </section>
-
-  <!-- АТЛАС -->
-  <section class="view narrow" id="view-atlas">
-    <h2 data-i18n="atlasTitle"></h2>
-    <p class="lead" data-i18n="atlasLead"></p>
-    <div class="atlas-wrap"><canvas id="atlasCanvas"></canvas></div>
-    <div class="chips" id="atlasChips"></div>
-    <p class="hint" id="atlasEmpty"></p>
-  </section>
-
-  <!-- РИСОВАНИЕ МЫШЬЮ -->
-  <section class="view narrow" id="view-mouse">
-    <div class="toolbar">
-      <span class="label" data-i18n="tryIt"></span>
-      <button class="btn tonal sm" data-ex="triangle" data-i18n="exTriangle"></button>
-      <button class="btn tonal sm" data-ex="twin" data-i18n="exTwin"></button>
-      <button class="btn tonal sm" data-ex="spire" data-i18n="exSpire"></button>
-    </div>
-    <div class="stage"><canvas id="mouseCanvas" width="640" height="480"></canvas><canvas class="fx" id="mouseFx"></canvas></div>
-    <div class="toolbar">
-      <button class="btn" id="mouseGuess" data-i18n="guess"></button>
-      <button class="btn outline" id="mouseUndo" data-i18n="undo"></button>
-      <button class="btn outline" id="mouseClear" data-i18n="clear"></button>
-      <button class="btn outline" id="mouseSave" data-i18n="save"></button>
-    </div>
-    <p class="hint" id="mouseHint"></p>
-    <div id="mouseResults"></div>
-  </section>
-
-  <!-- РИСОВАНИЕ КАМЕРОЙ -->
-  <section class="view narrow" id="view-cam">
-    <div class="stage">
-      <video id="video" playsinline muted></video>
-      <canvas id="camCanvas" width="640" height="480"></canvas>
-      <canvas class="fx" id="camFx"></canvas>
-      <div class="cursor" id="cursor"></div>
-    </div>
-    <div class="toolbar">
-      <button class="btn tonal" id="camStart" data-i18n="camStart"></button>
-      <button class="btn" id="camGuess" data-i18n="guess"></button>
-      <button class="btn outline" id="camClear" data-i18n="clear"></button>
-    </div>
-    <p class="hint" id="camHint"></p>
-    <div id="camResults"></div>
+    <div id="results"></div>
+    <footer class="home-contacts" id="homeContacts"></footer>
   </section>
 
   <!-- ЭКРАН ЗДАНИЯ: 3D из точек и описание -->
@@ -435,7 +548,7 @@ const MUSIC_FILE = '';
 const T = {
   en: {
     home: 'Home', info: 'How it works', contacts: 'Contact', music: 'Music',
-    heroTitle: 'Find <span>buildings</span><br>around the world from a simple sketch',
+    heroTitle: 'Draw it.<br><span>Find the building.</span>',
     heroText: 'Draw a shape with your mouse or webcam, and discover famous landmarks that look like it.',
     modeMouse: 'Draw with mouse', modeCam: 'Draw with webcam',
     infoTitle: 'How it works',
@@ -467,7 +580,7 @@ const T = {
   },
   ko: {
     home: '홈', info: '이용 방법', contacts: '연락처', music: '음악',
-    heroTitle: '간단한 스케치로<br>세계의 <span>건축물</span>을 찾아보세요',
+    heroTitle: '그리면,<br><span>건물이 보여요</span>',
     heroText: '마우스나 웹캠으로 도형을 그리면, 모양이 비슷한 세계의 유명한 건축물을 찾아 드려요.',
     modeMouse: '마우스로 그리기', modeCam: '웹캠으로 그리기',
     infoTitle: '이용 방법',
@@ -499,7 +612,7 @@ const T = {
   },
   ru: {
     home: 'Главная', info: 'Как это работает', contacts: 'Контакты', music: 'Музыка',
-    heroTitle: 'Находи <span>здания</span><br>по всему миру по простому скетчу',
+    heroTitle: 'Нарисуй —<br><span>найдём здание</span>',
     heroText: 'Нарисуй фигуру мышкой или через веб-камеру, и мы покажем знаменитые здания, которые на неё похожи.',
     modeMouse: 'Рисовать мышкой', modeCam: 'Рисовать через камеру',
     infoTitle: 'Как это работает',
@@ -552,6 +665,38 @@ T.en.floatHint = 'Tap a floating landmark to see it in 3D.';
 T.ko.floatHint = '떠다니는 명소를 눌러 3D로 보세요.';
 T.ru.floatHint = 'Нажми на парящее здание, чтобы увидеть его в 3D.';
 
+T.en.gDraw = 'Draw'; T.en.gDrawD = 'Touch your thumb and index finger together and move your hand.';
+T.en.gSearch = 'Search'; T.en.gSearchD = 'Open your whole hand and hold it still for a second.';
+T.en.gClear = 'Clear'; T.en.gClearD = 'Make a fist and hold it for a second.';
+T.ko.gDraw = '그리기'; T.ko.gDrawD = '엄지와 검지를 맞대고 손을 움직이세요.';
+T.ko.gSearch = '찾기'; T.ko.gSearchD = '손을 활짝 펴고 1초 동안 멈추세요.';
+T.ko.gClear = '지우기'; T.ko.gClearD = '주먹을 쥐고 1초 동안 유지하세요.';
+T.ru.gDraw = 'Рисовать'; T.ru.gDrawD = 'Соедини большой и указательный пальцы и двигай рукой.';
+T.ru.gSearch = 'Искать'; T.ru.gSearchD = 'Раскрой всю ладонь и задержи на секунду.';
+T.ru.gClear = 'Стереть'; T.ru.gClearD = 'Сожми кулак и задержи на секунду.';
+
+Object.assign(T.en, {
+  guess: 'Find building', ph: 'Draw here — with your mouse or your hand',
+  gameBtn: 'Draw from memory', gameDraw: 'Draw from memory:', gameNext: 'Another', gameScore: 'Your drawing is', gameMiss: 'The AI did not recognise it. It saw:',
+  gDraw: 'Pen grip', gDrawD: 'Touch thumb and index finger like holding a pen.', gSearch: 'Fist', gSearchD: 'Hold a fist for a second to search.', gClear: 'Open palm', gClearD: 'Hold your palm open to clear.',
+  gSearching: 'Searching…', gClearing: 'Clearing…', camReady: '',
+  toMouse: 'Draw with mouse', toCam: 'Draw with webcam', phCam: 'Show your hand and pinch to draw', phMouse: 'Draw here with your mouse'
+});
+Object.assign(T.ko, {
+  guess: '건물 찾기', ph: '여기에 마우스나 손으로 그려 보세요',
+  gameBtn: '기억으로 그리기', gameDraw: '기억으로 그려 보세요:', gameNext: '다른 건물', gameScore: '내 그림의 유사도', gameMiss: 'AI가 알아보지 못했어요. AI의 생각:',
+  gDraw: '펜 잡기', gDrawD: '펜을 잡듯 엄지와 검지를 붙이세요.', gSearch: '주먹', gSearchD: '주먹을 1초 쥐면 검색해요.', gClear: '손바닥', gClearD: '손바닥을 펴면 지워져요.',
+  gSearching: '검색 중…', gClearing: '지우는 중…', camReady: '',
+  toMouse: '마우스로 그리기', toCam: '웹캠으로 그리기', phCam: '손을 보여 주고 핀치하며 그려 보세요', phMouse: '여기에 마우스로 그려 보세요'
+});
+Object.assign(T.ru, {
+  guess: 'Найти здание', ph: 'Рисуй здесь — мышкой или рукой',
+  gameBtn: 'Рисовать по памяти', gameDraw: 'Нарисуй по памяти:', gameNext: 'Другое', gameScore: 'Твой рисунок похож на', gameMiss: 'ИИ не узнал рисунок. Он увидел:',
+  gDraw: 'Как ручку', gDrawD: 'Соедини большой и указательный пальцы, как будто держишь ручку.', gSearch: 'Кулак', gSearchD: 'Держи кулак секунду — начнётся поиск.', gClear: 'Ладонь', gClearD: 'Покажи открытую ладонь — рисунок сотрётся.',
+  gSearching: 'Ищу…', gClearing: 'Стираю…', camReady: '',
+  toMouse: 'Рисовать мышкой', toCam: 'Рисовать камерой', phCam: 'Покажи руку и соедини пальцы, чтобы рисовать', phMouse: 'Рисуй здесь мышкой'
+});
+
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const TAU = Math.PI * 2;
@@ -559,6 +704,7 @@ const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n)
 const hex2rgb = h => { h = h.replace('#', ''); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
 const TH = {                                      // цвета читаются из :root, так что палитра меняется в одном месте
   primaryHex: cssv('--primary'), lavHex: cssv('--lavender'), surface: cssv('--surface'), card: cssv('--card'),
+  inkHex: cssv('--ink'), ink2Hex: cssv('--ink2'),
   primary: hex2rgb(cssv('--primary')), lav: hex2rgb(cssv('--lavender')), light: hex2rgb(cssv('--light')), deep: hex2rgb(cssv('--deep'))
 };
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -578,9 +724,8 @@ function applyLang() {
   document.documentElement.lang = lang;
   document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t[el.dataset.i18n]);
   document.querySelectorAll('[data-i18n-html]').forEach(el => el.innerHTML = t[el.dataset.i18nHtml]);
-  $('infoSteps').innerHTML = t.infoSteps.map(s => `<li><span>${s}</span></li>`).join('');
   document.querySelectorAll('#langs button').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
-  renderContacts(); updateAtlasCount();
+  renderContacts(); renderGuide(); renderTarget(); renderMode();
 }
 document.querySelectorAll('#langs button').forEach(b => b.onclick = () => {
   lang = b.dataset.lang;
@@ -696,7 +841,7 @@ class Globe {
       dots(back, r0 * .7, .1);
       [.32, .5, .72, .95].forEach((a, i) => dots(B[i], r0 * (.8 + i * .08), a));
     }
-    g.strokeStyle = 'rgba(202,196,208,.9)'; g.lineWidth = 1; g.beginPath(); g.arc(cx, cy, R, 0, TAU); g.stroke();
+    g.strokeStyle = 'rgba(244,237,224,.28)'; g.lineWidth = 1; g.beginPath(); g.arc(cx, cy, R, 0, TAU); g.stroke();
 
     (this.pins || []).forEach(q => {              // метки найденных зданий (атлас)
       const f = q.lat * Math.PI / 180, l = q.lon * Math.PI / 180;
@@ -838,15 +983,16 @@ function renderCloud(g, W, H, C, v) {
     const y2 = y * cp - z1 * sp, z2 = y * sp + z1 * cp, f = D / (D - z2);
     return [cx + x1 * S * f, cy - y2 * S * f, z2, f];
   };
-  g.fillStyle = 'rgba(121,116,126,.34)'; g.beginPath();                 // кольца земли под зданием
+  const ga0 = g.globalAlpha; if (v.mix != null) g.globalAlpha = ga0 * v.mix * v.mix * v.mix;
+  g.fillStyle = 'rgba(244,237,224,.26)'; g.beginPath();                 // кольца земли под зданием
   [[C.rr, 120], [C.rr * .6, 72]].forEach(([rad, n]) => {
     for (let i = 0; i < n; i++) {
       const a = i / n * TAU, [x, y, , f] = tr(Math.cos(a) * rad, C.gy, Math.sin(a) * rad);
       g.moveTo(x + base * .75 * f, y); g.arc(x, y, base * .75 * f, 0, TAU);
     }
   });
-  g.fill();
-  const B = Array.from({ length: 20 }, () => []), prog = v.prog;
+  g.fill(); g.globalAlpha = ga0;
+  const B = Array.from({ length: 20 }, () => []), prog = v.prog, fr = v.from, mix = v.mix == null ? 1 : v.mix;
   for (let i = 0; i < C.n; i++) {
     let px = C.p[i * 3], py = C.p[i * 3 + 1], pz = C.p[i * 3 + 2];
     if (prog < 1) {                                                      // точки слетаются снизу вверх
@@ -855,7 +1001,8 @@ function renderCloud(g, W, H, C, v) {
       const k = Math.pow(1 - local, 3);
       px += C.s[i * 3] * k; py += C.s[i * 3 + 1] * k; pz += C.s[i * 3 + 2] * k;
     }
-    const [x, y, z, f] = tr(px, py, pz);
+    let [x, y, z, f] = tr(px, py, pz);
+    if (fr && mix < 1) { x = fr[i * 2] + (x - fr[i * 2]) * mix; y = fr[i * 2 + 1] + (y - fr[i * 2 + 1]) * mix; }      // из плоской линии в объём
     const d = Math.max(0, Math.min(4, Math.floor((z + 1) / 2 * 5))), hb = Math.min(3, Math.floor(C.h01[i] * 4));
     B[d * 4 + hb].push(x, y, f);
   }
@@ -906,27 +1053,15 @@ class Viewer {
 }
 const viewer = new Viewer($('modelCanvas'));
 
-/* ============ НАВИГАЦИЯ ============ */
-let current = 'home';
-const NAVS = { home: 'btnHome', info: 'btnInfo', atlas: 'btnAtlas' };
+/* ============ НАВИГАЦИЯ: одно полотно и экран здания ============ */
+let current = 'draw', savedY = 0;
 function show(name) {
   current = name;
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   $('view-' + name).classList.add('active');
-  document.body.classList.toggle('is-home', name === 'home');         // Земля только на главной
-  Object.entries(NAVS).forEach(([k, id]) => $(id).classList.toggle('active', k === name));
-  if (name !== 'cam') stopCamera();
-  if (name === 'home') floaters.start(); else floaters.stop();
-  if (name === 'atlas') { atlasGlobe.start(); renderAtlas(); } else atlasGlobe.stop();
-  if (name === 'detail') { viewer.start(); miniGlobe.start(); } else { viewer.stop(); miniGlobe.stop(); }
-  window.scrollTo(0, 0);
+  if (name === 'detail') { stopCamera(); viewer.start(); miniGlobe.start(); } else { viewer.stop(); miniGlobe.stop(); if (mode === 'cam') startCamera(); }
 }
-$('btnHome').onclick = () => show('home');
-$('btnInfo').onclick = () => show('info');
-$('btnAtlas').onclick = () => show('atlas');
-$('goMouse').onclick = () => show('mouse');
-$('goCam').onclick = () => show('cam');
-$('dBack').onclick = () => show(state.from);
+$('dBack').onclick = () => { show('draw'); window.scrollTo(0, savedY); };
 
 /* ============ ОБРАЩЕНИЕ К СЕРВЕРУ ============ */
 /* на GitHub Pages сервера нет, поэтому поиск обращается к серверу на Render */
@@ -1025,18 +1160,106 @@ function resolveWiki(item) {                       // находит насто�
 }
 
 /* ============ ПОИСК ЗДАНИЙ ПО РИСУНКУ ============ */
-const INK = '#1D1B20';
-function exportImage(canvas) {                    // белый фон + линии → JPEG
-  const t = document.createElement('canvas');
-  t.width = canvas.width; t.height = canvas.height;
-  const g = t.getContext('2d');
-  g.fillStyle = '#fff'; g.fillRect(0, 0, t.width, t.height); g.drawImage(canvas, 0, 0);
-  return t.toDataURL('image/jpeg', .85);
+const INK = TH.primaryHex;                      // янтарная линия на тёмном полотне
+function exportImage(canvas) {                    // обрезаем по рисунку, линии чёрные на белом → JPEG для ИИ
+  const W = canvas.width, H = canvas.height, d = canvas.getContext('2d').getImageData(0, 0, W, H).data;
+  let x0 = W, x1 = 0, y0 = H, y1 = 0;
+  for (let y = 0; y < H; y += 2) for (let x = 0; x < W; x += 2) if (d[(y * W + x) * 4 + 3] > 40) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  if (x1 <= x0 || y1 <= y0) { x0 = 0; y0 = 0; x1 = W; y1 = H; }
+  const pad = Math.max(x1 - x0, y1 - y0) * .16, sw = x1 - x0 + pad * 2, sh = y1 - y0 + pad * 2;
+  const t = document.createElement('canvas'); t.width = 640; t.height = 480;
+  const k = Math.min(t.width / sw, t.height / sh), g = t.getContext('2d');
+  const m = document.createElement('canvas'); m.width = t.width; m.height = t.height;
+  const mg = m.getContext('2d'); mg.drawImage(canvas, x0 - pad, y0 - pad, sw, sh, (t.width - sw * k) / 2, (t.height - sh * k) / 2, sw * k, sh * k);
+  mg.globalCompositeOperation = 'source-in'; mg.fillStyle = '#111'; mg.fillRect(0, 0, t.width, t.height);
+  g.fillStyle = '#fff'; g.fillRect(0, 0, t.width, t.height); g.drawImage(m, 0, 0);
+  return t.toDataURL('image/jpeg', .88);
 }
 function isBlank(canvas) {
   const d = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
   for (let i = 3; i < d.length; i += 4) if (d[i] > 0) return false;
   return true;
+}
+
+/* ============ РИСУНОК → 3D ИЗ ТОЧЕК ============ */
+const sk3d = new Map();                           // холст → активный 3D-вид рисунка
+function sketchCloud(canvas) {
+  const W = canvas.width, H = canvas.height, d = canvas.getContext('2d').getImageData(0, 0, W, H).data, raw = [];
+  let x0 = W, x1 = 0, y0 = H, y1 = 0;
+  for (let y = 0; y < H; y += 3) for (let x = 0; x < W; x += 3) if (d[(y * W + x) * 4 + 3] > 110) {
+    raw.push([x, y]); if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+  }
+  if (raw.length < 12) return null;
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, m = Math.max(x1 - x0, y1 - y0, 60) / 2, r = mulberry(5);
+  const kx = canvas.width / (canvas.getBoundingClientRect().width || canvas.width);      // пиксели полотна → пиксели экрана
+  const pts = [];
+  for (const [x, y] of raw) for (let k = 0; k < 3; k++) {          // каждый штрих получает объём: толщина и немного вширь
+    const a = r() * TAU, rad = 4 * Math.sqrt(r());
+    pts.push([(x - cx + Math.cos(a) * rad) / m, (cy - y + Math.sin(a) * rad) / m, (r() - .5) * .34 + Math.sin(a) * .03, (x + Math.cos(a) * rad) / kx, (y + Math.sin(a) * rad) / kx]);
+  }
+  for (let i = pts.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [pts[i], pts[j]] = [pts[j], pts[i]]; }
+  const N = Math.min(pts.length, 6500), fr = new Float32Array(N * 2), p = new Float32Array(N * 3), h01 = new Float32Array(N), sv = new Float32Array(N * 3);
+  let ymin = 9, ymax = -9; for (let i = 0; i < N; i++) { ymin = Math.min(ymin, pts[i][1]); ymax = Math.max(ymax, pts[i][1]); }
+  for (let i = 0; i < N; i++) {
+    p[i * 3] = pts[i][0]; p[i * 3 + 1] = pts[i][1]; p[i * 3 + 2] = pts[i][2]; fr[i * 2] = pts[i][3]; fr[i * 2 + 1] = pts[i][4];
+    h01[i] = (pts[i][1] - ymin) / ((ymax - ymin) || 1);
+    sv[i * 3] = (r() - .5) * 2.6; sv[i * 3 + 1] = r() * 1.8 + .3; sv[i * 3 + 2] = (r() - .5) * 2.6;
+  }
+  return { p, h01, s: sv, from: fr, n: N, gy: ymin, rr: Math.max(.45, Math.min(1.1, (x1 - x0) / m / 2 * 1.1)) };
+}
+class Sketch3D {
+  constructor(src, onExit) {
+    this.src = src; this.fx = src.parentElement.querySelector('canvas.fx'); this.onExit = onExit;
+    this.raf = 0; this.yaw = .5; this.pitch = .18; this.auto = true; this.t0 = 0; this.cloud = null;
+    const c = this.fx; let prev = null, moved = 0;
+    c.onpointerdown = e => { prev = [e.clientX, e.clientY]; moved = 0; this.auto = false; c.setPointerCapture(e.pointerId); };
+    c.onpointermove = e => {
+      if (!prev) return;
+      moved += Math.abs(e.clientX - prev[0]) + Math.abs(e.clientY - prev[1]);
+      this.yaw += (e.clientX - prev[0]) * .01; this.pitch = Math.max(-.3, Math.min(1.2, this.pitch + (e.clientY - prev[1]) * .008));
+      prev = [e.clientX, e.clientY];
+    };
+    c.onpointerup = c.onpointercancel = () => { if (prev && moved < 6) { this.stop(); if (this.onExit) this.onExit(); } prev = null; };
+  }
+  start() {
+    this.cloud = sketchCloud(this.src); if (!this.cloud) return false;
+    sk3d.get(this.src) && sk3d.get(this.src).stop();
+    sk3d.set(this.src, this); this.t0 = performance.now(); this.fx.classList.remove('solid'); this.fx.classList.add('on');
+    this.src.style.transition = 'opacity .5s'; this.src.style.opacity = '0';          // линии растворяются в точки, а не исчезают
+    const loop = t => { this.draw(t); this.raf = requestAnimationFrame(loop); };
+    this.raf = requestAnimationFrame(loop); return true;
+  }
+  stop() {
+    cancelAnimationFrame(this.raf); this.raf = 0; this.fx.classList.remove('on', 'solid');
+    this.src.style.transition = 'none'; this.src.style.opacity = '';
+    if (sk3d.get(this.src) === this) sk3d.delete(this.src);
+  }
+  draw(t) {
+    const [W, H, dpr] = fit(this.fx), g = this.fx.getContext('2d');
+    if (!W || !H) return;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    if (this.auto && !REDUCED) this.yaw += .006;
+    const el = (t - this.t0) / 1000, k = REDUCED ? 1 : Math.max(0, Math.min(1, (el - .55) / 1.35)), e = k * k * (3 - 2 * k);
+    if (el > 1.2) this.fx.classList.add('solid');
+    renderCloud(g, W, H, this.cloud, { yaw: this.yaw - (1 - e) * .9, pitch: this.pitch, zoom: .92, prog: 1, mix: e, from: this.cloud.from });
+  }
+}
+const exit3D = canvas => { const s = sk3d.get(canvas); if (s) s.stop(); };
+
+/* карта найденных зданий рядом с результатами */
+const resMaps = new Map();
+function stopMap(id) { const m = resMaps.get(id); if (m) m.stop(); }
+function showMap(outId, list, wikis) {
+  stopMap(outId);
+  const pins = list.map((p, i) => {
+    const w = wikis[i], lat = Number(p.lat ?? (w && w.lat)), lon = Number(p.lon ?? (w && w.lon));
+    return Number.isFinite(lat) && Number.isFinite(lon) && (lat || lon) ? { lat, lon } : null;
+  });
+  const cv = $(outId).querySelector('.rmap canvas'); if (!cv) return;
+  const gl = new Globe(cv, (W, H) => [W / 2, H / 2, Math.min(W, H) * .44], { rot: 0, tilt: .3, auto: true });
+  gl.pins = pins.filter(Boolean); gl.start(); resMaps.set(outId, gl);
+  const first = pins.find(Boolean); if (first) gl.setPin(first.lat, first.lon);
+  $(outId).querySelectorAll('.result').forEach(el => el.addEventListener('mouseenter', () => { const q = pins[+el.dataset.i]; if (q) gl.setPin(q.lat, q.lon); }));
 }
 
 async function runGuess(canvas, hintEl, outEl, btn, view) {
@@ -1045,14 +1268,16 @@ async function runGuess(canvas, hintEl, outEl, btn, view) {
   if (isBlank(canvas)) { hintEl.textContent = t.empty; return; }
   hintEl.textContent = t.thinking; outEl.innerHTML = ''; btn.disabled = true;
   const sketch = exportImage(canvas);
-  const fx = new Dissolve(canvas); fx.start();     // рисунок рассыпается на точки, пока ИИ думает
+  const fx = new Sketch3D(canvas, () => { outEl.innerHTML = ''; stopMap(outEl.id); $('stage').classList.remove('searched'); });
+  fx.start();
+  setTimeout(() => { if (sk3d.get(canvas) === fx) $('stage').classList.add('searched'); }, 1900);     // полотно уменьшается, когда рисунок уже стал 3D     // рисунок превращается в 3D из точек, пока ИИ думает
   try {
     const list = await api('/api/guess', { image: sketch, lang });
-    if (!Array.isArray(list) || !list.length) { hintEl.textContent = t.none; return; }
+    if (!Array.isArray(list) || !list.length) { hintEl.textContent = t.none; fx.stop(); $('stage').classList.remove('searched'); return; }
     list.sort((a, b) => (Number(b.match) || 0) - (Number(a.match) || 0));
     hintEl.textContent = '';
     const wikis = await Promise.all(list.map(p => resolveWiki(p)));
-    outEl.innerHTML = `<p class="results-hint">${t.resultsHint}</p><div class="results">` + list.map((p, i) => {
+    outEl.innerHTML = scoreHtml(list) + `<div class="res-wrap"><div class="results-col"><p class="results-hint">${t.resultsHint}</p><div class="results">` + list.map((p, i) => {
       const m = Math.max(0, Math.min(100, Math.round(Number(p.match) || 0))), th = wikis[i] && wikis[i].thumb;
       return `<article class="result" tabindex="0" role="button" data-i="${i}">
         ${th ? `<img src="${esc(th)}" alt="" loading="lazy" onerror="this.outerHTML='<div class=&quot;noimg&quot;></div>'">` : '<div class="noimg"></div>'}
@@ -1064,14 +1289,15 @@ async function runGuess(canvas, hintEl, outEl, btn, view) {
           <p>${esc(p.why)}</p>
           <span class="go">${t.view3d} →</span>
         </div></article>`;
-    }).join('') + '</div>';
+    }).join('') + '</div></div><div class="rmap"><canvas></canvas></div></div>';
+    showMap(outEl.id, list, wikis);
     const open = el => { const c = el.closest('.result'); if (c) { const i = +c.dataset.i; openDetail(list[i], view, { sketch, wiki: wikis[i] }); } };
     outEl.onclick = e => open(e.target);
     outEl.onkeydown = e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.result')) { e.preventDefault(); open(e.target); } };
-    outEl.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' });
+    window.scrollTo({ top: 0, behavior: REDUCED ? 'auto' : 'smooth' });
   } catch (e) {
-    hintEl.className = 'hint error'; hintEl.textContent = errText(e);
-  } finally { fx.stop(); btn.disabled = false; }
+    hintEl.className = 'hint error'; hintEl.textContent = errText(e); fx.stop(); $('stage').classList.remove('searched');
+  } finally { btn.disabled = false; }
 }
 
 /* рисунок рассыпается на точки, а потом собирается обратно */
@@ -1135,17 +1361,12 @@ function renderLinks() {
     `<a class="btn tonal sm" target="_blank" rel="noopener" href="${esc(wurl)}">${t.wikiLink}</a>` +
     `<a class="btn outline sm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${q}">${t.mapLink}</a>`;
 }
-function noteFound() {                             // запоминает здание в атласе
-  const c = coords(), it = state.item;
-  if (!c || !it) return;
-  addFound({ wiki: it.wiki, name: it.name, city: it.city || '', country: it.country || '', lat: c[0], lon: c[1] });
-}
 
 function openDetail(item, from, extra = {}) {
   const my = ++state.token;
   state.item = item; state.from = from; state.info = null; state.sketch = extra.sketch || null; state.wiki = null;
   state.preset = PRESETS.find(p => p.wiki === item.wiki) || null;
-  show('detail');
+  savedY = window.scrollY; show('detail'); window.scrollTo(0, 0);
   const place = [item.city, item.country].filter(Boolean).join(', ');
   $('dType').textContent = ''; $('dTitle').textContent = item.name || '';
   $('dSub').textContent = place; $('dWhere').textContent = place;
@@ -1164,7 +1385,7 @@ function openDetail(item, from, extra = {}) {
       img.src = w.thumb; $('dPhotoBox').hidden = false;
     }
     const c = coords(); if (c) setPinFrom(c[0], c[1], true);
-    renderLinks(); noteFound();
+    renderLinks(); 
   });
   loadInfo(my); loadModel(my);
 }
@@ -1193,12 +1414,12 @@ async function loadInfo(my) {
     $('dFact').hidden = !info.fact;
     $('dFact').innerHTML = info.fact ? `<b>${t.didYou}</b>${esc(info.fact)}` : '';
     const c = coords(); if (c) setPinFrom(c[0], c[1], false);
-    renderLinks(); noteFound();
+    renderLinks(); 
   } catch (e) {
     if (my !== state.token) return;
     if (pr) showStats(pr.year, pr.h, null);        // для готовых зданий хотя бы факты из памяти
     $('dSummary').textContent = e.status === 429 ? t.busy : t.infoFail;
-    renderLinks(); noteFound();
+    renderLinks(); 
   }
 }
 
@@ -1237,10 +1458,10 @@ async function saveCard() {
   renderCloud(tmp.getContext('2d'), 960, 960, viewer.cloud, { yaw: viewer.yaw, pitch: viewer.pitch, zoom: 1.1, prog: 1 });
   g.drawImage(tmp, 60, 60);
   const fam = '"Nunito","Noto Sans KR",sans-serif', place = [state.info && state.info.city || it.city, state.info && state.info.country || it.country].filter(Boolean).join(', ');
-  let size = 80; g.fillStyle = '#1D1B20';
+  let size = 80; g.fillStyle = TH.inkHex;
   do { g.font = `800 ${size}px ${fam}`; size -= 4; } while (g.measureText(it.name).width > 700 && size > 36);
   g.fillText(it.name, 60, 1130);
-  g.font = `500 40px ${fam}`; g.fillStyle = '#49454F'; g.fillText(place, 60, 1196);
+  g.font = `500 40px ${fam}`; g.fillStyle = TH.ink2Hex; g.fillText(place, 60, 1196);
   g.font = `700 32px ${fam}`; g.fillStyle = TH.primaryHex; g.fillText('Tower Sketch', 60, 1290);
   if (state.sketch) {
     await new Promise(res => { const im = new Image(); im.onload = () => { g.fillStyle = '#fff'; g.beginPath(); g.roundRect(790, 1070, 230, 172, 24); g.fill(); g.save(); g.clip(); g.drawImage(im, 790, 1070, 230, 172); g.restore(); g.strokeStyle = '#CAC4D0'; g.lineWidth = 2; g.beginPath(); g.roundRect(790, 1070, 230, 172, 24); g.stroke(); res(); }; im.onerror = res; im.src = state.sketch; });
@@ -1249,44 +1470,99 @@ async function saveCard() {
 }
 $('dShare').onclick = saveCard;
 
-/* ============ РИСОВАНИЕ МЫШЬЮ ============ */
-function setupStroke(ctx) { ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = INK; }
-const pos = (e, c) => { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) * c.width / r.width, (e.clientY - r.top) * c.height / r.height]; };
+/* ============ РИСОВАНИЕ: мышь и рука на одном огромном полотне ============ */
+const stage = $('stage'), cv = $('canvas'), cctx = cv.getContext('2d'), video = $('video'), cursor = $('cursor'), hintEl = $('hint');
+let SW = 1, SH = 1, DPR = 1;
+const strokes = []; let curStroke = null;
+function lineW() { return Math.max(5, Math.min(SW, SH) / 85) * DPR; }
+function segDraw(a, b) { cctx.beginPath(); cctx.moveTo(a[0] * cv.width, a[1] * cv.height); cctx.lineTo(b[0] * cv.width, b[1] * cv.height); cctx.stroke(); }
+function redraw() {
+  cctx.clearRect(0, 0, cv.width, cv.height);
+  cctx.lineWidth = lineW(); cctx.lineCap = 'round'; cctx.lineJoin = 'round'; cctx.strokeStyle = INK;
+  for (const st of strokes) for (let i = 0; i < st.length; i++) segDraw(st[Math.max(0, i - 1)], st[i]);
+}
+function sizeCanvas() {
+  if (stage.classList.contains('searched') || sk3d.has(cv)) return;     // пока показан 3D, рисунок не трогаем
+  const r = stage.getBoundingClientRect(); if (!r.width || !r.height) return;
+  DPR = Math.min(2, window.devicePixelRatio || 1); SW = r.width; SH = r.height;
+  cv.width = Math.round(SW * DPR); cv.height = Math.round(SH * DPR); redraw();
+}
+new ResizeObserver(sizeCanvas).observe(stage); sizeCanvas();
+function inkChanged() { stage.classList.toggle('ink', strokes.length > 0); }
+function beginStroke(x, y) { curStroke = [[x / SW, y / SH]]; strokes.push(curStroke); cctx.lineWidth = lineW(); cctx.lineCap = 'round'; cctx.strokeStyle = INK; segDraw(curStroke[0], curStroke[0]); inkChanged(); }
+function moveStroke(x, y) { if (!curStroke) return; const p = [x / SW, y / SH]; segDraw(curStroke[curStroke.length - 1], p); curStroke.push(p); }
+function endStroke() { curStroke = null; }
+let mouseDown = false;
+cv.addEventListener('pointerdown', e => { if (mode === 'cam' && stream) return; hintEl.textContent = ''; mouseDown = true; cv.setPointerCapture(e.pointerId); const r = cv.getBoundingClientRect(); beginStroke(e.clientX - r.left, e.clientY - r.top); });
+cv.addEventListener('pointermove', e => { if (!mouseDown) return; const r = cv.getBoundingClientRect(); moveStroke(e.clientX - r.left, e.clientY - r.top); });
+['pointerup', 'pointercancel'].forEach(ev => cv.addEventListener(ev, () => { mouseDown = false; endStroke(); }));
+function resetResults() { exit3D(cv); stopMap('results'); $('results').innerHTML = ''; stage.classList.remove('searched'); sizeCanvas(); }
+$('undo').onclick = () => { strokes.pop(); inkChanged(); resetResults(); redraw(); };
+$('clear').onclick = () => { strokes.length = 0; inkChanged(); hintEl.textContent = ''; resetResults(); redraw(); };
+$('find').onclick = () => { if (sk3d.has(cv)) return; runGuess(cv, hintEl, $('results'), $('find'), 'draw'); };
 
-const mc = $('mouseCanvas'), mctx = mc.getContext('2d');
-setupStroke(mctx);
-const undoStack = [];
-const saveUndo = () => { undoStack.push(mctx.getImageData(0, 0, mc.width, mc.height)); if (undoStack.length > 20) undoStack.shift(); };
-let drawing = false;
-mc.addEventListener('pointerdown', e => {
-  saveUndo(); drawing = true; mc.setPointerCapture(e.pointerId);
-  const [x, y] = pos(e, mc); mctx.beginPath(); mctx.moveTo(x, y); mctx.lineTo(x + .01, y); mctx.stroke();
-});
-mc.addEventListener('pointermove', e => { if (!drawing) return; const [x, y] = pos(e, mc); mctx.lineTo(x, y); mctx.stroke(); });
-['pointerup', 'pointercancel'].forEach(ev => mc.addEventListener(ev, () => drawing = false));
-$('mouseUndo').onclick = () => { const s = undoStack.pop(); if (s) mctx.putImageData(s, 0, 0); };
-$('mouseClear').onclick = () => { saveUndo(); mctx.clearRect(0, 0, mc.width, mc.height); $('mouseResults').innerHTML = ''; $('mouseHint').textContent = ''; };
-$('mouseSave').onclick = () => { const a = document.createElement('a'); a.download = 'my-sketch.jpg'; a.href = exportImage(mc); a.click(); };
-$('mouseGuess').onclick = () => runGuess(mc, $('mouseHint'), $('mouseResults'), $('mouseGuess'), 'mouse');
+/* режим: камера или мышь */
+let mode = (() => { try { return localStorage.getItem('towerMode') === 'mouse' ? 'mouse' : 'cam'; } catch { return 'cam'; } })();
+function renderMode() {
+  const t = T[lang];
+  $('modeBtn').textContent = mode === 'cam' ? '🖱  ' + t.toMouse : '📷  ' + t.toCam;
+  $('ph').textContent = mode === 'cam' ? t.phCam : t.phMouse;
+  stage.classList.toggle('mouse', mode === 'mouse');
+}
+function setMode(m) {
+  mode = m; try { localStorage.setItem('towerMode', m); } catch {}
+  renderMode();
+  if (m === 'cam') startCamera(); else stopCamera();
+}
+$('modeBtn').onclick = () => setMode(mode === 'cam' ? 'mouse' : 'cam');
 
-const examples = {
-  triangle: c => { c.moveTo(320, 90); c.lineTo(520, 380); c.lineTo(120, 380); c.closePath(); },
-  twin: c => { c.rect(190, 70, 80, 320); c.rect(370, 70, 80, 320); },
-  spire: c => { c.moveTo(320, 50); c.lineTo(390, 390); c.moveTo(320, 50); c.lineTo(250, 390); c.moveTo(290, 280); c.lineTo(350, 280); }
-};
-document.querySelectorAll('[data-ex]').forEach(b => b.onclick = () => {
-  saveUndo(); mctx.beginPath(); examples[b.dataset.ex](mctx); mctx.stroke();
-});
+/* игра «нарисуй по памяти» */
+const GAME = [
+  ['Eiffel Tower', 'Eiffel Tower', '에펠탑', 'Эйфелева башня'], ['Great Pyramid of Giza', 'Great Pyramid', '기자의 대피라미드', 'Пирамида Хеопса'],
+  ['Burj Khalifa', 'Burj Khalifa', '부르즈 칼리파', 'Бурдж-Халифа'], ['Leaning Tower of Pisa', 'Leaning Tower of Pisa', '피사의 사탑', 'Пизанская башня'],
+  ['Big Ben', 'Big Ben', '빅벤', 'Биг-Бен'], ['Sydney Opera House', 'Sydney Opera House', '시드니 오페라 하우스', 'Сиднейская опера'],
+  ['CN Tower', 'CN Tower', 'CN 타워', 'Си-Эн Тауэр'], ['Space Needle', 'Space Needle', '스페이스 니들', 'Спейс-Нидл'],
+  ['Empire State Building', 'Empire State Building', '엠파이어 스테이트 빌딩', 'Эмпайр-стейт-билдинг'], ['Taipei 101', 'Taipei 101', '타이베이 101', 'Тайбэй 101'],
+  ['Petronas Towers', 'Petronas Towers', '페트로나스 타워', 'Башни Петронас'], ['N Seoul Tower', 'N Seoul Tower', 'N서울타워', 'Сеульская башня N'],
+  ['Tokyo Skytree', 'Tokyo Skytree', '도쿄 스카이트리', 'Токио Скайтри'], ['Tokyo Tower', 'Tokyo Tower', '도쿄 타워', 'Токийская башня'],
+  ['The Gherkin', '30 St Mary Axe', '30 세인트 메리 액스', 'Огурец (30 Сент-Мэри-Экс)'], ['Colosseum', 'Colosseum', '콜로세움', 'Колизей']
+];
+let game = false, target = null;
+function pickTarget() { let n; do { n = GAME[Math.floor(Math.random() * GAME.length)]; } while (target && n === target && GAME.length > 1); target = n; }
+function renderTarget() {
+  const el = $('target'), t = T[lang];
+  el.innerHTML = target ? `<span>${t.gameDraw} ${esc(target[{ en: 1, ko: 2, ru: 3 }[lang]])}</span><button type="button" id="nextTarget">${t.gameNext}</button>` : '';
+  const b = $('nextTarget'); if (b) b.onclick = () => { pickTarget(); renderTarget(); $('clear').click(); };
+}
+$('gameBtn').onclick = () => { game = !game; stage.classList.toggle('game', game); if (game) { pickTarget(); $('clear').click(); } else target = null; renderTarget(); };
+function scoreHtml(list) {
+  if (!game || !target) return '';
+  const t = T[lang], key = s => String(s || '').toLowerCase().replace(/[^a-z0-9가-힣а-яё]/g, '');
+  const hit = list.find(p => key(p.wiki) === key(target[0]) || key(p.name) === key(target[{ en: 1, ko: 2, ru: 3 }[lang]]));
+  return hit
+    ? `<div class="score"><b>${Math.round(Number(hit.match) || 0)}%</b><span>${t.gameScore} ${esc(target[{ en: 1, ko: 2, ru: 3 }[lang]])}</span></div>`
+    : `<div class="score"><b>0%</b><span>${t.gameMiss} ${esc(list[0] && list[0].name || '')}</span></div>`;
+}
 
-/* ============ РИСОВАНИЕ КАМЕРОЙ (пальцем в воздухе) ============ */
-const cc = $('camCanvas'), cctx = cc.getContext('2d');
-setupStroke(cctx);
-const video = $('video'), cursor = $('cursor'), camHint = $('camHint');
-let stream = null, landmarker = null, rafId = null, lastVideoTime = -1, last = null, smooth = null;
-
+/* ============ РУКА: камера включается сама, жесты вместо кнопок ============ */
+function renderGuide() {
+  const t = T[lang];
+  $('guide').innerHTML = [['🤏', t.gDraw, t.gDrawD], ['✊', t.gSearch, t.gSearchD], ['✋', t.gClear, t.gClearD]]
+    .map(([i, a, b]) => `<div><b>${i}</b><p><strong>${a}</strong><span>${b}</span></p></div>`).join('');
+}
+let holdG = null, holdT = 0, holdLock = false;
+function gestureStep(g) {                         // жест держишь секунду: плашка заполняется, потом действие срабатывает само
+  const el = $('gest'), now = performance.now(), t = T[lang];
+  if (g !== holdG) { holdG = g; holdT = now; holdLock = false; }
+  if (!g || holdLock) { if (!g) el.classList.remove('on'); return; }
+  const p = Math.min(1, (now - holdT) / 1000);
+  el.innerHTML = `<b>${g === 'search' ? '✊' : '✋'}</b><span>${g === 'search' ? t.gSearching : t.gClearing}</span><i style="--p:${Math.round(p * 100)}%"></i>`;
+  el.classList.add('on');
+  if (p >= 1) { holdLock = true; el.classList.remove('on'); if (g === 'search') $('find').click(); else $('clear').click(); }
+}
+let starting = false, stream = null, landmarker = null, rafId = 0, lastVT = -1, smooth = null, handDown = false, camTried = false;
 async function loadModelHands() {
   if (landmarker) return;
-  camHint.textContent = T[lang].camLoad;
   const base = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
   const { HandLandmarker, FilesetResolver } = await import(base + '/vision_bundle.mjs');
   const fileset = await FilesetResolver.forVisionTasks(base + '/wasm');
@@ -1296,81 +1572,108 @@ async function loadModelHands() {
   });
 }
 async function startCamera() {
-  const t = T[lang];
-  camHint.className = 'hint'; camHint.textContent = t.camAsk;
-  try {                                           // здесь браузер сам спрашивает разрешение на камеру
-    stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: 'user' }, audio: false });
+  if (mode !== 'cam' || stream || starting) return;
+  starting = true;
+  camTried = true; const t = T[lang];
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' }, audio: false });
   } catch (err) {
-    camHint.className = 'hint error';
-    camHint.textContent = err.name === 'NotFoundError' ? t.camNone : t.camDenied;
+    starting = false; setMode('mouse');                 // камеры нет или не разрешена: переходим на мышку
+    hintEl.className = 'hint'; hintEl.textContent = err.name === 'NotFoundError' ? t.camNone : t.camDenied;
     return;
   }
-  video.srcObject = stream; await video.play();
-  try { await loadModelHands(); } catch { camHint.className = 'hint error'; camHint.textContent = t.fail; return; }
-  camHint.textContent = t.camReady;
+  starting = false;
+  if (mode !== 'cam') { stream.getTracks().forEach(tr => tr.stop()); stream = null; return; }
+  video.srcObject = stream; await video.play(); stage.classList.add('cam');
+  try { await loadModelHands(); } catch { setMode('mouse'); hintEl.className = 'hint'; hintEl.textContent = t.fail; return; }
   loop();
 }
 function stopCamera() {
-  if (rafId) cancelAnimationFrame(rafId);
-  rafId = null; last = null; smooth = null;
+  cancelAnimationFrame(rafId); rafId = 0; smooth = null; handDown = false; endStroke();
+  $('gest').classList.remove('on'); holdG = null; stage.classList.remove('cam');
   if (stream) stream.getTracks().forEach(tr => tr.stop());
-  stream = null; video.srcObject = null; cursor.style.display = 'none';
+  stream = null; video.srcObject = null; cursor.style.display = 'none'; starting = false;
 }
 function loop() {
   if (!stream) return;
-  if (video.currentTime !== lastVideoTime) {
-    lastVideoTime = video.currentTime;
+  if (video.currentTime !== lastVT && video.videoWidth) {
+    lastVT = video.currentTime;
     const res = landmarker.detectForVideo(video, performance.now());
     if (res.landmarks.length) {
       const h = res.landmarks[0], tip = h[8], thumb = h[4];
-      const rawX = (1 - tip.x) * cc.width, rawY = tip.y * cc.height;   // зеркало по X
-      smooth = smooth ? [smooth[0] + (rawX - smooth[0]) * .5, smooth[1] + (rawY - smooth[1]) * .5] : [rawX, rawY];
-      const handSize = Math.hypot(h[0].x - h[9].x, h[0].y - h[9].y);
-      const pinch = Math.hypot(tip.x - thumb.x, tip.y - thumb.y) / handSize < .3;
-      const rect = cc.getBoundingClientRect(), stage = cc.parentElement.getBoundingClientRect();
-      cursor.style.display = 'block';
-      cursor.style.left = (smooth[0] / cc.width * rect.width + rect.left - stage.left) + 'px';
-      cursor.style.top = (smooth[1] / cc.height * rect.height + rect.top - stage.top) + 'px';
-      cursor.classList.toggle('draw', pinch);
-      if (pinch) {
-        if (last) { cctx.beginPath(); cctx.moveTo(last[0], last[1]); cctx.lineTo(smooth[0], smooth[1]); cctx.stroke(); }
-        last = [smooth[0], smooth[1]];
-      } else last = null;
-    } else { cursor.style.display = 'none'; last = null; }
+      const sc = Math.max(SW / video.videoWidth, SH / video.videoHeight), dw = video.videoWidth * sc, dh = video.videoHeight * sc;
+      const rx = (1 - tip.x) * dw - (dw - SW) / 2, ry = tip.y * dh - (dh - SH) / 2;          // видео показано зеркально и с обрезкой по краям
+      smooth = smooth ? [smooth[0] + (rx - smooth[0]) * .5, smooth[1] + (ry - smooth[1]) * .5] : [rx, ry];
+      const dd = (a, b) => Math.hypot(a.x - b.x, a.y - b.y), handSize = dd(h[0], h[9]) || .1, pr = dd(tip, thumb) / handSize;
+      const ext = (a, b) => dd(h[a], h[0]) > dd(h[b], h[0]) * 1.12, up = [ext(8, 6), ext(12, 10), ext(16, 14), ext(20, 18)];
+      const pinch = pr < .28;
+      const gesture = pinch ? null : up.every(Boolean) && dd(h[4], h[17]) / handSize > .8 ? 'clear' : (!up.some(Boolean) && pr > .5) ? 'search' : null;
+      gestureStep(gesture);
+      cursor.style.display = 'block'; cursor.style.left = smooth[0] + 'px'; cursor.style.top = smooth[1] + 'px'; cursor.classList.toggle('draw', pinch);
+      const can = pinch && !sk3d.has(cv) && !stage.classList.contains('searched');
+      if (can) { if (!handDown) { handDown = true; hintEl.textContent = ''; beginStroke(smooth[0], smooth[1]); } else moveStroke(smooth[0], smooth[1]); }
+      else if (handDown) { handDown = false; endStroke(); }
+    } else { cursor.style.display = 'none'; if (handDown) { handDown = false; endStroke(); } gestureStep(null); }
   }
   rafId = requestAnimationFrame(loop);
 }
-$('camStart').onclick = startCamera;
-$('camClear').onclick = () => { cctx.clearRect(0, 0, cc.width, cc.height); $('camResults').innerHTML = ''; };
-$('camGuess').onclick = () => runGuess(cc, camHint, $('camResults'), $('camGuess'), 'cam');
 
-/* ============ ФОНОВАЯ МУЗЫКА (мягкая мелодия, которую создаёт сам код) ============ */
+/* ============ ФОНОВАЯ МУЗЫКА: Бетховен «К Элизе» и «Ода к радости», мягкий рояль ============ */
 const Music = (() => {
-  let ctx, master, bus, timer, audioEl, on = false, step = 0;
-  const chords = [[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]];
-  const bass = [110, 87.31, 130.81, 98], scale = [523.25, 587.33, 659.25, 783.99, 880, 1046.5];
+  let ctx, master, bus, timer, audioEl, on = false, nextT = 0, segI = 0;
+  const mf = m => 440 * Math.pow(2, (m - 69) / 12);
+  // --- Бетховен «К Элизе»: время в шестнадцатых, 1 доля = 1 шестнадцатая ---
+  function elise() {
+    const ev = [], N = [[0, 76, 1], [1, 75, 1], [2, 76, 1], [3, 75, 1], [4, 76, 1], [5, 71, 1], [6, 74, 1], [7, 72, 1], [8, 69, 2.5], [11, 60, 1], [12, 64, 1], [13, 69, 1],
+      [14, 71, 2.5], [17, 64, 1], [18, 68, 1], [19, 71, 1], [20, 72, 2.5], [23, 64, 1], [24, 76, 1], [25, 75, 1], [26, 76, 1], [27, 75, 1], [28, 76, 1], [29, 71, 1], [30, 74, 1], [31, 72, 1],
+      [32, 69, 2.5], [35, 60, 1], [36, 64, 1], [37, 69, 1], [38, 71, 2.5], [41, 64, 1], [42, 72, 1], [43, 71, 1], [44, 69, 6]];
+    N.forEach(([t, m, d]) => ev.push([t, m, d * 1.4, .15]));
+    [[8, 45], [14, 40], [20, 45], [26, 45], [32, 45], [38, 40], [44, 45]].forEach(([t, b]) => {
+      ev.push([t, b, 7, .17]); ev.push([t + 1.5, b + 12, 2, .05]); ev.push([t + 3.5, b + 19, 2, .05]);
+    });
+    return { bpm: 205, beats: 60, ev };
+  }
+  // --- Бетховен «Ода к радости» (до мажор) ---
+  function ode() {
+    const ev = [], mel = [[0, 76, 1], [1, 76, 1], [2, 77, 1], [3, 79, 1], [4, 79, 1], [5, 77, 1], [6, 76, 1], [7, 74, 1],
+      [8, 72, 1], [9, 72, 1], [10, 74, 1], [11, 76, 1], [12, 76, 1.5], [13.5, 74, .5], [14, 74, 2],
+      [16, 76, 1], [17, 76, 1], [18, 77, 1], [19, 79, 1], [20, 79, 1], [21, 77, 1], [22, 76, 1], [23, 74, 1],
+      [24, 72, 1], [25, 72, 1], [26, 74, 1], [27, 76, 1], [28, 74, 1.5], [29.5, 72, .5], [30, 72, 2]];
+    mel.forEach(([t, m, d]) => ev.push([t, m, d * 1.5, .15]));
+    const C = [48, 55], G = [43, 50];
+    [[0, C], [4, G], [8, C], [12, G], [16, C], [20, G], [24, C], [28, G], [30, C]].forEach(([t, ch]) => {
+      ev.push([t, ch[0], 3.5, .13]); ev.push([t + 1, ch[1] + 12, 2.5, .05]); ev.push([t + 2, ch[1], 2.5, .06]);
+    });
+    return { bpm: 76, beats: 36, ev };
+  }
+  const SEGS = [elise(), ode(), elise(), ode()];
   function init() {
     ctx = new (window.AudioContext || window.webkitAudioContext)();
-    master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
-    bus = ctx.createGain(); bus.connect(master);
-    const delay = ctx.createDelay(1.5); delay.delayTime.value = .55;
-    const fb = ctx.createGain(); fb.gain.value = .38; const wet = ctx.createGain(); wet.gain.value = .45;
-    bus.connect(delay); delay.connect(fb); fb.connect(delay); delay.connect(wet); wet.connect(master);
+    master = ctx.createGain(); master.gain.value = 0;
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3600;
+    bus = ctx.createGain(); bus.connect(lp); lp.connect(master); master.connect(ctx.destination);
+    const len = ctx.sampleRate * 3, ir = ctx.createBuffer(2, len, ctx.sampleRate);        // большой зал: реверб из затухающего шума
+    for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3); }
+    const verb = ctx.createConvolver(); verb.buffer = ir; const vg = ctx.createGain(); vg.gain.value = .55;
+    bus.connect(verb); verb.connect(vg); vg.connect(lp);
   }
-  function tone(f, t, dur, vol, type, attack) {
-    const o = ctx.createOscillator(), g = ctx.createGain();
-    o.type = type; o.frequency.value = f;
-    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(vol, t + attack); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
-    o.connect(g); g.connect(bus); o.start(t); o.stop(t + dur + .1);
+  function piano(m, t, dur, vol) {                // рояль: гармоники с быстрым затуханием
+    const f = mf(m), len = Math.min(dur + 1.4, 2 + dur), g = ctx.createGain();
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(vol, t + .008); g.gain.exponentialRampToValueAtTime(vol * .35, t + .25); g.gain.exponentialRampToValueAtTime(.0001, t + len);
+    [[1, 1], [2, .42], [3, .22], [4, .1], [5, .05]].forEach(([k, a]) => {
+      const o = ctx.createOscillator(), og = ctx.createGain(); o.frequency.value = f * k * (1 + (Math.random() - .5) * .0008); og.gain.value = a;
+      o.connect(og); og.connect(g); o.start(t); o.stop(t + len + .05);
+    });
+    g.connect(bus);
   }
-  function bar() {
+  function tick() {
     if (!on) return;
-    const t = ctx.currentTime + .1, i = step % 4;
-    chords[i].forEach(f => tone(f, t, 9, .05, 'sine', 2.5));
-    tone(bass[i], t, 9, .07, 'sine', 1.5);
-    const n = 4 + Math.floor(Math.random() * 3);
-    for (let k = 0; k < n; k++) tone(scale[Math.floor(Math.random() * scale.length)], t + .5 + k * (6.5 / n) + Math.random() * .4, 3.2, .045, 'triangle', .05);
-    step++; timer = setTimeout(bar, 8000);
+    while (nextT < ctx.currentTime + 3) {
+      const sg = SEGS[segI % SEGS.length], B = 60 / sg.bpm;
+      sg.ev.forEach(([b, m, d, v]) => piano(m, nextT + b * B + Math.random() * .012, d * B, v * (.9 + Math.random() * .2)));
+      nextT += sg.beats * B; segI++;
+    }
+    timer = setTimeout(tick, 800);
   }
   async function start() {
     on = true;
@@ -1378,8 +1681,8 @@ const Music = (() => {
     if (!ctx) init();
     await ctx.resume();
     master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
-    master.gain.linearRampToValueAtTime(.8, ctx.currentTime + 1.5);
-    clearTimeout(timer); bar();
+    master.gain.linearRampToValueAtTime(.55, ctx.currentTime + 3);
+    nextT = ctx.currentTime + .2; clearTimeout(timer); tick();
   }
   function stop() {
     on = false; clearTimeout(timer);
@@ -1394,13 +1697,13 @@ function setMusic(wantOn) {
   localStorage.setItem('towerMusic', wantOn ? 'on' : 'off');
 }
 $('btnMusic').onclick = () => setMusic(!Music.isOn());
-let autoTried = false;                            // браузер включает звук только после клика: включаем при первом клике на сайте
-window.addEventListener('pointerdown', e => {
+let autoTried = false;                            // браузер разрешает звук только после первого касания: включаем музыку сама
+['pointerdown', 'keydown'].forEach(ev => window.addEventListener(ev, e => {
   if (autoTried) return;
   autoTried = true;
-  if (e.target.closest('#btnMusic')) return;
+  if (e.target && e.target.closest && e.target.closest('#btnMusic')) return;
   if (localStorage.getItem('towerMusic') !== 'off') setMusic(true);
-}, true);
+}, true));
 
 /* ============ ГОТОВЫЕ ЗДАНИЯ НА ГЛАВНОЙ (3D-модели собраны вручную, ИИ для них не нужен) ============ */
 const EIFFEL = [
@@ -1464,103 +1767,10 @@ const PRESETS = [
   { wiki: 'Petronas Towers', name: { en: 'Petronas Towers', ko: '페트로나스 트윈 타워', ru: 'Башни Петронас' }, place: { en: 'Kuala Lumpur, Malaysia', ko: '말레이시아 쿠알라룸푸르', ru: 'Куала-Лумпур, Малайзия' }, lat: 3.1579, lon: 101.7116, year: 1998, h: 452, parts: PETRONAS }
 ];
 
-/* ---- простые здания только для фона главной (в 3D-просмотр не попадают) ---- */
-const stack = (spec, x = 0, z = 0) => { let y = 0; return spec.map(([r, r2, h]) => { const o = { t: 'cyl', x, y, z, r, r2, h }; y += h; return o; }); };
-const BG_EXTRA = [
-  [...[0, 1].map(i => ({ t: 'box', x: 0, y: 0, z: 0, w: 22, d: 22, h: 100 })), { t: 'box', x: 0, y: 100, z: 0, w: 24, d: 24, h: 14 }, { t: 'box', x: 0, y: 114, z: 0, w: 18, d: 18, h: 30, w2: 12, d2: 12 }, { t: 'cyl', x: 0, y: 144, z: 0, r: 7, r2: .5, h: 40 }, { t: 'sphere', x: 0, y: 128, z: 12.5, r: 6 }],                  // Big Ben
-  [{ t: 'sphere', x: -34, y: 0, z: 0, r: 30, half: true }, { t: 'sphere', x: 0, y: 0, z: 0, r: 36, half: true }, { t: 'sphere', x: 34, y: 0, z: 0, r: 26, half: true }, { t: 'box', x: 0, y: 0, z: 0, w: 120, d: 46, h: 5 }],       // Sydney Opera House
-  [...stack([[11, 8, 190], [8, 6, 20]]), { t: 'cyl', x: 0, y: 150, z: 0, r: 18, r2: 18, h: 12 }, { t: 'cyl', x: 0, y: 210, z: 0, r: 2, r2: .3, h: 90 }],    // CN Tower
-  [...stack([[3, 3, 70], [3, 3, 8]]), { t: 'cyl', x: 0, y: 70, z: 0, r: 24, r2: 24, h: 4 }, { t: 'cyl', x: 0, y: 74, z: 0, r: 13, r2: 18, h: 5 }, { t: 'cyl', x: 0, y: 79, z: 0, r: 10, r2: 3, h: 5 }, { t: 'cyl', x: 0, y: 84, z: 0, r: 1, r2: .3, h: 22 }],  // Space Needle
-  [{ t: 'cyl', x: 0, y: 0, z: 0, r: 12, r2: 7, h: 240 }, { t: 'cyl', x: 0, y: 240, z: 0, r: 15, r2: 15, h: 8 }, { t: 'cyl', x: 0, y: 248, z: 0, r: 8, r2: 4, h: 30 }, { t: 'cyl', x: 0, y: 278, z: 0, r: 3, r2: .4, h: 70 }],            // Skytree
-  [{ t: 'cyl', x: 0, y: 0, z: 0, r: 6, r2: 6, h: 100 }, { t: 'sphere', x: 0, y: 105, z: 0, r: 22 }, { t: 'cyl', x: 0, y: 125, z: 0, r: 4, r2: 4, h: 60 }, { t: 'sphere', x: 0, y: 190, z: 0, r: 13 }, { t: 'cyl', x: 0, y: 200, z: 0, r: 2, r2: .3, h: 40 }],   // Oriental Pearl
-  [{ t: 'box', x: 0, y: 0, z: 0, w: 52, d: 52, h: 80 }, { t: 'box', x: 0, y: 80, z: 0, w: 44, d: 44, h: 50 }, { t: 'box', x: 0, y: 130, z: 0, w: 32, d: 32, h: 55, w2: 26, d2: 26 }, { t: 'box', x: 0, y: 185, z: 0, w: 16, d: 16, h: 24, w2: 8, d2: 8 }, { t: 'cyl', x: 0, y: 209, z: 0, r: 1.2, r2: .3, h: 36 }],  // Empire State
-  [...[0, 1, 2, 3, 4, 5, 6, 7].map(i => ({ t: 'box', x: 0, y: i * 21, z: 0, w: 22 - (i % 2) * 1, d: 22, h: 18, w2: 28, d2: 28 })), { t: 'box', x: 0, y: 168, z: 0, w: 22, d: 22, h: 22 }, { t: 'cyl', x: 0, y: 190, z: 0, r: 2, r2: .4, h: 40 }],  // Taipei 101
-  [{ t: 'cyl', x: 0, y: 0, z: 0, r: 20, r2: 24, h: 70 }, { t: 'cyl', x: 0, y: 70, z: 0, r: 24, r2: 20, h: 40 }, { t: 'cyl', x: 0, y: 110, z: 0, r: 20, r2: 12, h: 40 }, { t: 'cyl', x: 0, y: 150, z: 0, r: 12, r2: 3, h: 20 }],  // Gherkin
-  [{ t: 'cyl', x: 0, y: 0, z: 0, r: 46, r2: 46, h: 26 }, { t: 'sphere', x: 0, y: 26, z: 0, r: 46, half: true }, ...[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([a, b]) => ({ t: 'cyl', x: a * 70, y: 0, z: b * 28, r: 9, r2: 9, h: 46 })), { t: 'box', x: 0, y: 0, z: 0, w: 130, d: 60, h: 14 }],  // St Peter's-like dome
-  [0, 1, 2, 3, 4].flatMap(i => [{ t: 'box', x: 0, y: i * 20, z: 0, w: 56 - i * 9, d: 56 - i * 9, h: 12 }, { t: 'box', x: 0, y: i * 20 + 12, z: 0, w: 66 - i * 9, d: 66 - i * 9, h: 4, w2: 58 - i * 9, d2: 58 - i * 9 }]).concat([{ t: 'cyl', x: 0, y: 100, z: 0, r: 1.6, r2: .3, h: 34 }]),       // Pagoda
-  [...stack([[16, 16, 60], [13, 13, 22]], 0, 0), { t: 'sphere', x: 0, y: 82, z: 0, r: 15 }, ...[[-26, 0], [26, 0], [0, -26], [0, 26]].flatMap(([a, b]) => [{ t: 'cyl', x: a, y: 0, z: b, r: 8, r2: 6, h: 40 }, { t: 'sphere', x: a, y: 40, z: b, r: 8 }]), { t: 'cyl', x: 0, y: 95, z: 0, r: .8, r2: .2, h: 16 }],        // St Basil's
-  [{ t: 'box', x: 0, y: 0, z: 0, w: 30, d: 30, h: 50, w2: 22, d2: 22 }, { t: 'box', x: 0, y: 50, z: 0, w: 22, d: 22, h: 60, w2: 14, d2: 14 }, { t: 'box', x: 0, y: 110, z: 0, w: 14, d: 14, h: 60, w2: 6, d2: 6 }, { t: 'cyl', x: 0, y: 170, z: 0, r: 2, r2: .3, h: 30 }],                 // Lotte World Tower
-  [{ t: 'cyl', x: 0, y: 0, z: 0, r: 4, r2: 4, h: 70 }, { t: 'path', pts: [[-4, 0, 0], [-34, 30, 0], [-26, 70, 0], [-4, 90, 0]], r: 2.2 }, { t: 'path', pts: [[-4, 0, 0], [16, 30, 0], [24, 70, 0], [4, 92, 0]], r: 2.2 }, { t: 'sphere', x: 0, y: 84, z: 0, r: 10, half: true }],  // sail tower
-  [{ t: 'box', x: 0, y: 0, z: 0, w: 120, d: 70, h: 8 }, { t: 'box', x: 0, y: 8, z: 0, w: 80, d: 44, h: 8 }, ...[[-1, -1], [1, -1], [-1, 1], [1, 1], [0, 0]].map(([a, b]) => ({ t: 'cyl', x: a * 30, y: 16, z: b * 14, r: 8, r2: 2, h: 50 }))],            // Angkor
-  [{ t: 'cyl', x: 0, y: 0, z: 0, r: 9, r2: 9, h: 90 }, ...[0, 1, 2, 3].map(i => ({ t: 'cyl', x: 0, y: 90 + i * 12, z: 0, r: 12 - i * 2.5, r2: 12 - i * 2.5, h: 4 })), { t: 'cyl', x: 0, y: 140, z: 0, r: 1, r2: .2, h: 36 }]       // pole tower
-];
-const BG_MODELS = PRESETS.map(p => buildCloud(p.parts, 1400)).concat(BG_EXTRA.map(p => buildCloud(p, 1400)));
-
-
-
-/* здания парят на фоне главной: сами по себе, трогать их нельзя; крупные ближе и ярче, мелкие дальше и бледнее */
-const SPOTS = (() => {
-  const r = mulberry(21), out = [], N = 22;
-  for (let i = 0; i < N; i++) {
-    const fx = (i * .6180339 + .08) % 1, band = i % 3;            // золотое сечение распределяет здания ровно, без кучек
-    const s = [.36, .25, .16][band] * (.8 + r() * .5);
-    out.push({ m: (i * 5) % BG_MODELS.length, x: .04 + fx * .94, y: .1 + ((i * .37 + r() * .3) % 1) * .84, s, sp: .7 + r() * .8, ph: r() * 6.28, ys: (r() < .5 ? -1 : 1) * (.0002 + r() * .0002), a: [.9, .65, .45][band] });
-  }
-  return out.sort((p, q) => p.s - q.s);
-})();
-class Floaters {
-  constructor(canvas) { this.c = canvas; this.g = canvas.getContext('2d'); this.raf = 0; this.t0 = 0; this.tx = 0; this.ty = 0; this.px = 0; this.py = 0; }
-  start() {
-    if (this.raf) return;
-    this.t0 = performance.now();
-    const loop = t => { this.draw(t); this.raf = requestAnimationFrame(loop); };
-    this.raf = requestAnimationFrame(loop);
-  }
-  stop() { cancelAnimationFrame(this.raf); this.raf = 0; }
-  draw(t) {
-    const [W, H, dpr] = fit(this.c);
-    if (!W || !H) return;
-    const g = this.g; g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
-    this.px += (this.tx - this.px) * .05; this.py += (this.ty - this.py) * .05;
-    const narrow = W < 900, k = Math.min(W * (narrow ? 1.1 : .8), H * 1.25);
-    SPOTS.forEach((sp, i) => {
-      const prog = REDUCED ? 1 : Math.min(1, (t - this.t0 - i * 120) / 2400);
-      if (prog <= 0) return;
-      const b = sp.s * k;
-      const bob = REDUCED ? 0 : Math.sin(t * .0008 * sp.sp + sp.ph) * (8 + sp.s * 16);
-      const drift = REDUCED ? 0 : Math.cos(t * .0005 * sp.sp + sp.ph) * 10;
-      const x = sp.x * W + drift + this.px * sp.s * 40, y = sp.y * H + bob + this.py * sp.s * 26;
-      const left = !narrow && sp.x < .5 ? .5 : 1;                 // слева текст: там здания бледнее, чтобы не мешали читать
-      g.save();
-      g.globalAlpha = Math.min(1, sp.a * left * Math.min(1, prog * 3));
-      g.translate(x - b / 2, y - b / 2);
-      renderCloud(g, b, b, BG_MODELS[sp.m], { yaw: t * sp.ys + sp.ph, pitch: .16 + Math.sin(t * .0006 + sp.ph) * .05, zoom: 1, prog, small: true });
-      g.restore();
-    });
-  }
-}
-const floaters = new Floaters($('globeBg'));
-window.addEventListener('mousemove', e => { floaters.tx = e.clientX / innerWidth - .5; floaters.ty = e.clientY / innerHeight - .5; });
-
-/* ============ АТЛАС: все найденные здания на глобусе ============ */
-const atlasGlobe = new Globe($('atlasCanvas'), (W, H) => [W / 2, H / 2, Math.min(W * .5, H * .46)], { rot: 0, tilt: .3 });
-const FKEY = 'towerFound';
-const getFound = () => { try { const a = JSON.parse(localStorage.getItem(FKEY) || '[]'); return Array.isArray(a) ? a : []; } catch { return []; } };
-function addFound(it) {
-  if (!it || !it.wiki || it.lat == null || it.lon == null) return;
-  const a = getFound();
-  if (a.some(x => x.wiki === it.wiki)) return;
-  a.push(it);
-  try { localStorage.setItem(FKEY, JSON.stringify(a.slice(-200))); } catch {}
-  updateAtlasCount();
-}
-function updateAtlasCount() { const n = getFound().length; $('atlasCount').textContent = n ? '(' + n + ')' : ''; }
-function renderAtlas() {
-  const a = getFound();
-  atlasGlobe.pins = a;
-  $('atlasChips').innerHTML = a.map((x, i) => `<button type="button" data-i="${i}">${esc(x.name)}</button>`).join('');
-  $('atlasEmpty').textContent = a.length ? '' : T[lang].atlasEmpty;
-  $('atlasChips').onclick = e => {
-    const b = e.target.closest('button'); if (!b) return;
-    const x = a[+b.dataset.i];
-    openDetail({ name: x.name, wiki: x.wiki, city: x.city, country: x.country }, 'atlas');
-  };
-}
-
 /* ============ СТАРТ ============ */
 applyLang();
-show('home');
-window.__tower = { buildCloud, viewer, miniGlobe, floaters, openDetail, show, state };   // для тестов
+renderMode(); show('draw');
+window.__tower = { buildCloud, viewer, miniGlobe, openDetail, show, state, strokes };   // для тестов
 </script>
 </body>
 </html>
